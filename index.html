@@ -1,582 +1,969 @@
 <!DOCTYPE html>
 <html lang="ja">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>財務分析アシスタント | Financial Analysis Assistant</title>
-    <style>
-        * {
-            margin: 0;
-            padding: 0;
-            box-sizing: border-box;
-        }
+  <meta charset="UTF-8" />
+  <title>寿司盛り付け評価AIシステム 改修提案書</title>
+  <style>
+    body {
+      font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      line-height: 1.6;
+      color: #222;
+      max-width: 960px;
+      margin: 0 auto;
+      padding: 24px 16px 80px;
+      background: #f7f7f7;
+    }
+    h1, h2, h3, h4 {
+      color: #222;
+      margin-top: 1.4em;
+      margin-bottom: 0.5em;
+    }
+    h1 {
+      font-size: 1.9rem;
+      text-align: center;
+      margin-bottom: 1rem;
+    }
+    h2 { font-size: 1.4rem; border-bottom: 1px solid #ddd; padding-bottom: 4px; }
+    h3 { font-size: 1.15rem; }
+    h4 { font-size: 1rem; }
+    p { margin: 0.4em 0; }
+    ul, ol { margin: 0.4em 0 0.4em 1.8em; }
+    code { background: #eee; padding: 0 2px; border-radius: 3px; }
 
-        body {
-            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
-            min-height: 100vh;
-            padding: 20px;
-            color: #333;
-        }
+    .toc-wrapper {
+      background: #fff;
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin: 16px 0 32px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
+    .toc-title {
+      font-weight: 600;
+      margin-bottom: 0.4em;
+    }
+    .toc-list {
+      list-style: none;
+      margin: 0;
+      padding-left: 0;
+      font-size: 0.95rem;
+    }
+    .toc-list li {
+      margin: 2px 0;
+    }
+    .toc-level-1 > a {
+      font-weight: 600;
+      text-decoration: none;
+      color: #333;
+    }
+    .toc-level-2 {
+      margin-left: 1.2em;
+    }
+    .toc-level-3 {
+      margin-left: 2.4em;
+      font-size: 0.92em;
+    }
+    .toc-list a:hover {
+      text-decoration: underline;
+    }
 
-        .container {
-            max-width: 1200px;
-            margin: 0 auto;
-            background: white;
-            border-radius: 20px;
-            box-shadow: 0 20px 40px rgba(0,0,0,0.1);
-            overflow: hidden;
-        }
+    .back-to-top {
+      display: inline-block;
+      margin-top: 16px;
+      font-size: 0.9rem;
+      text-decoration: none;
+      color: #0070c9;
+    }
+    .back-to-top::after {
+      content: " ▲";
+      font-size: 0.8rem;
+    }
 
-        /* Header */
-        .header {
-            background: linear-gradient(45deg, #4299e1, #3182ce);
-            color: white;
-            padding: 30px;
-            text-align: center;
-            position: relative;
-        }
+    .section-box {
+      background: #fff;
+      border-radius: 8px;
+      padding: 16px 20px;
+      margin-bottom: 20px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.06);
+    }
 
-        .header::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            right: 0;
-            bottom: 0;
-            background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="20" cy="20" r="2" fill="rgba(255,255,255,0.1)"/><circle cx="80" cy="40" r="3" fill="rgba(255,255,255,0.1)"/><circle cx="40" cy="80" r="1" fill="rgba(255,255,255,0.1)"/></svg>');
-            pointer-events: none;
-        }
+    .figure-block {
+      margin: 16px 0;
+      text-align: center;
+    }
+    .figure-block img {
+      max-width: 100%;
+      height: auto;
+      border-radius: 4px;
+      box-shadow: 0 1px 3px rgba(0,0,0,0.12);
+    }
+    .figure-caption {
+      font-size: 0.9rem;
+      color: #555;
+      margin-top: 6px;
+    }
 
-        .header h1 {
-            font-size: 2.5rem;
-            margin-bottom: 10px;
-            font-weight: 700;
-            position: relative;
-        }
+    .highlight {
+      background: #fff7d6;
+      padding: 4px 6px;
+      border-radius: 4px;
+    }
 
-        .header p {
-            font-size: 1.1rem;
-            opacity: 0.9;
-            position: relative;
-        }
-
-        /* Main Content */
-        .main-content {
-            padding: 40px;
-        }
-
-        .section {
-            margin-bottom: 40px;
-        }
-
-        .section-title {
-            font-size: 1.8rem;
-            color: #2d3748;
-            margin-bottom: 20px;
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-
-        .section-title::before {
-            content: '';
-            width: 4px;
-            height: 30px;
-            background: linear-gradient(to bottom, #4299e1, #3182ce);
-            border-radius: 2px;
-        }
-
-        /* Connection Status */
-        .connection-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-            gap: 20px;
-            margin-bottom: 30px;
-        }
-
-        .connection-card {
-            background: #f7fafc;
-            border-left: 4px solid;
-            padding: 20px;
-            border-radius: 12px;
-            transition: all 0.3s ease;
-        }
-
-        .connection-card:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
-        }
-
-        .connection-card.connected {
-            border-left-color: #48bb78;
-            background: #f0fff4;
-        }
-
-        .connection-card.not-connected {
-            border-left-color: #f56565;
-            background: #fffafa;
-        }
-
-        .connection-card.pending {
-            border-left-color: #ed8936;
-            background: #fffbf0;
-        }
-
-        .status-indicator {
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-            font-weight: 600;
-            margin-bottom: 10px;
-        }
-
-        .status-dot {
-            width: 10px;
-            height: 10px;
-            border-radius: 50%;
-        }
-
-        .connected .status-dot { background: #48bb78; }
-        .not-connected .status-dot { background: #f56565; }
-        .pending .status-dot { background: #ed8936; }
-
-        /* Input Section */
-        .input-section {
-            background: #f8f9fa;
-            padding: 30px;
-            border-radius: 15px;
-            margin-bottom: 30px;
-        }
-
-        .file-upload {
-            border: 2px dashed #4299e1;
-            border-radius: 12px;
-            padding: 40px;
-            text-align: center;
-            background: white;
-            margin-bottom: 20px;
-            transition: all 0.3s ease;
-        }
-
-        .file-upload:hover {
-            border-color: #3182ce;
-            background: #f7fafc;
-        }
-
-        .upload-icon {
-            font-size: 3rem;
-            color: #4299e1;
-            margin-bottom: 15px;
-        }
-
-        /* Buttons */
-        .btn {
-            padding: 12px 24px;
-            border: none;
-            border-radius: 8px;
-            font-size: 1rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.3s ease;
-            display: inline-flex;
-            align-items: center;
-            gap: 8px;
-        }
-
-        .btn-primary {
-            background: linear-gradient(45deg, #4299e1, #3182ce);
-            color: white;
-        }
-
-        .btn-primary:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 8px 25px rgba(66, 153, 225, 0.3);
-        }
-
-        .btn-secondary {
-            background: #e2e8f0;
-            color: #4a5568;
-        }
-
-        .btn-secondary:hover {
-            background: #cbd5e0;
-        }
-
-        .btn-success {
-            background: linear-gradient(45deg, #48bb78, #38a169);
-            color: white;
-        }
-
-        /* Analysis Results */
-        .analysis-grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
-            gap: 25px;
-        }
-
-        .analysis-card {
-            background: white;
-            border-radius: 15px;
-            padding: 25px;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            border: 1px solid #e2e8f0;
-        }
-
-        .analysis-card h3 {
-            color: #2d3748;
-            margin-bottom: 15px;
-            font-size: 1.3rem;
-        }
-
-        .metric {
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 10px 0;
-            border-bottom: 1px solid #f1f5f9;
-        }
-
-        .metric:last-child {
-            border-bottom: none;
-        }
-
-        .metric-value {
-            font-weight: 600;
-            color: #4299e1;
-        }
-
-        /* Chat Interface */
-        .chat-interface {
-            background: white;
-            border-radius: 15px;
-            padding: 20px;
-            margin-top: 30px;
-            border: 1px solid #e2e8f0;
-        }
-
-        .chat-messages {
-            height: 300px;
-            overflow-y: auto;
-            border: 1px solid #e2e8f0;
-            border-radius: 10px;
-            padding: 15px;
-            margin-bottom: 15px;
-            background: #f8f9fa;
-        }
-
-        .message {
-            margin-bottom: 15px;
-            padding: 10px 15px;
-            border-radius: 10px;
-            max-width: 80%;
-        }
-
-        .message.user {
-            background: #4299e1;
-            color: white;
-            margin-left: auto;
-        }
-
-        .message.assistant {
-            background: white;
-            border: 1px solid #e2e8f0;
-        }
-
-        .chat-input {
-            display: flex;
-            gap: 10px;
-        }
-
-        .chat-input input {
-            flex: 1;
-            padding: 12px;
-            border: 1px solid #e2e8f0;
-            border-radius: 8px;
-            font-size: 1rem;
-        }
-
-        /* Responsive Design */
-        @media (max-width: 768px) {
-            .header h1 {
-                font-size: 2rem;
-            }
-            
-            .main-content {
-                padding: 20px;
-            }
-            
-            .connection-grid,
-            .analysis-grid {
-                grid-template-columns: 1fr;
-            }
-            
-            .file-upload {
-                padding: 20px;
-            }
-            
-            .upload-icon {
-                font-size: 2rem;
-            }
-        }
-
-        @media (max-width: 480px) {
-            body {
-                padding: 10px;
-            }
-            
-            .header {
-                padding: 20px;
-            }
-            
-            .header h1 {
-                font-size: 1.8rem;
-            }
-        }
-
-        /* Loading Animation */
-        .loading {
-            display: inline-block;
-            width: 20px;
-            height: 20px;
-            border: 3px solid #f3f3f3;
-            border-top: 3px solid #4299e1;
-            border-radius: 50%;
-            animation: spin 1s linear infinite;
-        }
-
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-    </style>
+    .cost-table {
+      width: 100%;
+      border-collapse: collapse;
+      font-size: 0.95rem;
+      margin: 8px 0;
+      background: #fff;
+    }
+    .cost-table th,
+    .cost-table td {
+      border: 1px solid #ddd;
+      padding: 6px 8px;
+      text-align: left;
+    }
+    .cost-table th {
+      background: #f0f0f0;
+      font-weight: 600;
+    }
+    .cost-table tfoot td {
+      font-weight: 600;
+      background: #fafafa;
+    }
+  </style>
 </head>
 <body>
-    <div class="container">
-        <!-- Header -->
-        <div class="header">
-            <h1>💼 財務分析アシスタント</h1>
-            <p>経営戦略のための AI 財務分析プラットフォーム</p>
-        </div>
+<a id="top"></a>
 
-        <!-- Main Content -->
-        <div class="main-content">
-            <!-- Connection Status Section -->
-            <div class="section">
-                <h2 class="section-title">🔗 会計ソフト連携状況</h2>
-                <div class="connection-grid">
-                    <div class="connection-card connected">
-                        <div class="status-indicator">
-                            <span class="status-dot"></span>
-                            freee 会計
-                        </div>
-                        <p>✅ 正常に接続されています</p>
-                        <p><small>最終同期: 2024年12月15日 14:30</small></p>
-                    </div>
-                    
-                    <div class="connection-card not-connected">
-                        <div class="status-indicator">
-                            <span class="status-dot"></span>
-                            マネーフォワード
-                        </div>
-                        <p>❌ 未接続</p>
-                        <button class="btn btn-primary" style="margin-top: 10px;">
-                            🔑 OAuth認証で接続
-                        </button>
-                    </div>
+<h1>寿司盛り付け評価AIシステム 改修提案書</h1>
 
-                    <div class="connection-card pending">
-                        <div class="status-indicator">
-                            <span class="status-dot"></span>
-                            弥生会計オンライン
-                        </div>
-                        <p>⏳ 認証処理中...</p>
-                        <div class="loading" style="margin-top: 10px;"></div>
-                    </div>
-                </div>
-            </div>
+<div class="toc-wrapper">
+  <div class="toc-title">目次</div>
+  <ul class="toc-list">
+    <li class="toc-level-1"><a href="#sec-1">1. 背景と全体目標</a></li>
+    <li class="toc-level-1"><a href="#sec-2">2. 新アーキテクチャ選定の理由</a></li>
+    <li class="toc-level-1"><a href="#sec-3">3. 全体アーキテクチャと桶テンプレート</a></li>
+    <li class="toc-level-2"><a href="#sec-3-1">3.1 Mask R-CNN を用いた論理アーキテクチャ</a></li>
+    <li class="toc-level-2"><a href="#sec-3-2">3.2 「桶テンプレート（Box Template）」の定義</a></li>
+    <li class="toc-level-2"><a href="#sec-3-3">3.3 画像評価フロー</a></li>
+    <li class="toc-level-1"><a href="#sec-4">4. フェーズ1 – 新しい桶・寿司への対応AIコア</a></li>
+    <li class="toc-level-2"><a href="#sec-4-1">4.1 フェーズ1の目標</a></li>
+    <li class="toc-level-2"><a href="#sec-4-2">4.2 技術アプローチ（Mask R-CNN + テンプレート）</a></li>
+    <li class="toc-level-2"><a href="#sec-4-3">4.3 フェーズ1の開発範囲</a></li>
+    <li class="toc-level-2"><a href="#sec-4-4">4.4 使用技術</a></li>
+    <li class="toc-level-2"><a href="#sec-4-5">4.5 フェーズ1終了後に対応可能な桶種</a></li>
+    <li class="toc-level-2"><a href="#sec-4-6">4.6 新しい桶・ネタを追加しても評価精度を維持するための条件</a></li>
+    <li class="toc-level-2"><a href="#sec-4-7">4.7 アーキテクチャと継続学習フロー概要</a></li>
+    <li class="toc-level-2"><a href="#sec-4-8">4.8 フェーズ1で御社にご準備いただきたい事項</a></li>
+    <li class="toc-level-2"><a href="#sec-4-9">4.9 フェーズ1 工数見積り</a></li>
+    <li class="toc-level-1"><a href="#sec-5">5. フェーズ2 – パフォーマンス改善（1〜2秒）</a></li>
+    <li class="toc-level-2"><a href="#sec-5-1">5.1 フェーズ2の目標</a></li>
+    <li class="toc-level-2"><a href="#sec-5-2">5.2 最適化内容の詳細</a></li>
+    <li class="toc-level-1"><a href="#sec-6">6. フェーズ3 – KD連携 &amp; 継続学習（Continuous Learning）</a></li>
+    <li class="toc-level-2"><a href="#sec-6-1">6.1 フェーズ3の目標</a></li>
+    <li class="toc-level-2"><a href="#sec-6-2">6.2 KD連携（KDシステムとの連携）</a></li>
+    <li class="toc-level-2"><a href="#sec-6-3">6.3 継続学習（Continuous Learning）</a></li>
+    <li class="toc-level-1"><a href="#sec-7">7. 開発費用 &amp; アノテーション費用</a></li>
+    <li class="toc-level-1"><a href="#sec-8">8. サーバインフラ費用（開発環境・本番環境）</a></li>
+    <li class="toc-level-1"><a href="#sec-9">9. 実行ロードマップ</a></li>
+  </ul>
+</div>
 
-            <!-- File Upload Section -->
-            <div class="section">
-                <h2 class="section-title">📊 手動データアップロード</h2>
-                <div class="input-section">
-                    <div class="file-upload">
-                        <div class="upload-icon">📁</div>
-                        <h3>試算表・財務データをアップロード</h3>
-                        <p>Excel (.xlsx), CSV (.csv) ファイルに対応</p>
-                        <button class="btn btn-primary" style="margin-top: 15px;">
-                            📤 ファイルを選択
-                        </button>
-                    </div>
-                    <div style="display: flex; gap: 10px; flex-wrap: wrap;">
-                        <button class="btn btn-secondary">📋 試算表テンプレート</button>
-                        <button class="btn btn-secondary">💹 損益計算書テンプレート</button>
-                        <button class="btn btn-secondary">🏦 貸借対照表テンプレート</button>
-                    </div>
-                </div>
-            </div>
+<div class="section-box" id="sec-1">
+  <h2>1. 背景と全体目標</h2>
+  <p>現行システムでは TensorFlow と旧来アーキテクチャを用い、寿司の種類（クラス）ごとに認識を行い得点付けをしています。このアプローチには以下の課題があります。</p>
+  <ul>
+    <li>特定の寿司ネタ（クラス）に強く依存しており、新しいネタを追加するたびに複雑な再学習が必要になる。</li>
+    <li>新しい桶（丸型・角型・人数違いなど）への拡張が難しい。</li>
+    <li>詳細なアノテーションが必要で、運用コストが高くなりがち。</li>
+  </ul>
+  <p>本提案書の主な目的は以下の通りです。</p>
+  <ul>
+    <li><span class="highlight">AIコアの設計を刷新</span>し、個々の寿司ネタ識別への依存を減らし、レイアウト・個数・間隔・整列・バランスといった観点で評価できるようにする。</li>
+    <li><span class="highlight">新しい桶・新しいネタ</span>を追加しても、評価精度が落ちない仕組みを整える。</li>
+    <li>将来的に以下を実現できる基盤を準備する。
+      <ul>
+        <li>パフォーマンス改善（1〜2秒/枚のレスポンス）。</li>
+        <li>KDシステムとの連携（KD連携）。</li>
+        <li>段階的な継続学習（Continuous Learning）の構築。</li>
+      </ul>
+    </li>
+  </ul>
+  <a href="#top" class="back-to-top">ページ上部へ戻る</a>
+</div>
 
-            <!-- Analysis Results Section -->
-            <div class="section">
-                <h2 class="section-title">📈 財務分析結果</h2>
-                <div class="analysis-grid">
-                    <div class="analysis-card">
-                        <h3>💰 収益性分析</h3>
-                        <div class="metric">
-                            <span>売上総利益率</span>
-                            <span class="metric-value">65.2%</span>
-                        </div>
-                        <div class="metric">
-                            <span>営業利益率</span>
-                            <span class="metric-value">18.7%</span>
-                        </div>
-                        <div class="metric">
-                            <span>ROE</span>
-                            <span class="metric-value">12.4%</span>
-                        </div>
-                        <div class="metric">
-                            <span>ROA</span>
-                            <span class="metric-value">8.9%</span>
-                        </div>
-                    </div>
+<div class="section-box" id="sec-2">
+  <h2>2. 新アーキテクチャ選定の理由</h2>
+  <p>検討の過程で、以下のような選択肢を比較しました。</p>
+  <ul>
+    <li>YOLO（Object Detection）  
+      非常に高速ですが、出力は<strong>矩形（Bounding Box）のみ</strong>であり、輪郭（Contour）の情報はありません。寿司が密に並んでいる本件のようなケースでは、YOLO + 後処理のみで現行ルールレベルの精度を実現するのは難しいと判断しました。</li>
+    <li>AWS Rekognition / Rekognition Custom Labels  
+      POC には便利ですが、以下の制約があります。
+      <ul>
+        <li>ロジックのきめ細かなカスタマイズが難しい。</li>
+        <li>モデルをモバイル／エッジ側へ出力する柔軟性が低い。</li>
+        <li>大規模な運用時のコストが高くなりやすい。</li>
+      </ul>
+    </li>
+  </ul>
+  <p>検証・試行の結果、以下のように結論づけました。</p>
+  <ul>
+    <li><strong>YOLO</strong>  
+      精度を犠牲にして速度を優先する場合には有効ですが、本案件では<strong>レイアウトや輪郭の精度</strong>が重要であり、リアルタイム性はそこまで強く要求されていないため、不向きと判断しました。</li>
+    <li><strong>現行のクラウドサービス</strong>（Rekognition など）  
+      本案件の細かい得点ルールをすべて実装するには柔軟性が足りません。</li>
+    <li><strong>Mask R-CNN + PyTorch</strong>  
+      以下の点から最適な選択肢だと考えています。
+      <ul>
+        <li>各寿司の輪郭（インスタンスセグメンテーション）を取得でき、レイアウト評価との相性が良い。</li>
+        <li>形状・面積・相対位置に基づいた詳細なルールエンジンを構築可能。</li>
+        <li>フェーズ2でのパフォーマンス最適化も十分に見込める。</li>
+      </ul>
+    </li>
+  </ul>
+  <p>以上から、AIコア部分は <strong>Mask R-CNN + PyTorch</strong> を採用し、桶テンプレートと組み合わせて得点処理を行うアーキテクチャを提案します。</p>
+  <a href="#top" class="back-to-top">ページ上部へ戻る</a>
+</div>
 
-                    <div class="analysis-card">
-                        <h3>🏦 安全性分析</h3>
-                        <div class="metric">
-                            <span>流動比率</span>
-                            <span class="metric-value">156.8%</span>
-                        </div>
-                        <div class="metric">
-                            <span>当座比率</span>
-                            <span class="metric-value">98.3%</span>
-                        </div>
-                        <div class="metric">
-                            <span>自己資本比率</span>
-                            <span class="metric-value">72.1%</span>
-                        </div>
-                        <div class="metric">
-                            <span>負債比率</span>
-                            <span class="metric-value">27.9%</span>
-                        </div>
-                    </div>
+<div class="section-box" id="sec-3">
+  <h2>3. 全体アーキテクチャと桶テンプレート</h2>
 
-                    <div class="analysis-card">
-                        <h3>⚡ 効率性分析</h3>
-                        <div class="metric">
-                            <span>総資産回転率</span>
-                            <span class="metric-value">0.72回</span>
-                        </div>
-                        <div class="metric">
-                            <span>売上債権回転率</span>
-                            <span class="metric-value">8.4回</span>
-                        </div>
-                        <div class="metric">
-                            <span>在庫回転率</span>
-                            <span class="metric-value">12.1回</span>
-                        </div>
-                        <div class="metric">
-                            <span>固定資産回転率</span>
-                            <span class="metric-value">2.3回</span>
-                        </div>
-                    </div>
-                </div>
+  <div id="sec-3-1">
+    <h3>3.1 Mask R-CNN を用いた論理アーキテクチャ</h3>
+    <p>新アーキテクチャにおける基本フローは以下の通りです。</p>
+    <ul>
+      <li>スマートフォンアプリから寿司桶の写真を撮影し、AIサーバへアップロード。</li>
+      <li>AIサーバ側で Mask R-CNN（PyTorch）を用いて以下を実施。
+        <ul>
+          <li>寿司、ガリ、軍艦巻き、巻き物など、各ピースごとにセグメンテーション（輪郭抽出）。</li>
+          <li>桶（丸型／角型）の輪郭・形状の認識。</li>
+        </ul>
+      </li>
+      <li>Rule Engine が<strong>桶テンプレート</strong>と評価ルール群を適用し、総合スコアを算出。</li>
+      <li>クライアント（モバイル／他システム）に JSON 形式で結果を返却。</li>
+    </ul>
 
-                <div style="margin-top: 20px; text-align: center;">
-                    <button class="btn btn-success">📄 詳細レポートをPDF出力</button>
-                    <button class="btn btn-success" style="margin-left: 10px;">📊 Excelでエクスポート</button>
-                </div>
-            </div>
-
-            <!-- AI Assistant Chat -->
-            <div class="section">
-                <h2 class="section-title">🤖 AI財務アドバイザー</h2>
-                <div class="chat-interface">
-                    <div class="chat-messages">
-                        <div class="message assistant">
-                            <strong>AI財務アドバイザー:</strong><br>
-                            こんにちは！財務分析が完了しました。御社の財務状況は全体的に健全ですが、いくつか改善点があります。<br><br>
-                            <strong>主なポイント:</strong><br>
-                            ✅ 自己資本比率72.1%で財務基盤は非常に安定<br>
-                            ⚠️ 在庫回転率がやや低め - 在庫管理の見直しを推奨<br>
-                            💡 ROE向上のため、適度なレバレッジ活用を検討
-                        </div>
-                        <div class="message user">
-                            在庫管理について具体的なアドバイスをお願いします
-                        </div>
-                        <div class="message assistant">
-                            <strong>AI財務アドバイザー:</strong><br>
-                            在庫管理改善のための具体的施策をご提案します：<br><br>
-                            <strong>1. ABC分析の導入</strong><br>
-                            • 売上貢献度の高い商品を重点管理<br>
-                            • デッドストック候補の早期特定<br><br>
-                            <strong>2. 発注サイクルの最適化</strong><br>
-                            • 需要予測精度の向上<br>
-                            • 適正在庫水準の設定（3-4週間分を目安）
-                        </div>
-                    </div>
-                    <div class="chat-input">
-                        <input type="text" placeholder="財務に関する質問を入力してください..." />
-                        <button class="btn btn-primary">🎤 音声入力</button>
-                        <button class="btn btn-primary">送信</button>
-                    </div>
-                </div>
-            </div>
-
-            <!-- SWOT Analysis Section -->
-            <div class="section">
-                <h2 class="section-title">🎯 SWOT分析 & 戦略提案</h2>
-                <div class="analysis-grid">
-                    <div class="analysis-card" style="border-left: 4px solid #48bb78;">
-                        <h3>💪 強み (Strengths)</h3>
-                        <ul style="margin-left: 20px; color: #4a5568;">
-                            <li>高い自己資本比率（72.1%）</li>
-                            <li>安定した売上総利益率</li>
-                            <li>優良な流動性</li>
-                            <li>低い負債依存度</li>
-                        </ul>
-                    </div>
-
-                    <div class="analysis-card" style="border-left: 4px solid #f56565;">
-                        <h3>⚠️ 弱み (Weaknesses)</h3>
-                        <ul style="margin-left: 20px; color: #4a5568;">
-                            <li>在庫回転率の低さ</li>
-                            <li>ROEの伸び悩み</li>
-                            <li>資本効率の改善余地</li>
-                            <li>設備投資の遅れ</li>
-                        </ul>
-                    </div>
-
-                    <div class="analysis-card" style="border-left: 4px solid #4299e1;">
-                        <h3>🌟 機会 (Opportunities)</h3>
-                        <ul style="margin-left: 20px; color: #4a5568;">
-                            <li>デジタル変革による効率化</li>
-                            <li>新市場への参入可能性</li>
-                            <li>低金利環境の活用</li>
-                            <li>M&A機会の探索</li>
-                        </ul>
-                    </div>
-
-                    <div class="analysis-card" style="border-left: 4px solid #ed8936;">
-                        <h3>⚡ 脅威 (Threats)</h3>
-                        <ul style="margin-left: 20px; color: #4a5568;">
-                            <li>競合他社の台頭</li>
-                            <li>原材料価格の上昇</li>
-                            <li>人材不足の深刻化</li>
-                            <li>規制環境の変化</li>
-                        </ul>
-                    </div>
-                </div>
-
-                <div style="margin-top: 25px; padding: 20px; background: #f0fff4; border-radius: 10px; border-left: 4px solid #48bb78;">
-                    <h3 style="color: #22543d; margin-bottom: 15px;">🚀 戦略提案</h3>
-                    <p style="color: #2f855a; line-height: 1.6;">
-                        <strong>短期施策（3-6ヶ月）:</strong> 在庫管理システムの導入、ABC分析の実施、デッドストックの処分<br>
-                        <strong>中期施策（6-12ヶ月）:</strong> DX推進による業務効率化、新規事業領域の検討<br>
-                        <strong>長期施策（1-3年）:</strong> 戦略的M&Aの検討、海外展開の準備、サステナビリティ経営の推進
-                    </p>
-                </div>
-            </div>
-        </div>
+    <!-- HÌNH DUY NHẤT: Sơ đồ luồng Mask R-CNN + Rule Engine -->
+    <div class="figure-block">
+      <img src="Sushi/mask_rcnn_flow.png" alt="画像 → Mask R-CNN による輪郭抽出 → Rule Engine による幾何計算とスコアリングのフロー図" />
+      <div class="figure-caption">
+        Mask R-CNN によって各寿司ピースの輪郭を高精度に取得し、Rule Engine 側で
+        重心・主軸・距離・平行性などの幾何情報を算出することで、詳細な盛り付け評価を可能にします。
+      </div>
     </div>
+  </div>
+
+  <div id="sec-3-2">
+    <h3>3.2 「桶テンプレート（Box Template）」の定義</h3>
+    <p><strong>桶テンプレート（Box Template）</strong> は、桶ごとのマスタ設定です。  
+    評価ロジックをコード側にハードコーディングするのではなく、次のように役割分担します。</p>
+    <ul>
+      <li><strong>AIモデル</strong>：  
+        「見る」部分を担当し、各寿司ピースの位置・輪郭・形状を認識します。</li>
+      <li><strong>桶テンプレート + ルールエンジン</strong>：  
+        「評価する」部分を担当し、桶ごとの理想レイアウトと比較しながら採点します。</li>
+    </ul>
+    <p>各桶ごとのテンプレートには、主に以下の情報を保持します。</p>
+    <ul>
+      <li>ゾーン数／行数／列数などの構造。</li>
+      <li>各ゾーンに期待される寿司の個数。</li>
+      <li>レイアウトパターン（例：3行×10貫、上下2段構成など）。</li>
+      <li>各行・ゾーンの桶の中心からの相対位置（上下バランスや整列評価に利用）。</li>
+      <li>最低限、寿司の<strong>種類</strong>を細かく識別しなくても、個数とレイアウトが正しければ評価できる構成。</li>
+    </ul>
+    <p>テンプレート適用時のフローは以下の通りです。</p>
+    <ol>
+      <li>AI が寿司ピースと桶の輪郭をセグメント。</li>
+      <li>桶の形状（丸／角）と相対サイズ情報から、該当する桶テンプレートを選択。</li>
+      <li>各寿司ピースを、正規化した座標を用いてテンプレート上のゾーンにマッピング。</li>
+      <li>以下の観点でルールを適用。
+        <ul>
+          <li>各ゾーンの寿司個数は期待値通りか。</li>
+          <li>各行が平行か、直線上に揃っているか、間隔が適切か。</li>
+          <li>桶の中心に対して上下・左右のバランスが取れているか。</li>
+        </ul>
+      </li>
+    </ol>
+    <!-- HÌNH 2: Minh hoạ Box Template -->
+   <div class="figure-block">
+  <img
+    src="Sushi/box_template_example.png"
+    alt="角型桶テンプレート例：ゾーン／行／列と期待個数の図"
+    style="max-width:50%;"
+  />
+  <div class="figure-caption">
+    角型桶に対するテンプレート例：桶をゾーン・行・列に分割し、各ゾーンごとの期待個数を定義。
+    AI が検出した各寿司ピースをテンプレート上に配置し、理想レイアウトとのズレを Rule Engine で評価します。
+  </div>
+</div>
+
+  </div>
+
+  <div id="sec-3-3">
+    <h3>3.3 画像評価フロー</h3>
+    <p>1枚の画像に対する基本的な評価フローは次の通りです。</p>
+    <ol>
+      <li>モバイルアプリから画像を受信。</li>
+      <li>画像の正規化（リサイズ・正規化など）。</li>
+      <li>Mask R-CNN による推論：
+        <ul>
+          <li>寿司、ガリ、軍艦、巻き物等の各ピースをセグメント。</li>
+          <li>桶の輪郭をセグメント。</li>
+        </ul>
+      </li>
+      <li>座標を正規化し、対応する桶テンプレートにマッピング。</li>
+      <li>10個の評価ルール（新ルールセット。寿司種類依存度を下げたもの）を適用。</li>
+      <li>総合点・減点理由・OK/NG 判定を集計。</li>
+      <li>結果を JSON 形式でクライアントに返却。</li>
+    </ol>
+  </div>
+
+  <a href="#top" class="back-to-top">ページ上部へ戻る</a>
+</div>
+
+<div class="section-box" id="sec-4">
+  <h2>4. フェーズ1 – 新しい桶・寿司に対応するAIコア</h2>
+
+  <div id="sec-4-1">
+    <h3>4.1 フェーズ1の目標</h3>
+    <ul>
+      <li>新しい桶（丸型・角型・人数違いなど）に対応できるようにする。</li>
+      <li>新しいパターン追加時に、全体の再学習を必要以上に行わず、柔軟に拡張できる構造にする。</li>
+      <li>個々の寿司ネタの詳細な種類認識に依存せず、以下を満たすような評価ロジックとする。
+        <ul>
+          <li>桶定義どおりの寿司個数が確保されていること。</li>
+          <li>レイアウト（位置・間隔・整列・バランスなど）が基準を満たしていること。</li>
+        </ul>
+      </li>
+      <li>TensorFlow ベースの旧モデルを段階的に置き換える形で、<strong>Mask R-CNN + PyTorch</strong> による新AIモデルを導入する。</li>
+    </ul>
+  </div>
+
+  <div id="sec-4-2">
+    <h3>4.2 技術アプローチ（Mask R-CNN + テンプレート）</h3>
+    <p>従来のように寿司を細かいクラスごとに識別するのではなく、フェーズ1では以下にフォーカスします。</p>
+    <ul>
+      <li>Mask R-CNN により、寿司ピースを「形状オブジェクト」として検出（インスタンスセグメンテーション）。</li>
+      <li>ルール用に重要となる形状グループを大まかに判別。
+        <ul>
+          <li>一般的な握り寿司。</li>
+          <li>ガリ（黄色・ピンク系の色、特徴的な形状）。</li>
+          <li>軍艦巻き（楕円形 + 海苔の黒い縁）。</li>
+          <li>細巻きなどの巻き寿司（円形 + 黒い縁 + 中央に白いシャリ）。</li>
+        </ul>
+      </li>
+      <li>各桶ごとに「桶テンプレート」を用意し、ゾーン数・行数・列数・個数を定義。</li>
+      <li>以下の観点に基づいたルールを適用。
+        <ul>
+          <li>レイアウト（行・列の並び）。</li>
+          <li>位置（相対位置・間隔・平行性など）。</li>
+          <li>個数（各ゾーンの寿司数）。</li>
+        </ul>
+      </li>
+    </ul>
+    <p>これにより、<strong>ネタのクラスIDに強く依存せずに</strong>、現行に近い、あるいはそれ以上の評価を実現することを目指します。</p>
+
+    <h4>「皮目の向き」に関するルールについて</h4>
+    <p>現行ルール：  
+    「まち・しめさばのみ、皮目が左に向いていること」  
+    このルールは特定のネタを高精度に識別する必要があり、新しい桶・新しいネタへの拡張を阻害する要因となります。</p>
+    <p>フェーズ1の提案：</p>
+    <ul>
+      <li><strong>本ルールはフェーズ1の範囲から外す</strong>ことを提案します。まずは桶・ネタ拡張と全体安定を優先します。</li>
+      <li>「向きの統一」という考え方を残す場合は、<strong>フェーズ2/3の高度ルール</strong>として扱います。
+        <ul>
+          <li>「皮目」があるようなテクスチャを持つ寿司のグルーピング。</li>
+          <li>同一グループ内での相対的な向きの揃い具合を評価。</li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+
+  <div id="sec-4-3">
+    <h3>4.3 フェーズ1の開発範囲</h3>
+    <ol>
+      <li>AIサーバアーキテクチャの再設計
+        <ul>
+          <li>新規 Mask R-CNN モデル（PyTorch）の設計・実装。</li>
+          <li>レイアウト／位置／個数を重視した新しいルールエンジンの設計・実装。</li>
+        </ul>
+      </li>
+      <li>評価APIの設計
+        <ul>
+          <li>例：<code>POST /api/v1/sushi/score</code>  
+          （画像アップロード → スコア・OK/NG・減点理由を含む JSON を返却）。</li>
+        </ul>
+      </li>
+      <li>「桶テンプレート」向けデータ構造の設計
+        <ul>
+          <li>各桶ごとの設定（ゾーン・行・列など）を DB として管理。</li>
+        </ul>
+      </li>
+      <li>既存10ルールをベースにしつつ、寿司種類への依存度を下げた新ルールセットの構築
+        <ul>
+          <li>主にレイアウト・位置・個数に基づく評価ロジックへの再設計。</li>
+        </ul>
+      </li>
+      <li>必要最小限のテンプレート管理用画面／ツールの設計・実装
+        <ul>
+          <li>新しい桶テンプレートの登録・編集。</li>
+          <li>行数／列数／期待個数／ゾーン位置の設定。</li>
+        </ul>
+      </li>
+      <li>将来の「管理された継続学習」に向けた基盤整備
+        <ul>
+          <li>画像＋評価結果の保存。</li>
+          <li>難しいケース（Hard Case）のマーキング機能の準備。</li>
+        </ul>
+      </li>
+    </ol>
+  </div>
+
+  <div id="sec-4-4">
+    <h3>4.4 使用技術</h3>
+    <p>フェーズ1では、AI部分とアプリケーション部分を明確に分離します。</p>
+    <ul>
+      <li><strong>AI部分（新規構築）</strong>
+        <ul>
+          <li><strong>PyTorch + Mask R-CNN</strong>：  
+            寿司ピース・ガリ・軍艦・巻き物などをインスタンスセグメンテーション。</li>
+          <li>Python：推論サービスおよびルールエンジンロジックの実装。</li>
+          <li>S3 などのオブジェクトストレージ：学習用画像・データセット・モデルの保存。</li>
+          <li>GPU/CPU サーバ：初期学習と推論の実行環境。</li>
+        </ul>
+      </li>
+      <li><strong>アプリケーション部分</strong>
+        <ul>
+          <li><strong>アプリケーションバックエンド</strong>：  
+            現行システムで利用中の Ruby on Rails（RoR）等のスタックをベースに想定。
+            <ul>
+              <li>モバイルアプリ向け API の提供。</li>
+              <li>AIサービス（Python）の呼び出し。</li>
+              <li>評価結果・ログ・ユーザ情報等の管理。</li>
+            </ul>
+          </li>
+          <li><strong>管理画面フロントエンド</strong>：ReactJS（既存Adminサイト）
+            <ul>
+              <li>桶テンプレートの管理。</li>
+              <li>評価結果の確認。</li>
+            </ul>
+          </li>
+          <li><strong>モバイルアプリ</strong>：Flutter  
+            以下を前提とします。
+            <ul>
+              <li>UI/UX の大きな変更は不要。</li>
+              <li>主にエンドポイントの更新と、新評価結果の表示調整（必要に応じて）。</li>
+            </ul>
+          </li>
+          <li><strong>データベース</strong>：PostgreSQL
+            <ul>
+              <li>桶テンプレート情報。</li>
+              <li>評価ログ、画像メタデータ等。</li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+
+  <div id="sec-4-5">
+    <h3>4.5 フェーズ1終了後に対応可能な桶種</h3>
+    <p>フェーズ1（2,000時間）を前提とした対応範囲のイメージは以下の通りです。</p>
+    <ul>
+      <li><strong>丸型桶グループ</strong>
+        <ul>
+          <li>現在運用中の主要な丸型桶（1人前・2人前など、定型レイアウトのもの）。</li>
+          <li>上記と類似レイアウトの新丸型桶（行数・貫数が多少異なるバリエーション）で、テンプレートで表現可能なもの。</li>
+        </ul>
+      </li>
+      <li><strong>角型桶グループ</strong>
+        <ul>
+          <li>生産で主に利用される標準的な角型桶（本提案でターゲットとするパターン）。</li>
+          <li>行数や列数が異なるが、同系統レイアウトの角型桶（例：行を1つ増やす、列を2つ増やす等）。</li>
+        </ul>
+      </li>
+      <li><strong>ネタに関して</strong>
+        <ul>
+          <li>対象桶の中で使用されるネタ（握り・軍艦・細巻き等）については、以下のレベルを想定します。
+            <ul>
+              <li>サーモン・マグロなど魚種の厳密識別までは行わず、以下を重視。
+                <ul>
+                  <li>総貫数が定義どおりであるか。</li>
+                  <li>各ゾーン・各行ごとの個数が定義どおりであるか。</li>
+                  <li>行の整列、上下左右のバランス、間隔が適切であるか。</li>
+                </ul>
+              </li>
+            </ul>
+          </li>
+          <li>「皮目があるネタ」や「サイズが大きく異なる軍艦」「多層の巻き物」など、
+              特殊なルールが必要なネタは、フェーズ2/3での強化対象として整理します。</li>
+        </ul>
+      </li>
+    </ul>
+    <p>実際にどの桶・どのレイアウトをフェーズ1の対象とするかは、要件定義フェーズで御社とすり合わせさせていただきます。</p>
+  </div>
+
+  <div id="sec-4-6">
+    <h3>4.6 新しい桶・ネタを追加しても評価精度を維持するための条件</h3>
+    <p>新たな桶・ネタを追加した際に、評価の安定性を保つための考え方は以下の通りです。</p>
+    <ul>
+      <li><strong>桶追加時</strong>
+        <ul>
+          <li>既存桶と大きく異なる「自由配置」ではなく、行・列ベースで表現可能なレイアウトであること。</li>
+          <li>行数／列数／ゾーン構成と、各ゾーンの期待貫数をテンプレートで定義できること。</li>
+          <li>基本的なルール（整列・端との距離・バランス等）が流用可能であること。</li>
+        </ul>
+      </li>
+      <li><strong>ネタ追加時</strong>
+        <ul>
+          <li>魚種が変わるだけでレイアウトが同じ場合：  
+            テンプレート側の設定（例えば「ここには◯貫」など）を修正するだけで済み、モデル再学習は不要なケースもあります。</li>
+          <li>形状が大きく異なるネタ（極端に高さがある、非常に大きい等）の場合：
+            <ul>
+              <li>既存の形状クラス（握り・軍艦・巻き物等）で表現可能かどうかを検討。</li>
+              <li>必要に応じて、新しい形状グループとして学習対象に追加（次回学習タイミングで対応）。</li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li><strong>運用面</strong>
+        <ul>
+          <li>新しい桶を追加する際は、以下の運用を推奨します。
+            <ul>
+              <li>テンプレートを追加。</li>
+              <li>実際の生産写真でテストし、安定性を確認。</li>
+            </ul>
+          </li>
+          <li>短期間に多くの桶・レイアウトが追加される場合は、3〜6ヶ月単位で定期的な再学習計画を立て、モデルが多様な画像に慣れるよう運用します。</li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+
+  <div id="sec-4-7">
+    <h3>4.7 アーキテクチャと継続学習フロー概要</h3>
+    <h4>3.3.1 初期AIモデル構築</h4>
+    <p>初期モデル構築の流れ：</p>
+    <p><em>課題定義 → データ収集 → データアノテーション → データセット分割（train/val/test） → モデル選定（Mask R-CNN / 派生モデル） → 学習 → 評価・検証 → モデル出力 → AIコアロジック構築 → デプロイ</em></p>
+
+    <h4>3.3.2 AI継続学習モジュール</h4>
+    <p>初期段階では、人手によるチェックを含めた「管理された継続学習」を想定します。</p>
+    <p><em>管理者 → 画像アップロード → アノテーションツール（例：EC2上で運用）でラベリング → S3 にデータセットとして保存 → Mask R-CNN で再学習 → 新モデル → 評価後にAIモデルとして反映</em></p>
+
+    <h4>3.3.3 AI画像判定モジュール</h4>
+    <p>推論フロー：</p>
+    <p><em>ユーザー → 画像アップロード → AIモデル（Mask R-CNN + ルールエンジン） → 評価結果を返却</em></p>
+  </div>
+
+  <div id="sec-4-8">
+    <h3>4.8 フェーズ1で御社にご準備いただきたい事項</h3>
+    <p>フェーズ1をスムーズに進めるため、主に以下のご準備をお願いしたく存じます。</p>
+    <ul>
+      <li><strong>1）対象桶（オケ）の一覧</strong>
+        <ul>
+          <li>フェーズ1で対応対象とする桶のリストアップ。
+            <ul>
+              <li>丸型桶：主要パターン（1人前・2人前など）。</li>
+              <li>角型桶：現在利用中／今後利用予定の代表的なパターン。</li>
+            </ul>
+          </li>
+          <li>併せて、以下の情報をご共有いただけると設計が明確になります。
+            <ul>
+              <li>標準貫数。</li>
+              <li>配置（行数・段数・ゾーン構成等）。</li>
+              <li>特別な評価ルール（あれば）。</li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li><strong>2）学習用画像データ</strong>
+        <ul>
+          <li>以下を組み合わせて利用する想定です。
+            <ul>
+              <li>過去にご提供いただいた画像（残っている場合）。</li>
+              <li>新しい角型／丸型桶に対して新規撮影した画像。</li>
+            </ul>
+          </li>
+          <li>これまでの学習では、1ネタあたり<strong>約200枚</strong>、全体で<strong>約4,000枚</strong>の画像をご提供いただいていました。</li>
+          <li>新アーキテクチャでは、以下のような画像を優先します。
+            <ul>
+              <li>桶全体のレイアウトがはっきり分かる画像。</li>
+              <li>実際の現場に近い条件（照明・カメラ・撮影距離など）のバリエーション。</li>
+              <li>各ターゲット桶ごとの画像が十分に含まれているデータセット。</li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li><strong>3）アノテーションデータ</strong>
+        <ul>
+          <li>既存モデルの学習時に使用したアノテーション（ラベル・マスク）が残っている場合は、形式・保管場所を確認させていただきます。
+            <ul>
+              <li>ただし、新アーキテクチャでは Mask R-CNN 用のフォーマットに合わせる必要があるため、形式変換や再アノテーションが必要となる可能性があります。</li>
+              <li>もし旧アノテーションが一部または全て利用できない場合は、新形式に合わせた再アノテーションを行います。</li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li><strong>4）現行の評価ルール（10ルール）の詳細</strong>
+        <ul>
+          <li>最新版の10ルールの詳細資料をご提供いただきたいです。</li>
+          <li>フェーズ1で必須とするルールと、フェーズ2/3に回してもよい「高度ルール」（例：皮目の向き）を一緒に整理させてください。</li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+
+  <div id="sec-4-9">
+    <h3>4.9 フェーズ1 工数見積り</h3>
+    <p>フェーズ1の総工数見積りは <strong>2,000時間</strong>（フェーズ2・フェーズ3は別途）を想定しています。</p>
+    <p>開発単価：<strong>2,500円 / 時間</strong></p>
+    <p>フェーズ1開発費用（概算）：</p>
+    <ul>
+      <li><strong>2,000h × 2,500円 = 5,000,000円</strong>  
+        （税別・サーバインフラ費用・アノテーション費用は含みません）。</li>
+    </ul>
+  </div>
+
+  <a href="#top" class="back-to-top">ページ上部へ戻る</a>
+</div>
+
+<div class="section-box" id="sec-5">
+  <h2>5. フェーズ2 – パフォーマンス改善（1〜2秒）</h2>
+
+  <div id="sec-5-1">
+    <h3>5.1 フェーズ2の目標</h3>
+    <p>フェーズ1で精度・ルール・対象桶が安定して運用できることを確認した上で、フェーズ2では以下を目標とします。</p>
+    <ul>
+      <li>1枚あたりの処理時間を<strong>1〜2秒</strong>程度まで短縮（環境・画像サイズに依存）。</li>
+      <li>スマートフォンで撮影 → 即時に近い形で評価結果が返るユーザー体験の実現。</li>
+    </ul>
+  </div>
+
+  <div id="sec-5-2">
+    <h3>5.2 最適化内容の詳細</h3>
+    <h4>AIモデルの最適化</h4>
+    <ul>
+      <li>Mask R-CNN / バックボーンのチューニング
+        <ul>
+          <li>軽量なバックボーン（ResNet-50, MobileNet-v2/v3 等）の採用。</li>
+          <li>入力画像サイズの調整、Proposal 数の削減など。</li>
+        </ul>
+      </li>
+      <li>AIコア内での不要処理の削減
+        <ul>
+          <li>不要な後処理の削除・簡略化。</li>
+          <li>得点計算に影響が少ない幾何計算の簡素化。</li>
+        </ul>
+      </li>
+      <li>識別に十分な範囲で画像解像度を下げ、推論速度を向上。</li>
+      <li>Python Runtime の最適化
+        <ul>
+          <li>入出力処理の改善。</li>
+          <li>不要なDBアクセスの削減。</li>
+          <li>バッチ処理や接続プールの導入検討。</li>
+        </ul>
+      </li>
+    </ul>
+
+    <h4>サーバ・インフラの最適化</h4>
+    <ul>
+      <li>以下の条件を満たす場合、GPU導入を検討。
+        <ul>
+          <li>モデル部分の推論時間を 80〜120ms 未満にしたい場合。</li>
+          <li>リクエスト数が多く、並列処理が必要な場合。</li>
+          <li>高解像度の画像が多い場合。</li>
+        </ul>
+      </li>
+      <li>メモリ・CPU の最適化
+        <ul>
+          <li>モデルをあらかじめメモリ上にロードし、起動オーバーヘッドを削減。</li>
+          <li>ワーカープロセスやバッチングの最適化。</li>
+        </ul>
+      </li>
+      <li><strong>並列リクエスト処理</strong>に耐えられる構成
+        <ul>
+          <li>Webサーバ／アプリケーションサーバのスケールアウト。</li>
+        </ul>
+      </li>
+      <li>画像処理オーバーヘッドの削減
+        <ul>
+          <li>アップロード画像のフォーマット制限（JPEG推奨等）。</li>
+          <li>クライアント側での事前リサイズ。</li>
+        </ul>
+      </li>
+    </ul>
+
+    <h4>モバイル側の最適化</h4>
+    <ul>
+      <li>アップロード画像サイズの規定
+        <ul>
+          <li>例：最長辺 1,024〜1,600px 程度（詳細は要件定義時に協議）。</li>
+        </ul>
+      </li>
+      <li>JPEG など適切な圧縮形式の利用。</li>
+      <li>必要に応じて
+        <ul>
+          <li>通信状態が悪い場合のリトライロジック。</li>
+          <li>アップロードや判定進捗の UI 表示。</li>
+        </ul>
+      </li>
+    </ul>
+
+    <h4>計測と改善サイクル</h4>
+    <p>パフォーマンス最適化のため、<strong>モニタリング基盤</strong>を整備し、以下の指標を取得します。</p>
+    <ul>
+      <li>リクエスト単位の指標
+        <ul>
+          <li>Upload time：クライアント→AIサーバへのアップロード時間。</li>
+          <li>Decode time：画像の読込・デコード時間。</li>
+          <li>Preprocess time：モデル入力用の前処理時間。</li>
+          <li>Inference time：Mask R-CNN の推論時間。</li>
+          <li>AI Core time：モデル+ルールエンジンを含むAI処理全体時間。</li>
+          <li>Response time：クライアントへの応答完了までの総時間。</li>
+        </ul>
+      </li>
+      <li>サーバ全体の指標
+        <ul>
+          <li>Average latency：平均レイテンシ。</li>
+          <li>P95 / P99：95%/99% のリクエストがこれより早く処理される時間。</li>
+          <li>Error rate：エラー発生率。</li>
+          <li>Model confidence distribution：モデルの信頼度分布（難しいケースの把握）。</li>
+        </ul>
+      </li>
+    </ul>
+    <p>これらの指標をもとに、モデル構成・サーバ構成・画像サイズ等の組み合わせを試験し、<strong>コスト</strong>と<strong>スピード</strong>のバランスが最も良い構成を選定します。</p>
+  </div>
+
+  <a href="#top" class="back-to-top">ページ上部へ戻る</a>
+</div>
+
+<div class="section-box" id="sec-6">
+  <h2>6. フェーズ3 – KDシステム連携 &amp; 継続学習</h2>
+
+  <div id="sec-6-1">
+    <h3>6.1 フェーズ3の目標</h3>
+    <ul>
+      <li>KDシステムから共通のAIサーバを呼び出し、画像評価を行えるようにする（KD連携）。</li>
+      <li>以下を実現するための基盤を構築する。
+        <ul>
+          <li>生産現場で撮影された画像と評価結果の蓄積。</li>
+          <li>学習価値の高い画像の選別と、学習パイプラインへの投入。</li>
+          <li>AIプロジェクトをゼロからやり直すことなく、段階的に精度を向上させる仕組み。</li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+
+  <div id="sec-6-2">
+    <h3>6.2 KD連携（KDシステムとの連携）</h3>
+    <p>KD と AI サーバ間の API インターフェースは以下を想定します。</p>
+    <ul>
+      <li>KDシステムから、評価対象画像または画像URLを送信。</li>
+      <li>AI側は以下を含む詳細な評価結果を返却。
+        <ul>
+          <li>OK / NG 判定。</li>
+          <li>スコア。</li>
+          <li>各ルールごとの減点理由。</li>
+        </ul>
+      </li>
+      <li>安定運用のための仕組み
+        <ul>
+          <li>APIバージョン管理（v1, v2 ...）：モデルやロジックが変更されても KD 側の運用が影響を受けないようにする。</li>
+          <li>ログ・監査：リクエスト数、処理時間、エラー履歴等の記録。</li>
+        </ul>
+      </li>
+    </ul>
+  </div>
+
+  <div id="sec-6-3">
+    <h3>6.3 継続学習（Continuous Learning）</h3>
+    <p>継続学習の推奨フロー：</p>
+    <ol>
+      <li><strong>データ保存</strong>
+        <ul>
+          <li>全ての画像と、その時点の AI 評価結果をデータレイク（S3 + DB）に保存。</li>
+          <li>特に以下の画像を別キューとして管理。
+            <ul>
+              <li>モデル信頼度が低い（閾値未満）ケース。</li>
+              <li>検知結果に異常があると判定されたケース。</li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li><strong>Hard Case Queue の運用</strong>
+        <ul>
+          <li>難しいケース（Hard Case）を集約したキューを作成。</li>
+          <li>QC/リーダー向けの画面で、AI判定結果の確認と正解ラベリングを行えるようにする。</li>
+        </ul>
+      </li>
+      <li><strong>定期的な再学習サイクル</strong>
+        <ul>
+          <li>3〜6ヶ月ごとに再学習プロジェクトを立ち上げ。</li>
+          <li>学習データセットは以下の組み合わせで構成。
+            <ul>
+              <li>既存の安定データセット。</li>
+              <li>Hard Case から選別した画像。</li>
+              <li>検証用の標準テスト画像。</li>
+            </ul>
+          </li>
+        </ul>
+      </li>
+      <li><strong>新モデルの評価・デプロイ</strong>
+        <ul>
+          <li>標準テストセットで新旧モデルを比較評価。</li>
+          <li>既存モデルより良い場合に限り、本番モデルとしてデプロイ。</li>
+          <li>性能が劣る場合は、既存モデルを維持し、新モデルは候補として保管。</li>
+        </ul>
+      </li>
+    </ol>
+    <p>自動化レベルについて：</p>
+    <ul>
+      <li>初期段階では「人手による確認を前提とした継続学習」とし、常に人間のレビューを挟みます。</li>
+      <li>運用が安定し、データが蓄積してきた段階で、徐々に自動化の比率を高めつつも、いつでもロールバックできる仕組みを維持します。</li>
+    </ul>
+  </div>
+
+  <a href="#top" class="back-to-top">ページ上部へ戻る</a>
+</div>
+
+<div class="section-box" id="sec-7">
+  <h2>7. 開発費用 &amp; アノテーション費用</h2>
+  <p><strong>AIおよびアプリケーション開発単価：</strong> 2,500円 / 時間</p>
+  <p><strong>アノテーション（データラベリング）単価：</strong> 2,000円 / 時間</p>
+
+  <table class="cost-table">
+    <thead>
+      <tr>
+        <th>項目</th>
+        <th>想定工数</th>
+        <th>単価（円/時間）</th>
+        <th>概算費用（円）</th>
+      </tr>
+    </thead>
+    <tbody>
+      <tr>
+        <td>フェーズ1 – AIコア &amp; アプリケーション開発</td>
+        <td>2,000h</td>
+        <td>2,500円</td>
+        <td>5,000,000円</td>
+      </tr>
+      <tr>
+        <td>画像アノテーション作業</td>
+        <td>例：500h</td>
+        <td>2,000円</td>
+        <td>1,000,000円</td>
+      </tr>
+      <tr>
+        <td>フェーズ2・フェーズ3</td>
+        <td>（別途詳細見積り）</td>
+        <td>-</td>
+        <td>-</td>
+      </tr>
+    </tbody>
+    <tfoot>
+      <tr>
+        <td>合計（フェーズ1 + アノテーション例）</td>
+        <td>-</td>
+        <td>-</td>
+        <td><strong>約 6,000,000円</strong>（税・インフラ費別）</td>
+      </tr>
+    </tfoot>
+  </table>
+
+  <p>実際のアノテーション時間と費用は、旧アノテーションデータの再利用可否、再ラベリングが必要な画像枚数、およびマスク／ラベルの粒度によって変動します。</p>
+
+  <a href="#top" class="back-to-top">ページ上部へ戻る</a>
+</div>
+
+<div class="section-box" id="sec-8">
+  <h2>8. サーバインフラ費用（開発環境・本番環境）</h2>
+  <p>現行システム（TensorFlow ベース）は、高スペック構成で運用されており、サーバ費用として<strong>月額40〜50万円程度</strong>が発生している状況と理解しております。</p>
+  <p>新アーキテクチャ（Mask R-CNN + PyTorch）では、最適化次第でリソース効率の改善が見込めますが、安定した推論のためには一定レベルのサーバ性能が必要となります。</p>
+
+  <h3 id="sec-8-1">8.1 開発環境向けインフラ</h3>
+  <ul>
+    <li>AI開発用サーバ：
+      <ul>
+        <li>GPU付きEC2（または同等サービス）を1台想定。  
+          初期学習および検証時のみ起動し、学習が終わり次第停止することでコストを抑えます。</li>
+      </ul>
+    </li>
+    <li>アプリケーション開発／ステージング環境：
+      <ul>
+        <li>CPUベースのサーバを1〜2台（アプリケーション＋DB）想定。</li>
+      </ul>
+    </li>
+    <li>開発環境の月額コスト目安：
+      <ul>
+        <li>GPU利用時間にもよりますが、数万円／月 程度からコントロール可能と考えています。</li>
+      </ul>
+    </li>
+  </ul>
+
+  <h3 id="sec-8-2">8.2 本番環境向けインフラ</h3>
+  <ul>
+    <li>AI推論サーバ：
+      <ul>
+        <li>CPU高性能サーバまたは小規模GPUサーバを1台（トラフィックに応じてスケールアウト）。</li>
+      </ul>
+    </li>
+    <li>アプリケーションサーバ：
+      <ul>
+        <li>Webアプリケーションサーバを1〜2台。  
+        現行インフラの一部流用も検討可能です。</li>
+      </ul>
+    </li>
+    <li>データベース &amp; ストレージ：
+      <ul>
+        <li>PostgreSQL（マネージドDBまたは専用サーバ）。</li>
+        <li>S3 などのオブジェクトストレージ（画像・モデルの保存）。</li>
+      </ul>
+    </li>
+    <li>本番環境の月額コスト目安：
+      <ul>
+        <li>旧TensorFlow構成よりも効率的な構成が可能と考えており、  
+          同等またはそれ以下のコストに抑えられる可能性があります。</li>
+        <li>ただし最終的な金額は、
+          <ul>
+            <li>1日の評価リクエスト数。</li>
+            <li>フェーズ2以降で求めるレスポンス時間。</li>
+          </ul>
+          に応じて変動するため、別途シミュレーションが必要です。</li>
+      </ul>
+    </li>
+  </ul>
+
+  <p>詳細なお見積りでは、「Low / Standard / High」など複数構成案をご提示し、月額目安とあわせて比較検討いただけるようにいたします。</p>
+
+  <a href="#top" class="back-to-top">ページ上部へ戻る</a>
+</div>
+
+<div class="section-box" id="sec-9">
+  <h2>9. 実行ロードマップ</h2>
+  <p>本プロジェクトは、次の3フェーズでの実行を想定しています。</p>
+  <ul>
+    <li><strong>フェーズ1：</strong>  
+      新AIコア（Mask R-CNN + 桶テンプレート）の構築、評価APIの実装、テンプレート管理ツールの整備。
+      <ul>
+        <li>フォーカス：評価精度の確保、新しい桶・ネタへの対応（寿司の種類に依存しない評価）。</li>
+      </ul>
+    </li>
+    <li><strong>フェーズ2：</strong>  
+      パフォーマンス最適化により、1〜2秒/枚のレスポンスを目指す。
+      <ul>
+        <li>フォーカス：モデル・サーバ・モバイル・ネットワークの総合的な最適化とモニタリング。</li>
+      </ul>
+    </li>
+    <li><strong>フェーズ3：</strong>  
+      KDシステムとの連携（KD連携）と継続学習基盤の整備。
+      <ul>
+        <li>フォーカス：KDからの共通利用、Hard Case の収集・再学習、定期的なモデルアップデート。</li>
+      </ul>
+    </li>
+  </ul>
+
+  <a href="#top" class="back-to-top">ページ上部へ戻る</a>
+</div>
+
 </body>
 </html>
