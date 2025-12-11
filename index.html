@@ -23,7 +23,11 @@
       text-align: center;
       margin-bottom: 1rem;
     }
-    h2 { font-size: 1.4rem; border-bottom: 1px solid #ddd; padding-bottom: 4px; }
+    h2 {
+      font-size: 1.4rem;
+      border-bottom: 1px solid #ddd;
+      padding-bottom: 4px;
+    }
     h3 { font-size: 1.15rem; }
     h4 { font-size: 1rem; }
     p { margin: 0.4em 0; }
@@ -147,7 +151,7 @@
     <li class="toc-level-2"><a href="#sec-3-3">3.3 画像評価フロー</a></li>
     <li class="toc-level-1"><a href="#sec-4">4. フェーズ1 – 新しい桶・寿司への対応AIコア</a></li>
     <li class="toc-level-2"><a href="#sec-4-1">4.1 フェーズ1の目標</a></li>
-    <li class="toc-level-2"><a href="#sec-4-2">4.2 技術アプローチ（Mask R-CNN + テンプレート）</a></li>
+    <li class="toc-level-2"><a href="#sec-4-2">4.2 技術アプローチ（YOLO11-seg / Mask R-CNN + テンプレート）</a></li>
     <li class="toc-level-2"><a href="#sec-4-3">4.3 フェーズ1の開発範囲</a></li>
     <li class="toc-level-2"><a href="#sec-4-4">4.4 使用技術</a></li>
     <li class="toc-level-2"><a href="#sec-4-5">4.5 フェーズ1終了後に対応可能な桶種</a></li>
@@ -193,11 +197,18 @@
 
 <div class="section-box" id="sec-2">
   <h2>2. 新アーキテクチャ選定の理由</h2>
+  <p>本案件のポイントは、以下の2つのバランスをどのように取るかです。</p>
+  <ul>
+    <li>盛り付け評価のための<strong>輪郭・レイアウト情報の精度</strong></li>
+    <li>現場で使える<strong>推論速度・運用性</strong></li>
+  </ul>
   <p>検討の過程で、以下のような選択肢を比較しました。</p>
   <ul>
-    <li>YOLO（Object Detection）  
-      非常に高速ですが、出力は<strong>矩形（Bounding Box）のみ</strong>であり、輪郭（Contour）の情報はありません。寿司が密に並んでいる本件のようなケースでは、YOLO + 後処理のみで現行ルールレベルの精度を実現するのは難しいと判断しました。</li>
-    <li>AWS Rekognition / Rekognition Custom Labels  
+    <li><strong>YOLO 系（YOLO11 / YOLO11-seg 等）</strong><br>
+      従来の YOLO は矩形（Bounding Box）のみでしたが、最新の YOLO11-seg では<strong>セグメンテーションマスク</strong>も出力できるようになり、精度次第では本案件にも適用可能です。  
+      一方で、「桶の中で寿司同士が密集している」「行単位での整列や間隔評価が必要」という要件を満たすためには、<strong>マスク精度の検証</strong>が重要となります。
+    </li>
+    <li><strong>AWS Rekognition / Rekognition Custom Labels</strong><br>
       POC には便利ですが、以下の制約があります。
       <ul>
         <li>ロジックのきめ細かなカスタマイズが難しい。</li>
@@ -206,22 +217,24 @@
       </ul>
     </li>
   </ul>
-  <p>検証・試行の結果、以下のように結論づけました。</p>
+  <p>そこで、本提案では次のような方針を取ります。</p>
   <ul>
-    <li><strong>YOLO</strong>  
-      精度を犠牲にして速度を優先する場合には有効ですが、本案件では<strong>レイアウトや輪郭の精度</strong>が重要であり、リアルタイム性はそこまで強く要求されていないため、不向きと判断しました。</li>
-    <li><strong>現行のクラウドサービス</strong>（Rekognition など）  
-      本案件の細かい得点ルールをすべて実装するには柔軟性が足りません。</li>
-    <li><strong>Mask R-CNN + PyTorch</strong>  
-      以下の点から最適な選択肢だと考えています。
+    <li><strong>1ヶ月目：YOLO11-seg による検証（速度重視の選択肢）</strong>
       <ul>
-        <li>各寿司の輪郭（インスタンスセグメンテーション）を取得でき、レイアウト評価との相性が良い。</li>
-        <li>形状・面積・相対位置に基づいた詳細なルールエンジンを構築可能。</li>
-        <li>フェーズ2でのパフォーマンス最適化も十分に見込める。</li>
+        <li>YOLO11-seg を用いて、桶・寿司ピース・サイド（ガリ等）のマスク精度と速度を検証します。</li>
+        <li>もし「行単位の整列」「隣接との間隔」「桶の縁からの距離」など、評価に必要な幾何情報が十分に取れる場合は、そのまま YOLO ベースでフェーズ1の実装を進めます。</li>
+      </ul>
+    </li>
+    <li><strong>YOLO の精度が要件を満たさない場合：Mask R-CNN + PyTorch へ切り替え</strong>
+      <ul>
+        <li>YOLO では一部のケースでマスク／輪郭精度が不足する場合、インスタンスセグメンテーションに実績のある Mask R-CNN を採用します。</li>
+        <li>Mask R-CNN は、寿司ピースごとの輪郭と形状情報を高精度に取得でき、細かいレイアウト評価との相性が非常に良いです。</li>
       </ul>
     </li>
   </ul>
-  <p>以上から、AIコア部分は <strong>Mask R-CNN + PyTorch</strong> を採用し、桶テンプレートと組み合わせて得点処理を行うアーキテクチャを提案します。</p>
+  <p>このように、<strong>最初の1ヶ月で YOLO11-seg の可能性を最大限試したうえで</strong>、  
+  必要に応じて <strong>Mask R-CNN へ切り替える</strong>構成とすることで、速度と精度の両面から最適なアーキテクチャを選択できるようにします。</p>
+
   <a href="#top" class="back-to-top">ページ上部へ戻る</a>
 </div>
 
@@ -233,7 +246,7 @@
     <p>新アーキテクチャにおける基本フローは以下の通りです。</p>
     <ul>
       <li>スマートフォンアプリから寿司桶の写真を撮影し、AIサーバへアップロード。</li>
-      <li>AIサーバ側で Mask R-CNN（PyTorch）を用いて以下を実施。
+      <li>AIサーバ側で YOLO11-seg または Mask R-CNN（PyTorch）を用いて以下を実施。
         <ul>
           <li>寿司、ガリ、軍艦巻き、巻き物など、各ピースごとにセグメンテーション（輪郭抽出）。</li>
           <li>桶（丸型／角型）の輪郭・形状の認識。</li>
@@ -243,11 +256,10 @@
       <li>クライアント（モバイル／他システム）に JSON 形式で結果を返却。</li>
     </ul>
 
-    <!-- HÌNH DUY NHẤT: Sơ đồ luồng Mask R-CNN + Rule Engine -->
     <div class="figure-block">
       <img src="mask_rcnn_flow.png" alt="画像 → Mask R-CNN による輪郭抽出 → Rule Engine による幾何計算とスコアリングのフロー図" />
       <div class="figure-caption">
-        Mask R-CNN によって各寿司ピースの輪郭を高精度に取得し、Rule Engine 側で
+        YOLO11-seg または Mask R-CNN によって各寿司ピースの輪郭を高精度に取得し、Rule Engine 側で
         重心・主軸・距離・平行性などの幾何情報を算出することで、詳細な盛り付け評価を可能にします。
       </div>
     </div>
@@ -284,19 +296,37 @@
         </ul>
       </li>
     </ol>
-    <!-- HÌNH 2: Minh hoạ Box Template -->
-   <div class="figure-block">
-  <img
-    src="box_template_example.png"
-    alt="角型桶テンプレート例：ゾーン／行／列と期待個数の図"
-    style="max-width:50%;"
-  />
-  <div class="figure-caption">
-    角型桶に対するテンプレート例：桶をゾーン・行・列に分割し、各ゾーンごとの期待個数を定義。
-    AI が検出した各寿司ピースをテンプレート上に配置し、理想レイアウトとのズレを Rule Engine で評価します。
-  </div>
-</div>
 
+    <div class="figure-block">
+      <img
+        src="box_template_example.png"
+        alt="角型桶テンプレート例：ゾーン／行／列と期待個数の図"
+        style="max-width:50%;"
+      />
+      <div class="figure-caption">
+        角型桶に対するテンプレート例：桶をゾーン・行・列に分割し、各ゾーンごとの期待個数を定義。
+        AI が検出した各寿司ピースをテンプレート上に配置し、理想レイアウトとのズレを Rule Engine で評価します。
+      </div>
+    </div>
+
+    <!-- 新しく追加した 2 つのテンプレート画像 -->
+    <div class="figure-block">
+      <img
+        src="template_round_image1.png"
+        alt="丸型桶テンプレートの盛り付け例 Image1"
+        style="max-width:48%; margin-right:2%;"
+      />
+      <img
+        src="template_round_image2.png"
+        alt="同一テンプレートで貫数・行数を増やした盛り付け例 Image2"
+        style="max-width:48%;"
+      />
+      <div class="figure-caption">
+        同一テンプレートに属する2つの盛り付け例：  
+        Image1 は標準パターン、Image2 は同じテンプレート定義のまま貫数・行数を増やしたバリエーションです。  
+        テンプレート側で「行・ゾーン・期待個数」を定義しておくことで、ネタが増えても評価ロジックを共通化できます。
+      </div>
+    </div>
   </div>
 
   <div id="sec-3-3">
@@ -305,7 +335,7 @@
     <ol>
       <li>モバイルアプリから画像を受信。</li>
       <li>画像の正規化（リサイズ・正規化など）。</li>
-      <li>Mask R-CNN による推論：
+      <li>YOLO11-seg または Mask R-CNN による推論：
         <ul>
           <li>寿司、ガリ、軍艦、巻き物等の各ピースをセグメント。</li>
           <li>桶の輪郭をセグメント。</li>
@@ -335,15 +365,15 @@
           <li>レイアウト（位置・間隔・整列・バランスなど）が基準を満たしていること。</li>
         </ul>
       </li>
-      <li>TensorFlow ベースの旧モデルを段階的に置き換える形で、<strong>Mask R-CNN + PyTorch</strong> による新AIモデルを導入する。</li>
+      <li>TensorFlow ベースの旧モデルを段階的に置き換える形で、<strong>YOLO11-seg / Mask R-CNN + PyTorch</strong> による新AIモデルを導入する。</li>
     </ul>
   </div>
 
   <div id="sec-4-2">
-    <h3>4.2 技術アプローチ（Mask R-CNN + テンプレート）</h3>
+    <h3>4.2 技術アプローチ（YOLO11-seg / Mask R-CNN + テンプレート）</h3>
     <p>従来のように寿司を細かいクラスごとに識別するのではなく、フェーズ1では以下にフォーカスします。</p>
     <ul>
-      <li>Mask R-CNN により、寿司ピースを「形状オブジェクト」として検出（インスタンスセグメンテーション）。</li>
+      <li>YOLO11-seg または Mask R-CNN により、寿司ピースを「形状オブジェクト」として検出（インスタンスセグメンテーション）。</li>
       <li>ルール用に重要となる形状グループを大まかに判別。
         <ul>
           <li>一般的な握り寿司。</li>
@@ -351,6 +381,19 @@
           <li>軍艦巻き（楕円形 + 海苔の黒い縁）。</li>
           <li>細巻きなどの巻き寿司（円形 + 黒い縁 + 中央に白いシャリ）。</li>
         </ul>
+      </li>
+      <li><strong>モデル上のクラス定義（例）</strong>  
+        実際の学習・推論では、個々のネタ名（サーモン、マグロ等）ではなく、以下のようなクラスIDに集約します。
+        <ul>
+          <li><code>TRAY</code>：桶／トレー本体の輪郭</li>
+          <li><code>SUSHI_MAIN</code>：一般的な握り寿司（ネタは問わない）</li>
+          <li><code>SUSHI_MAKI</code>：巻き寿司（細巻き・太巻きなど）</li>
+          <li><code>SUSHI_GUNKAN</code>：軍艦巻き</li>
+          <li><code>SIDE_GINGER</code>：ガリ</li>
+          <li><code>SIDE_OTHER</code>：その他の付け合わせ（大葉、レモン、山葵 等）</li>
+        </ul>
+        <p>これにより、「20種類以上のネタをそれぞれクラス分けして学習する」方式から、  
+        「レイアウト評価に必要な観点だけをクラスに切り出す」方式に切り替えることができます。</p>
       </li>
       <li>各桶ごとに「桶テンプレート」を用意し、ゾーン数・行数・列数・個数を定義。</li>
       <li>以下の観点に基づいたルールを適用。
@@ -379,7 +422,7 @@
     </ul>
   </div>
 
-  <div id="sec-4-3">
+    <div id="sec-4-3">
     <h3>4.3 フェーズ1の開発範囲</h3>
     <ol>
       <li>AIサーバアーキテクチャの再設計
@@ -417,6 +460,114 @@
         </ul>
       </li>
     </ol>
+
+    <h4>4.3.1 本フェーズで扱う寿司クラス（クラス数と役割）</h4>
+    <p>フェーズ1では、ネタごとの細かい種類（マグロ・サーモン等）ではなく、  
+    盛り付け評価に必要な<strong>6種類のクラス</strong>に集約して学習・推論を行います。</p>
+    <ul>
+      <li><strong>TRAY</strong>：桶そのもの（丸桶・角桶）。テンプレートとの対応付けに使用。</li>
+      <li><strong>SUSHI_MAIN</strong>：一般的な握り寿司（シャリ＋ネタの1貫）。</li>
+      <li><strong>SUSHI_MAKI</strong>：巻き寿司（細巻き・太巻きなど、円形断面を持つロール）。</li>
+      <li><strong>SUSHI_GUNKAN</strong>：軍艦巻き（海苔で囲まれた楕円形の寿司）。</li>
+      <li><strong>SIDE_GINGER</strong>：ガリ（ショウガ）。ガリゾーンの判定・異物チェックに利用。</li>
+      <li><strong>SIDE_OTHER</strong>：その他の付け合わせ（ワサビ、飾り、仕切りパーツ等）。</li>
+    </ul>
+    <p>Mask R-CNN は画像からこれら6クラスをインスタンス単位で検出し、  
+    各インスタンスの<strong>輪郭・重心・面積・向き</strong>などの幾何情報を出力します。  
+    ルールエンジン側では、この幾何情報と桶テンプレート（Row・ゾーン・期待個数）の情報を組み合わせて採点を行います。</p>
+
+    <h4>4.3.2 テンプレート方式に対応した採点ルール例（10ルール）</h4>
+    <p>現行の10ルールと同等レベルのチェックを、テンプレート方式＋6クラスで再定義します。  
+    それぞれのルールは 0〜10 点のスコアを持ち、合計 100 点からの減点方式（または加点方式）で総合点を算出します。</p>
+
+    <table class="cost-table">
+      <thead>
+        <tr>
+          <th>ルール</th>
+          <th>評価観点（テンプレートとクラスの利用イメージ）</th>
+          <th>主に利用するクラス</th>
+        </tr>
+      </thead>
+      <tbody>
+        <tr>
+          <td>Rule 1：総貫数</td>
+          <td>テンプレートに定義された expected_total_pieces と、  
+              <strong>SUSHI_MAIN / SUSHI_MAKI / SUSHI_GUNKAN</strong> の検出数を比較。  
+              差が0なら満点、差が1〜2貫なら減点、小さすぎ／多すぎの場合は大きく減点。</td>
+          <td>SUSHI_MAIN, SUSHI_MAKI, SUSHI_GUNKAN</td>
+        </tr>
+        <tr>
+          <td>Rule 2：行ごとの貫数</td>
+          <td>桶テンプレート上の各 Row に対して「期待貫数」を定義。  
+              各寿司ピースの重心をテンプレート座標にマッピングし、Rowごとに個数をカウント。  
+              行ごとの個数がテンプレートと一致していれば満点、±1貫で減点。</td>
+          <td>SUSHI_MAIN, SUSHI_MAKI, SUSHI_GUNKAN, TRAY</td>
+        </tr>
+        <tr>
+          <td>Rule 3：行の直線性・平行性</td>
+          <td>Rowごとに寿司の重心を直線フィッティングし、  
+              直線の角度と残差（どれだけ直線からズレているか）を算出。  
+              テンプレートの行角度（row_angle_deg）とのズレが許容範囲内なら満点。</td>
+          <td>SUSHI_MAIN, SUSHI_MAKI, SUSHI_GUNKAN</td>
+        </tr>
+        <tr>
+          <td>Rule 4：行間の間隔</td>
+          <td>上下の Row の中心線の距離を比較し、  
+              テンプレートに定義された row_gap_px_ratio と比べてバラつきが小さければ満点。  
+              行間が詰まりすぎ／空きすぎの場合は減点。</td>
+          <td>SUSHI_MAIN, SUSHI_MAKI, SUSHI_GUNKAN, TRAY</td>
+        </tr>
+        <tr>
+          <td>Rule 5：桶の縁とのマージン</td>
+          <td>各寿司ピースの重心から桶の縁（TRAY マスク）までの距離を計測。  
+              edge_margin_ratio（「桶の内側何％以内」など）の範囲に収まっていれば満点。  
+              縁に近すぎる／中央に寄りすぎる行には減点。</td>
+          <td>SUSHI_MAIN, SUSHI_MAKI, SUSHI_GUNKAN, TRAY</td>
+        </tr>
+        <tr>
+          <td>Rule 6：ガリゾーン</td>
+          <td>テンプレート上で「Ginger Zone」を定義し、  
+              そこに <strong>SIDE_GINGER</strong> が1〜数個だけ存在するかを確認。  
+              ゾーン外にガリがある、またはまったく無い場合は減点。</td>
+          <td>SIDE_GINGER, TRAY</td>
+        </tr>
+        <tr>
+          <td>Rule 7：巻き物／軍艦の配置</td>
+          <td>一部のテンプレートでは、<strong>SUSHI_MAKI / SUSHI_GUNKAN</strong> を  
+              特定の Row またはゾーンにまとめて配置するルールを定義。  
+              テンプレートのゾーン内に所定数があるか、他のゾーンに散らばっていないかをチェック。</td>
+          <td>SUSHI_MAKI, SUSHI_GUNKAN, TRAY</td>
+        </tr>
+        <tr>
+          <td>Rule 8：左右・上下バランス</td>
+          <td>TRAY の中心線で上下／左右に分割し、各側の寿司ピース数・面積の合計を比較。  
+              上下／左右のバランスがテンプレート比 ±○％以内なら満点。</td>
+          <td>SUSHI_MAIN, SUSHI_MAKI, SUSHI_GUNKAN, TRAY</td>
+        </tr>
+        <tr>
+          <td>Rule 9：重なり・異常配置</td>
+          <td>寿司どうしのマスクの重なり具合（IoU）を確認し、  
+              極端な重なりや、<strong>SIDE_OTHER / SUSHI_*</strong> がテンプレート外に大きくはみ出していないかをチェック。  
+              異常なオーバーラップや飛び出しがある場合に減点。</td>
+          <td>SUSHI_MAIN, SUSHI_MAKI, SUSHI_GUNKAN, SIDE_OTHER, TRAY</td>
+        </tr>
+        <tr>
+          <td>Rule 10：空白・欠け</td>
+          <td>テンプレート上で寿司が入るべきゾーンに大きな空白領域がないかを確認。  
+              連続した空白ゾーンがある場合や、Row中央に穴が空いている場合には減点。</td>
+          <td>SUSHI_MAIN, SUSHI_MAKI, SUSHI_GUNKAN, TRAY</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <p>スコアリングのイメージ：</p>
+    <ul>
+      <li>各ルールを 0〜10 点で評価し、合計 100 点満点とします。</li>
+      <li>80 点以上：OK（良好）／ 60〜79 点：要注意／ 59 点以下：NG など、  
+          しきい値は要件定義時に御社とすり合わせの上で決定します。</li>
+      <li>テンプレート定義を変更（行数・期待個数・ゾーン）することで、  
+          新しい桶やバリエーションにも同じルールセットをそのまま適用できます。</li>
+    </ul>
   </div>
 
   <div id="sec-4-4">
@@ -425,7 +576,7 @@
     <ul>
       <li><strong>AI部分（新規構築）</strong>
         <ul>
-          <li><strong>PyTorch + Mask R-CNN</strong>：  
+          <li><strong>YOLO11-seg / Mask R-CNN（PyTorch）</strong>：  
             寿司ピース・ガリ・軍艦・巻き物などをインスタンスセグメンテーション。</li>
           <li>Python：推論サービスおよびルールエンジンロジックの実装。</li>
           <li>S3 などのオブジェクトストレージ：学習用画像・データセット・モデルの保存。</li>
@@ -534,7 +685,7 @@
               <li>実際の生産写真でテストし、安定性を確認。</li>
             </ul>
           </li>
-          <li>短期間に多くの桶・レイアウトが追加される場合は、3〜6ヶ月単位で定期的な再学習計画を立て、モデルが多様な画像に慣れるよう運用します。</li>
+          <li>短期間に多くの桶・レイアウトが追加される場合は、3〜6ヶ月単位で定期的な再学習計画を立ち、モデルが多様な画像に慣れるよう運用します。</li>
         </ul>
       </li>
     </ul>
@@ -542,18 +693,22 @@
 
   <div id="sec-4-7">
     <h3>4.7 アーキテクチャと継続学習フロー概要</h3>
-        <ul>
-          <li><strong><h4>4.7.1 初期AIモデル構築</h4></strong>
-    <p>初期モデル構築の流れ：</p>
-    <p><em>課題定義 → データ収集 → データアノテーション → データセット分割（train/val/test） → モデル選定（Mask R-CNN / 派生モデル） → 学習 → 評価・検証 → モデル出力 → AIコアロジック構築 → デプロイ</em></p>
+    <ul>
+      <li><h4>4.7.1 初期AIモデル構築</h4>
+        <p>初期モデル構築の流れ：</p>
+        <p><em>課題定義 → データ収集 → データアノテーション → データセット分割（train/val/test） → モデル選定（YOLO11-seg / Mask R-CNN） → 学習 → 評価・検証 → モデル出力 → AIコアロジック構築 → デプロイ</em></p>
+      </li>
 
-    <strong><h4>4.7.2 AI継続学習モジュール</h4></strong>
-    <p>初期段階では、人手によるチェックを含めた「管理された継続学習」を想定します。</p>
-    <p><em>管理者 → 画像アップロード → アノテーションツール（例：EC2上で運用）でラベリング → S3 にデータセットとして保存 → Mask R-CNN で再学習 → 新モデル → 評価後にAIモデルとして反映</em></p>
+      <li><h4>4.7.2 AI継続学習モジュール</h4>
+        <p>初期段階では、人手によるチェックを含めた「管理された継続学習」を想定します。</p>
+        <p><em>管理者 → 画像アップロード → アノテーションツール（例：EC2上で運用）でラベリング → S3 にデータセットとして保存 → YOLO11-seg / Mask R-CNN で再学習 → 新モデル → 評価後にAIモデルとして反映</em></p>
+      </li>
 
-    <strong><h4>4.7.3 AI画像判定モジュール</h4></strong>
-    <p>推論フロー：</p>
-    <p><em>ユーザー → 画像アップロード → AIモデル（Mask R-CNN + ルールエンジン） → 評価結果を返却</em></p>
+      <li><h4>4.7.3 AI画像判定モジュール</h4>
+        <p>推論フロー：</p>
+        <p><em>ユーザー → 画像アップロード → AIモデル（YOLO11-seg / Mask R-CNN + ルールエンジン） → 評価結果を返却</em></p>
+      </li>
+    </ul>
   </div>
 
   <div id="sec-4-8">
@@ -599,7 +754,7 @@
         <ul>
           <li>既存モデルの学習時に使用したアノテーション（ラベル・マスク）が残っている場合は、形式・保管場所を確認させていただきます。
             <ul>
-              <li>ただし、新アーキテクチャでは Mask R-CNN 用のフォーマットに合わせる必要があるため、形式変換や再アノテーションが必要となる可能性があります。</li>
+              <li>ただし、新アーキテクチャでは YOLO11-seg / Mask R-CNN 用のフォーマットに合わせる必要があるため、形式変換や再アノテーションが必要となる可能性があります。</li>
               <li>もし旧アノテーションが一部または全て利用できない場合は、新形式に合わせた再アノテーションを行います。</li>
             </ul>
           </li>
@@ -644,10 +799,12 @@
     <h3>5.2 最適化内容の詳細</h3>
     <h4>AIモデルの最適化</h4>
     <ul>
-      <li>Mask R-CNN / バックボーンのチューニング
+      <li><strong>Mask R-CNN / YOLO11-seg のチューニング</strong>
         <ul>
-          <li>軽量なバックボーン（ResNet-50, MobileNet-v2/v3 等）の採用。</li>
-          <li>入力画像サイズの調整、Proposal 数の削減など。</li>
+          <li>Mask R-CNN 側では、<strong>ResNet-50-FPN 系のバックボーン</strong>を前提としつつ、  
+            入力画像サイズや特徴量の数、Proposal 数などを調整することで軽量化・高速化を図ります。</li>
+          <li>YOLO11-seg 側では、<strong>MobileNet-v2/v3 などの軽量バックボーン構成</strong>も含めて検証し、  
+            精度と速度のバランスが最も良い構成を選定します。</li>
         </ul>
       </li>
       <li>AIコア内での不要処理の削減
@@ -718,7 +875,7 @@
           <li>Upload time：クライアント→AIサーバへのアップロード時間。</li>
           <li>Decode time：画像の読込・デコード時間。</li>
           <li>Preprocess time：モデル入力用の前処理時間。</li>
-          <li>Inference time：Mask R-CNN の推論時間。</li>
+          <li>Inference time：YOLO11-seg / Mask R-CNN の推論時間。</li>
           <li>AI Core time：モデル+ルールエンジンを含むAI処理全体時間。</li>
           <li>Response time：クライアントへの応答完了までの総時間。</li>
         </ul>
@@ -757,7 +914,7 @@
 
   <div id="sec-6-2">
     <h3>6.2 KD連携（KDシステムとの連携）</h3>
-    <p>KD と AI サーバ間の API インターフェースは以下を想定します。</p>
+    <p>KD と AIサーバ間の API インターフェースは以下を想定します。</p>
     <ul>
       <li>KDシステムから、評価対象画像または画像URLを送信。</li>
       <li>AI側は以下を含む詳細な評価結果を返却。
@@ -879,7 +1036,7 @@
 <div class="section-box" id="sec-8">
   <h2>8. サーバインフラ費用（開発環境・本番環境）</h2>
   <p>現行システム（TensorFlow ベース）は、高スペック構成で運用されており、サーバ費用として<strong>月額40〜50万円程度</strong>が発生している状況と理解しております。</p>
-  <p>新アーキテクチャ（Mask R-CNN + PyTorch）では、最適化次第でリソース効率の改善が見込めますが、安定した推論のためには一定レベルのサーバ性能が必要となります。</p>
+  <p>新アーキテクチャ（YOLO11-seg / Mask R-CNN + PyTorch）では、最適化次第でリソース効率の改善が見込めますが、安定した推論のためには一定レベルのサーバ性能が必要となります。</p>
 
   <h3 id="sec-8-1">8.1 開発環境向けインフラ</h3>
   <ul>
@@ -944,7 +1101,7 @@
   <p>本プロジェクトは、次の3フェーズでの実行を想定しています。</p>
   <ul>
     <li><strong>フェーズ1：</strong>  
-      新AIコア（Mask R-CNN + 桶テンプレート）の構築、評価APIの実装、テンプレート管理ツールの整備。
+      新AIコア（YOLO11-seg / Mask R-CNN + 桶テンプレート）の構築、評価APIの実装、テンプレート管理ツールの整備。
       <ul>
         <li>フォーカス：評価精度の確保、新しい桶・ネタへの対応（寿司の種類に依存しない評価）。</li>
       </ul>
