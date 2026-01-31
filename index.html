@@ -271,7 +271,7 @@
 
   <div id="sec-3-2">
     <h3>3.2 「桶テンプレート（Box Template）」の定義</h3>
-    <p><strong>桶テンプレート（Box Template）</strong> は、桶ごとのマスタ設定です。  
+    <p><strong>桶テンプレート（Box Template）</strong> は、「並び × 商品名 × 人前」の組み合わせごとに定義される桶ごとのマスタ設定です。  
     評価ロジックをコード側にハードコーディングするのではなく、次のように役割分担します。</p>
     <ul>
       <li><strong>AIモデル</strong>：  
@@ -337,7 +337,7 @@
     <h3>3.3 画像評価フロー</h3>
     <p>1枚の画像に対する基本的な評価フローは次の通りです。</p>
     <ol>
-      <li>モバイルアプリから画像を受信。</li>
+      <li>モバイルアプリ側で「並び → 商品名 → 人前」を選択した上で桶を撮影し、画像をAIサーバへ送信。</li>
       <li>画像の正規化（リサイズ・正規化など）。</li>
       <li>YOLO11-seg または Mask R-CNN による推論：
         <ul>
@@ -438,9 +438,15 @@
       <li>評価APIの設計
         <ul>
           <li>例：<code>POST /api/v1/sushi/score</code>  
-          （画像アップロード → スコア・OK/NG・減点理由を含む JSON を返却）。</li>
+          （「並びID・商品ID・人前」などのパラメータと画像を受け取り → スコア・OK/NG・減点理由を含む JSON を返却）。</li>
+          <li>
+      このAPIはモバイルアプリ専用ではなく、
+      ご用意いただく検証用の画面やツールから直接画像をアップロードし、
+      AI判定結果（JSON）を取得する用途でもご利用いただける想定です。
+    </li>
         </ul>
       </li>
+
       <li>「桶テンプレート」向けデータ構造の設計
         <ul>
           <li>各桶ごとの設定（ゾーン・行・列など）を DB として管理。</li>
@@ -480,10 +486,21 @@
     各インスタンスの<strong>輪郭・重心・面積・向き</strong>などの幾何情報を出力します。  
     ルールエンジン側では、この幾何情報と桶テンプレート（Row・ゾーン・期待個数）の情報を組み合わせて採点を行います。</p>
 
-    <h4>4.3.2 テンプレート方式に対応した採点ルール例（10ルール）</h4>
-    <p>現行の10ルールと同等レベルのチェックを、テンプレート方式＋6クラスで再定義します。  
-    それぞれのルールは 0〜10 点のスコアを持ち、合計 100 点からの減点方式（または加点方式）で総合点を算出します。</p>
+    <h4>4.3.2 テンプレート方式に対応した採点ルール例（最大10ルール想定）</h4>
+    <p>
+本節では、テンプレート方式に最適化した採点ルール案として最大10個のルールを例示しますが、
+フェーズ1では現行アプリと同等の「コア6ルール」で評価を行い、
+盛り込み方法に関する追加4ルールは別途ご相談のうえ段階的に導入する想定です。
+各ルールは 0〜10 点のスコアを持ち、合計 100 点からの減点方式（または加点方式）で総合点を算出します。
+</p>
 
+<p>
+また、本件のアプリでは各ルールごとに<br>
+・ルールの有効／無効（ON/OFF）<br>
+・ルールごとの重み（ウェイト）<br>
+を設定値として変更できるように設計します。これらの設定は管理画面もしくは設定ファイルで管理し、
+AIモデルの再学習を行わずに、アプリケーション側の設定変更のみで調整可能な構成を想定しています。
+</p>
     <table class="cost-table">
       <thead>
         <tr>
@@ -764,10 +781,10 @@
           </li>
         </ul>
       </li>
-      <li><strong>4）現行の評価ルール（10ルール）の詳細</strong>
+      <li><strong>4）現行の評価ルール（6ルール＋拡張候補）の詳細</strong>
         <ul>
-          <li>最新版の10ルールの詳細資料をご提供いただきたいです。</li>
-          <li>フェーズ1で必須とするルールと、フェーズ2/3に回してもよい「高度ルール」（例：皮目の向き）を一緒に整理させてください。</li>
+          <li>現行システムで運用中の6つの評価ルールの最新版資料をご提供いただきたいです。</li>
+          <li>あわせて、将来的に追加を検討されている盛り込み方法などの評価項目（最大10ルール程度までを想定）についても、フェーズ1で必須とするルールと、フェーズ2/3に回してよい「高度ルール」（例：皮目の向き）を一緒に整理させてください。</li>
         </ul>
       </li>
     </ul>
@@ -1345,21 +1362,28 @@
   <a href="#top" class="back-to-top">ページ上部へ戻る</a>
 </div>
 
-
 <div class="section-box" id="sec-11">
   <h2>11. 見積</h2>
+
+  <!-- 11.1 AIコア開発およびアプリケーション開発に関する見積 -->
   <h3>AIコア開発およびアプリケーション開発に関する見積</h3>
   <table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse; width:100%;">
+    <colgroup>
+      <col style="width:6%;">
+      <col style="width:60%;">
+      <col style="width:10%;">
+      <col style="width:24%;">
+    </colgroup>
     <thead>
       <tr style="background:#f2f2f2;">
         <th>STT</th>
         <th>内容</th>
-        <th style="width: 12%; text-align: center;">見積（md）</th>
-        <th style="width: 10%;">備考</th>
+        <th style="text-align: center;">見積（md）</th>
+        <th>備考</th>
       </tr>
     </thead>
     <tbody>
-      <!--I-->
+      <!-- I -->
       <tr>
         <td><strong>I</strong></td>
         <td><strong>PoC準備 + PoC YOLO-seg</strong></td>
@@ -1376,9 +1400,9 @@
         <td></td>
       </tr>
       <tr><td></td><td>認識用初期モデルの学習</td><td style="text-align: center;">3</td><td></td></tr>
-      <tr><td></td><td>チューニングおよびデータ拡張</td><td style="text-align: center;">8</td><td></td></tr>
+      <tr><td></td><td>チューニングおよびデータ拡張</td><td style="text-align: center;">10</td><td></td></tr><!-- 8→10 -->
       <tr><td></td><td>学習後の結果評価</td><td style="text-align: center;">5</td><td></td></tr>
-      <tr><td></td><td>再学習（2～3回のイテレーション）</td><td style="text-align: center;">10</td><td></td></tr>
+      <tr><td></td><td>再学習（2～3回のイテレーション）</td><td style="text-align: center;">12</td><td></td></tr><!-- 10→12 -->
       <tr><td>5</td><td>アーキテクチャレビューおよび方針決定</td><td style="text-align: center;">2</td><td></td></tr>
 
       <!-- II -->
@@ -1401,7 +1425,7 @@
         <td></td>
       </tr>
       <tr><td>1</td><td>本番用追加データの収集</td><td style="text-align: center;"></td><td></td></tr>
-      <tr><td>2</td><td>QA／チェックおよび修正</td><td style="text-align: center;">12</td><td></td></tr>
+      <tr><td>2</td><td>QA／チェックおよび修正</td><td style="text-align: center;">14</td><td></td></tr><!-- 12→14 -->
       <tr><td>3</td><td>YOLO-Seg／Mask R-CNN用ツールおよびフォーマット設定</td><td style="text-align: center;">3</td><td></td></tr>
       <tr>
         <td>4</td>
@@ -1410,9 +1434,9 @@
         <td></td>
       </tr>
       <tr><td></td><td>認識用初期モデルの学習</td><td style="text-align: center;">3</td><td></td></tr>
-      <tr><td></td><td>チューニングおよびデータ拡張</td><td style="text-align: center;">10</td><td></td></tr>
+      <tr><td></td><td>チューニングおよびデータ拡張</td><td style="text-align: center;">12</td><td></td></tr><!-- 10→12 -->
       <tr><td></td><td>学習後の結果評価</td><td style="text-align: center;">5</td><td></td></tr>
-      <tr><td></td><td>再学習（2～3回のイテレーション）</td><td style="text-align: center;">13</td><td></td></tr>
+      <tr><td></td><td>再学習（2～3回のイテレーション）</td><td style="text-align: center;">15</td><td></td></tr><!-- 13→15 -->
       <tr><td>5</td><td>データセットのバージョン管理</td><td style="text-align: center;">2</td><td></td></tr>
       <tr><td>6</td><td>モデル最適化</td><td style="text-align: center;">6</td><td></td></tr>
       <tr><td>7</td><td>トレイ別・テンプレート別精度レポート作成</td><td style="text-align: center;">3</td><td></td></tr>
@@ -1434,15 +1458,15 @@
         <td></td>
       </tr>
       <tr><td></td><td>採点用初期モデルの学習</td><td style="text-align: center;">4</td><td></td></tr>
-      <tr><td></td><td>チューニングおよびデータ拡張</td><td style="text-align: center;">10</td><td></td></tr>
+      <tr><td></td><td>チューニングおよびデータ拡張</td><td style="text-align: center;">12</td><td></td></tr><!-- 10→12 -->
       <tr><td></td><td>学習結果の評価</td><td style="text-align: center;">5</td><td></td></tr>
-      <tr><td></td><td>再学習（2～3回のイテレーション）</td><td style="text-align: center;">15</td><td></td></tr>
+      <tr><td></td><td>再学習（2～3回のイテレーション）</td><td style="text-align: center;">17</td><td></td></tr><!-- 15→17 -->
       <tr><td>5</td><td>AI出力（マスク）とルールのマッピング</td><td style="text-align: center;">6</td><td></td></tr>
       <tr><td>6</td><td>テンプレート管理用簡易UI／ツールの実装</td><td style="text-align: center;">3</td><td></td></tr>
       <tr><td>7</td><td>代表的テンプレート（丸皿／角皿）での検証</td><td style="text-align: center;">5</td><td></td></tr>
       <tr><td>8</td><td>モデルのエクスポート</td><td style="text-align: center;">3</td><td></td></tr>
 
-      <!--V-->
+      <!-- V -->
       <tr>
         <td><strong>V</strong></td>
         <td><strong>API統合 + 統合テスト</strong></td>
@@ -1452,13 +1476,13 @@
       <tr><td>1</td><td>推論API（画像アップロード受付）</td><td style="text-align: center;">2</td><td></td></tr>
       <tr><td></td><td>寿司採点API</td><td style="text-align: center;">3</td><td></td></tr>
       <tr><td></td><td>デバッグAPI</td><td style="text-align: center;">1</td><td></td></tr>
-      <tr><td>2</td><td>モデル解析サービスの実装</td><td style="text-align: center;">3</td><td></td></tr>
+      <tr><td>2</td><td>モデル解析サービスの実装</td><td style="text-align: center;">5</td><td></td></tr><!-- 3→5 -->
       <tr><td>3</td><td>スコア受信APIおよびバックエンド連携</td><td style="text-align: center;">3</td><td></td></tr>
       <tr><td>4</td><td>再学習不要で変更可能な項目の整理</td><td style="text-align: center;">2</td><td></td></tr>
       <tr><td></td><td>ルール重み変更API</td><td style="text-align: center;">3</td><td></td></tr>
       <tr><td></td><td>ルール変更時の動作確認</td><td style="text-align: center;">1</td><td></td></tr>
       <tr><td>5</td><td>APIとBE・モバイル連携</td><td style="text-align: center;">2</td><td></td></tr>
-      <tr><td>6</td><td>実機環境での総合テスト</td><td style="text-align: center;">5</td><td></td></tr>
+      <tr><td>6</td><td>実機環境での総合テスト</td><td style="text-align: center;">7</td><td></td></tr><!-- 5→7 -->
       <tr><td>7</td><td>テンプレート・ルール別スコア分布確認および閾値調整</td><td style="text-align: center;">2</td><td></td></tr>
       <tr><td>8</td><td>ログ・モニタリング評価</td><td style="text-align: center;">2</td><td></td></tr>
 
@@ -1481,36 +1505,48 @@
         <td style="text-align: center;"></td>
         <td></td>
       </tr>
+      <!-- セキュリティ強化（合計10md＝80h） -->
       <tr><td>1</td><td>CloudFrontバイパス防止</td><td style="text-align: center;">2</td><td></td></tr>
       <tr><td>2</td><td>Public SSHの廃止</td><td style="text-align: center;">1</td><td></td></tr>
       <tr><td>3</td><td>デプロイ方式の変更（Public SSH非使用）</td><td style="text-align: center;">3</td><td></td></tr>
       <tr><td>4</td><td>EC2セキュリティグループの強化</td><td style="text-align: center;">1</td><td></td></tr>
       <tr><td>5</td><td>WAFのチューニング</td><td style="text-align: center;">1</td><td></td></tr>
       <tr><td>6</td><td>ロギングおよびモニタリングの追加</td><td style="text-align: center;">2</td><td></td></tr>
-      <tr><td>7</td><td>AIモデル開発用の検証環境（dev/stg）の構築</td><td style="text-align: center;">10</td><td>本番環境は既存インフラを継続利用し、本フェーズではセキュリティ強化のみを実施する想定です。</td></tr>
+      <!-- 開発用検証環境 + 連携 -->
+      <tr>
+        <td>7</td>
+        <td>AIモデル開発用の検証環境（dev/stg）の構築</td>
+        <td style="text-align: center;">12</td><!-- 10→12 -->
+        <td>フェーズ1では主に開発・検証用途の環境構築を想定しています。</td>
+      </tr>
       <tr><td>8</td><td>既存アプリケーションサーバからAIモデル推論APIへの連携構築</td><td style="text-align: center;">5</td><td></td></tr>
 
       <tr style="background:#f2f2f2;">
         <td colspan="2"><strong>合計</strong></td>
-        <td style="text-align: center;"><strong>243</strong></td>
-        <td></td>
+        <td style="text-align: center;"><strong>260</strong></td>
+        <td>1md＝8h換算。260md≒2,080h（開発2,000h + セキュリティ強化80h）</td>
       </tr>
-
     </tbody>
   </table>
 
+  <!-- 11.2 画像アノテーション作業に関する見積 -->
   <h3>画像アノテーション作業に関する見積</h3>
   <table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse; width:100%;">
+    <colgroup>
+      <col style="width:6%;">
+      <col style="width:60%;">
+      <col style="width:10%;">
+      <col style="width:24%;">
+    </colgroup>
     <thead>
       <tr style="background:#f2f2f2;">
-        <th style="width: 7%;">STT</th>
+        <th>STT</th>
         <th>内容</th>
-        <th style="width: 12%;">見積（md）</th>
-        <th style="width: 10%;">備考</th>
+        <th style="text-align: center;">見積（md）</th>
+        <th>備考</th>
       </tr>
     </thead>
     <tbody>
-
       <!-- I -->
       <tr>
         <td>I</td>
@@ -1559,56 +1595,66 @@
       <tr>
         <td>2</td>
         <td>追加データに対するアノテーション</td>
-        <td style="text-align: center;">31</td>
-        <td>約500枚</td>
+        <td style="text-align: center;">31.5</td><!-- 31→31.5 -->
+        <td>約500枚想定（合計500h相当）</td>
       </tr>
 
       <!--Total-->
       <tr style="background:#f2f2f2;">
         <td colspan="2"><strong>合計</strong></td>
-        <td style="text-align: center;"><strong>62</strong></td>
-        <td></td>
+        <td style="text-align: center;"><strong>62.5</strong></td>
+        <td>62.5md × 8h ≒ 500h</td>
       </tr>
     </tbody>
   </table>
 
+  <!-- 11.3 フェーズ1における総見積 -->
   <h3>フェーズ1における総見積</h3>
   <table border="1" cellpadding="6" cellspacing="0" style="border-collapse:collapse; width:100%;">
+    <colgroup>
+      <col style="width:6%;">
+      <col style="width:60%;">
+      <col style="width:10%;">
+      <col style="width:24%;">
+    </colgroup>
     <thead>
       <tr style="background:#f2f2f2;">
-        <th style="width: 7%;">STT</th>
+        <th>STT</th>
         <th>内容</th>
-        <th style="width: 12%;">見積（md）</th>
-        <th style="width: 10%;">備考</th>
+        <th style="text-align: center;">見積（md）</th>
+        <th>備考</th>
       </tr>
     </thead>
     <tbody>
       <tr>
         <td>1</td>
-        <td>AIコア開発およびアプリケーション開発</td>
-        <td style="text-align: center;">234</td>
-        <td></td>
+        <td>AIコア開発およびアプリケーション開発（セキュリティ強化含む）</td>
+        <td style="text-align: center;">260</td>
+        <td>
+          約2,080h（開発2,000h + セキュリティ強化80h）× 2,500円/h
+          ＝ 5,200,000円（税抜）
+        </td>
       </tr>
       <tr>
         <td>2</td>
         <td>アノテーション作業</td>
-        <td style="text-align: center;">62</td>
-        <td></td>
-      </tr>
-      <tr>
-        <td>3</td>
-        <td>管理コスト</td>
-        <td style="text-align: center;">29.6</td>
-        <td></td>
+        <td style="text-align: center;">62.5</td>
+        <td>
+          約500h × 2,000円/h ＝ 1,000,000円（税抜）
+        </td>
       </tr>
       <tr style="background:#f2f2f2;">
         <td colspan="2"><strong>合計</strong></td>
-        <td style="text-align: center;"><strong>325.6</strong></td>
-        <td></td>
+        <td style="text-align: center;"><strong>322.5</strong></td>
+        <td>
+          フェーズ1概算合計：6,200,000円（税抜）<br>
+          ※1md＝8h換算。上記は開発・セキュリティ強化・アノテーションを含む総工数ベースの試算です。
+        </td>
       </tr>
     </tbody>
   </table>
-  <a href="#top" class="back-to-top">ページ上部へ戻る</a>
+</div>
+<a href="#top" class="back-to-top">ページ上部へ戻る</a>
 </div>
 </body>
 </html>
