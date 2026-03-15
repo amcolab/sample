@@ -1,0 +1,509 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MooM - CM08-4 撮影案件詳細 (差し戻し)</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Public+Sans:wght@400;500;700&display=swap" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet"/>
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: 'Noto Sans JP', sans-serif; background: #fafafa; color: #000; font-size: 13px; margin: 0; }
+    .wf { border: 1px solid #000; }
+    .wf2 { border: 1px solid #ccc; }
+    .nav-item { display:block; padding:10px 24px; cursor:pointer; color:#333; font-size:13px; text-decoration:none; }
+    .nav-item:hover { background:#f0f0f0; }
+    .nav-active { font-weight:700; border-left:4px solid #000; background:#f9f9f9; padding:10px 20px; display:block; font-size:13px; color:#000; text-decoration:none; }
+    .btn { border:1px solid #000; padding:6px 14px; background:#fff; font-size:12px; cursor:pointer; font-family:inherit; }
+    .btn:hover { background:#f2f2f2; }
+    .btn-black { background:#000; color:#fff; border:1px solid #000; padding:7px 18px; font-size:13px; cursor:pointer; font-family:inherit; font-weight:600; }
+    .btn-black:hover { background:#333; }
+    .btn-sm { border:1px solid #000; padding:4px 12px; background:#fff; font-size:12px; cursor:pointer; font-family:inherit; }
+    .btn-sm-black { background:#000; color:#fff; border:1px solid #000; padding:4px 12px; font-size:12px; cursor:pointer; font-family:inherit; }
+    .badge { display:inline-block; border:1px solid #000; padding:2px 9px; font-size:11px; white-space:nowrap; background:#fff; }
+    .badge-dark { background:#000; color:#fff; }
+    .badge-warn { background:#fffbeb; color:#92400e; border-color:#d97706; }
+    .badge-ok { background:#f0fdf4; color:#166534; border-color:#16a34a; }
+    .badge-confirmed { background:#ecfdf5; color:#059669; border-color:#059669; }
+    .badge-rejected { background:#fef2f2; color:#dc2626; border-color:#dc2626; }
+    .card { background:#fff; border:1px solid #000; padding:18px 20px; }
+    .card-title { font-size:13px; font-weight:700; margin-bottom:14px; padding-bottom:10px; border-bottom:1px solid #eee; }
+    .info-label { font-size:11px; color:#999; margin-bottom:2px; }
+    .info-value { font-size:13px; color:#000; font-weight:500; }
+    .room-card { border:1px solid #ccc; margin-bottom:14px; }
+    .room-header { padding:10px 16px; border-bottom:1px solid #ccc; display:flex; justify-content:space-between; align-items:center; background:#f9f9f9; }
+    .room-body { padding:16px; }
+    .ph-upload-video { background:#f8fafc; border:1px dashed #cbd5e1; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px; font-size:11px; color:#94a3b8; font-weight:600; cursor:pointer; }
+    .ph-upload-video:hover { background:#f1f5f9; border-color:#000; color:#000; }
+    .ph-upload-video-green { background:#f0fdf4; border:1px dashed #22c55e; color:#166534; }
+    .ph-upload-video-green:hover { background:#e7fdec; border-color:#16a34a; }
+    .rejection-box { background:#fef2f2; border:1px solid #dc2626; padding:12px 16px; margin-bottom:16px; border-radius:2px; }
+    .rejection-label { font-weight:700; color:#dc2626; margin-bottom:8px; }
+    .media-preview { background:#1f2937; border:1px solid #ccc; display:flex; align-items:center; justify-content:center; color:#fff; font-size:24px; height:120px; margin-bottom:12px; position:relative; }
+    .media-grid-thumb { background:#1f2937; border:1px solid #ccc; height:80px; display:flex; align-items:center; justify-content:center; color:#fff; font-size:12px; position:relative; }
+    .media-grid-thumb.approved { opacity:0.7; }
+    .approved-checkmark { position:absolute; top:4px; right:4px; background:#16a34a; color:#fff; width:20px; height:20px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:12px; }
+    .media-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; }
+    .log-row { display:grid; grid-template-columns:120px 170px 1fr; gap:10px; padding:9px 0; border-bottom:1px solid #f2f2f2; }
+    .log-row:last-child { border-bottom:none; }
+    .log-time { font-size:11px; color:#999; }
+    .log-event { font-size:12px; font-weight:700; }
+    .log-desc { font-size:12px; color:#444; line-height:1.5; }
+    .memo-item { border:1px solid #ccc; padding:10px 12px; margin-bottom:8px; }
+    .alert-banner { background:#fef2f2; border-left:4px solid #dc2626; padding:12px 16px; margin-bottom:20px; display:flex; gap:12px; align-items:flex-start; }
+    .alert-banner-text { flex:1; line-height:1.5; }
+
+    /* ===== Modal ===== */
+    .modal-bg {
+      display: none; position: fixed; inset: 0;
+      background: rgba(0,0,0,0.5); z-index: 500;
+      align-items: center; justify-content: center;
+    }
+    .modal-bg.open { display: flex; }
+    .modal { background: #fff; border: 1px solid #000; }
+    .photo-row select, .photo-row input[type=text], .photo-row input[type=date] {
+      width: 100%; border: 1px solid #000; padding: 5px 8px;
+      font-size: 11px; font-family: inherit; background: #fff; outline: none;
+    }
+  </style>
+</head>
+<body style="display:flex;">
+  <!-- Sidebar -->
+  <aside style="width:200px; min-width:200px; border-right:1px solid #000; display:flex; flex-direction:column; background:#fff;">
+    <a href="CM0-01.html" style="padding:16px; border-bottom:1px solid #000; text-decoration:none; color:inherit; display:block;">
+      <div style="font-size:15px; font-weight:700;">MooM</div>
+      <div style="font-size:10px; color:#888; margin-top:2px;">カメラマンポータル</div>
+    </a>
+    <nav style="flex:1; padding:8px 0;">
+      <a href="CM0-01.html" class="nav-item">ダッシュボード</a>
+      <a href="CM2-01.html" class="nav-item">物件一覧</a>
+      <a href="CM07.html" class="nav-active">撮影案件</a>
+      <a href="CM4-01.html" class="nav-item">カレンダー</a>
+      <a href="PC2-01.html" class="nav-item">報酬管理</a>
+      <a href="AD24.html" class="nav-item">設定</a>
+    </nav>
+    <div style="padding:12px; border-top:1px solid #000;">
+      <div style="font-size:12px; color:#888; text-align:center;">佐藤 健太</div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main style="flex:1; display:flex; flex-direction:column;">
+    <!-- Top Header -->
+    <header style="height:52px; border-bottom:1px solid #000; display:flex; align-items:center; justify-content:space-between; padding:0 24px; background:#fff; flex-shrink:0;">
+      <div style="width:240px;">
+        <input type="text" placeholder="検索..." style="border:1px solid #000; padding:6px 10px; font-size:12px; width:100%; outline:none; background:#fff;" />
+      </div>
+      <div style="display:flex; gap:16px; align-items:center;">
+        <div style="position:relative; display:inline-block;" id="bellWrap">
+          <div onclick="toggleBell()" style="position:relative; cursor:pointer; font-size:18px;">🔔
+            <span style="position:absolute; top:-8px; right:-8px; background:#f44336; color:#fff; width:18px; height:18px; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700;">2</span>
+          </div>
+          <div id="bellMenu" style="display:none; position:absolute; right:0; top:calc(100% + 8px); background:#fff; border:1px solid #000; z-index:300; width:300px;">
+            <div style="padding:10px 14px; border-bottom:1px solid #000; font-weight:700; font-size:12px; background:#f9f9f9;">お知らせ <span style="color:#f44336;">(2)</span></div>
+            <a href="#" style="display:block; padding:10px 14px; border-bottom:1px solid #eee; text-decoration:none; color:#000;">
+              <div style="font-size:12px; font-weight:600;">撮影マニュアルが更新されました</div>
+              <div style="font-size:11px; color:#888; margin-top:2px;">2023/11/10 · MooM運営</div>
+            </a>
+            <a href="#" style="display:block; padding:10px 14px; border-bottom:1px solid #eee; text-decoration:none; color:#000;">
+              <div style="font-size:12px; font-weight:600;">報酬振込スケジュールのご案内</div>
+              <div style="font-size:11px; color:#888; margin-top:2px;">2023/11/05 · MooM運営</div>
+            </a>
+            <div style="padding:8px 14px; text-align:center; font-size:11px; color:#999; cursor:pointer;">すべて見る</div>
+          </div>
+        </div>
+        <div style="cursor:pointer; font-size:18px;">❓</div>
+        <div style="position:relative; display:inline-block;" id="userMenuWrap">
+          <button onclick="toggleUserMenu()" style="border:1px solid #000; padding:6px 14px; background:#fff; cursor:pointer; font-size:12px; font-weight:600; font-family:inherit;">佐藤 健太 ▾</button>
+          <div id="userMenu" style="display:none; position:absolute; right:0; top:100%; background:#fff; border:1px solid #000; z-index:200; min-width:160px;">
+            <a href="AD24.html" style="display:block; padding:9px 16px; font-size:12px; text-decoration:none; color:#000; border-bottom:1px solid #eee;">プロフィール更新</a>
+            <a href="AP0-01.html" style="display:block; padding:9px 16px; font-size:12px; text-decoration:none; color:#dc2626;">ログアウト</a>
+          </div>
+        </div>
+      </div>
+    </header>
+    <!-- Content Header -->
+    <header style="border-bottom:1px solid #000; background:#fff; padding:20px 24px;">
+      <div style="font-size:11px; color:#999; margin-bottom:12px;">撮影案件 › 案件詳細 (差し戻し)</div>
+      <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+        <div>
+          <h2 style="font-size:18px; font-weight:700; margin:0 0 12px 0;">撮影案件詳細</h2>
+          <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+            <span class="badge" style="font-weight:700;">SHT-008</span>
+            <a href="#" style="color:#0066cc; text-decoration:none; font-weight:500;">中目黒テラス ↗</a>
+            <span class="badge badge-rejected">差し戻し</span>
+            <span class="badge">Plan B（最大 5,000円）</span>
+          </div>
+        </div>
+        <button class="btn-black" onclick="openUploadModal('中目黒テラス', '301号室')">再提出する</button>
+      </div>
+    </header>
+
+    <!-- Alert Banner -->
+    <div class="alert-banner" style="margin:24px 24px 0 24px;">
+      <div style="font-weight:700; color:#dc2626;">⚠</div>
+      <div class="alert-banner-text">
+        <div style="color:#991b1b;">差し戻しがあります。内容を確認して再提出してください。</div>
+      </div>
+    </div>
+
+    <!-- Content Area -->
+    <div style="flex:1; padding:24px; display:grid; grid-template-columns:1fr 280px; gap:24px; overflow-auto;">
+      <!-- Left Column -->
+      <div>
+        <!-- 物件概要 Card -->
+        <div class="card" style="margin-bottom:24px;">
+          <div class="card-title">物件概要</div>
+          <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px;">
+            <div>
+              <div class="info-label">建物名</div>
+              <div class="info-value">グランドパレス渋谷神南</div>
+            </div>
+            <div>
+              <div class="info-label">住所</div>
+              <div class="info-value">東京都渋谷区神南1-2-3</div>
+            </div>
+            <div>
+              <div class="info-label">管理会社</div>
+              <div class="info-value">株式会社サンプル不動産</div>
+            </div>
+            <div>
+              <div class="info-label">電話番号</div>
+              <div class="info-value">03-1234-5678</div>
+            </div>
+            <div>
+              <div class="info-label">最寄り駅</div>
+              <div class="info-value">渋谷駅 徒歩5分</div>
+            </div>
+          </div>
+          <div style="background:#e0f2fe; border:1px solid #0ea5e9; height:120px; display:flex; align-items:center; justify-content:center; color:#0369a1; font-weight:600; margin-bottom:12px;">Map Placeholder</div>
+          <div style="border-top:1px solid #eee; padding-top:12px;">
+            <div class="info-label">撮影日程</div>
+            <div class="info-value">2023/11/12 09:00（完了）</div>
+          </div>
+        </div>
+
+        <!-- 差し戻し内容の確認 Section -->
+        <div style="border-bottom:2px solid #dc2626; padding-bottom:24px; margin-bottom:24px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+            <h3 style="font-size:14px; font-weight:700; margin:0;">差し戻し内容の確認</h3>
+            <button class="btn-black" onclick="openUploadModal('中目黒テラス', '301号室')">再提出</button>
+          </div>
+
+          <!-- Room 1 - Rejected -->
+          <div class="room-card">
+            <div class="room-header">
+              <div style="font-weight:700;">4LDK - 301号室</div>
+              <span class="badge badge-rejected">差し戻し</span>
+            </div>
+            <div class="room-body">
+              <!-- Rejection Info -->
+              <div class="rejection-box">
+                <div class="rejection-label">差し戻し理由</div>
+                <div style="margin-bottom:8px;">
+                  <div style="font-size:11px; color:#666; margin-bottom:4px;">理由</div>
+                  <div style="font-size:12px; color:#dc2626; font-weight:600;">動画の画質が不足している</div>
+                </div>
+                <div>
+                  <div style="font-size:11px; color:#666; margin-bottom:4px;">コメント</div>
+                  <div style="font-size:12px; color:#666; line-height:1.5;">
+                    解像度が低く、物件の詳細が確認できません。再撮影またはより高品質なファイルでのアップロードをお願いします。
+                  </div>
+                </div>
+              </div>
+
+              <!-- Re-upload Area -->
+              <div style="margin-bottom:16px;">
+                <div class="info-label" style="margin-bottom:8px;">修正ファイルをアップロード</div>
+                <div class="ph-upload-video ph-upload-video-green" style="height:120px;">
+                  <i class="fas fa-video" style="font-size:24px;"></i>
+                  <span>修正ファイルをドロップまたはクリック</span>
+                </div>
+              </div>
+
+              <div style="margin-bottom:12px;">
+                <div class="info-label" style="margin-bottom:8px;">平面図・写真の修正</div>
+                <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px;">
+                  <div class="ph-upload-video ph-upload-video-green" style="height:80px;">
+                    <i class="fas fa-plus" style="font-size:18px;"></i>
+                  </div>
+                  <div class="ph-upload-video ph-upload-video-green" style="height:80px;">
+                    <i class="fas fa-plus" style="font-size:18px;"></i>
+                  </div>
+                  <div class="ph-upload-video ph-upload-video-green" style="height:80px;">
+                    <i class="fas fa-plus" style="font-size:18px;"></i>
+                  </div>
+                </div>
+              </div>
+
+              <button class="btn-black" style="width:100%;" onclick="openUploadModal('中目黒テラス', '301号室')">再提出する</button>
+            </div>
+          </div>
+
+          <!-- Room 2 - Approved -->
+          <div class="room-card">
+            <div class="room-header">
+              <div style="font-weight:700;">1K - 205号室</div>
+              <span class="badge badge-ok">承認済み</span>
+            </div>
+            <div class="room-body">
+              <!-- Video Preview -->
+              <div style="margin-bottom:12px;">
+                <div class="info-label" style="margin-bottom:8px;">動画</div>
+                <div class="media-preview">
+                  <img src="main.jpg" alt="video thumbnail" style="width:100%; height:100%; object-fit:cover; position:absolute;">
+                  <div class="approved-checkmark" style="z-index:2;">✓</div>
+                </div>
+              </div>
+
+              <!-- Photos Grid -->
+              <div style="margin-bottom:8px;">
+                <div class="info-label" style="margin-bottom:8px;">室内写真</div>
+                <div class="media-grid">
+                  <div class="media-grid-thumb approved">
+                    <img src="inside1.jpg" alt="photo 1" style="width:100%; height:100%; object-fit:cover;">
+                    <div class="approved-checkmark">✓</div>
+                  </div>
+                  <div class="media-grid-thumb approved">
+                    <img src="inside2.jpg" alt="photo 2" style="width:100%; height:100%; object-fit:cover;">
+                    <div class="approved-checkmark">✓</div>
+                  </div>
+                  <div class="media-grid-thumb approved">
+                    <img src="inside3.jpg" alt="photo 3" style="width:100%; height:100%; object-fit:cover;">
+                    <div class="approved-checkmark">✓</div>
+                  </div>
+                </div>
+              </div>
+
+              <div style="font-size:11px; color:#166534; font-weight:600; background:#f0fdf4; padding:8px 12px; border-radius:2px;">
+                承認済み - 再提出不要
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- アクティビティログ Card -->
+        <div class="card">
+          <div class="card-title">アクティビティログ</div>
+          <div class="log-row">
+            <div class="log-time">23/11/15 16:00</div>
+            <div class="log-event">Rejected</div>
+            <div class="log-desc">301号室のデータが差し戻されました。理由：動画の画質が不足しています</div>
+          </div>
+          <div class="log-row">
+            <div class="log-time">23/11/15 12:30</div>
+            <div class="log-event">Media Submitted</div>
+            <div class="log-desc">全室の撮影データをアップロードしました</div>
+          </div>
+          <div class="log-row">
+            <div class="log-time">23/11/12 10:00</div>
+            <div class="log-event">Shooting Completed</div>
+            <div class="log-desc">撮影が完了しました</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Right Column -->
+      <div>
+        <!-- 建物外観画像 Card -->
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-title">建物外観画像</div>
+          <div style="background:#e8e8e8; height:200px; display:flex; align-items:center; justify-content:center; margin-bottom:12px;">
+            <img src="outside2.jpg" alt="外観" style="width:100%; height:100%; object-fit:cover;">
+          </div>
+          <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px;">
+            <div style="background:#e8e8e8; height:60px; cursor:pointer; border:1px solid #ccc;">
+              <img src="outside.jpg" alt="thumbnail" style="width:100%; height:100%; object-fit:cover;">
+            </div>
+            <div style="background:#e8e8e8; height:60px; cursor:pointer; border:1px solid #ccc;">
+              <img src="outside2.jpg" alt="thumbnail" style="width:100%; height:100%; object-fit:cover;">
+            </div>
+            <div style="background:#e8e8e8; height:60px; cursor:pointer; border:1px solid #ccc;">
+              <img src="outsite3.png" alt="thumbnail" style="width:100%; height:100%; object-fit:cover;">
+            </div>
+          </div>
+        </div>
+
+        <!-- 報酬情報 Card -->
+        <div class="card" style="margin-bottom:16px;">
+          <div class="card-title">報酬情報</div>
+          <div style="margin-bottom:12px;">
+            <div class="info-label">プラン</div>
+            <div class="info-value">Plan B</div>
+          </div>
+          <div style="margin-bottom:12px;">
+            <div class="info-label">報酬上限</div>
+            <div class="info-value">¥5,000</div>
+          </div>
+          <div>
+            <div class="info-label">支払いステータス</div>
+            <div class="info-value">差し止め中</div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+<!-- ===== UPLOAD MODAL ===== -->
+<div class="modal-bg" id="uploadModal">
+  <div class="modal" style="width:700px; max-width:95vw; max-height:90vh; overflow-y:auto; padding:0;">
+    <div style="padding:20px 24px; border-bottom:1px solid #000; display:flex; justify-content:space-between; align-items:center; background:#f9f9f9;">
+      <div>
+        <div style="font-size:10px; color:#999; font-weight:700; text-transform:uppercase; letter-spacing:.06em; margin-bottom:4px;">差し戻し再提出 — ファイルをアップロード</div>
+        <div style="font-size:15px; font-weight:700;"><span id="upBuilding"></span> / <span id="upRoom" style="color:#2563eb;"></span></div>
+      </div>
+      <button onclick="closeUploadModal()" style="font-size:20px; background:none; border:none; cursor:pointer; color:#666;">×</button>
+    </div>
+    <div style="padding:24px;">
+
+      <!-- Step 1: 動画 -->
+      <div style="margin-bottom:28px;">
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:14px;">
+          <div style="width:28px; height:28px; background:#000; color:#fff; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; flex-shrink:0;">1</div>
+          <span style="font-weight:700; font-size:13px;">動画 (MP4)</span>
+          <span style="font-size:10px; color:#aaa;">※ 1ファイルのみ</span>
+        </div>
+        <div id="videoDropArea" style="border:2px dashed #ccc; padding:32px; text-align:center; cursor:pointer; background:#fafafa; transition:border-color .15s;"
+          onmouseenter="this.style.borderColor='#000'; this.style.background='#f5f5f5';"
+          onmouseleave="this.style.borderColor='#ccc'; this.style.background='#fafafa';"
+          onclick="document.getElementById('videoFileInput').click()">
+          <i class="fas fa-video" style="font-size:24px; color:#ccc; display:block; margin-bottom:8px;"></i>
+          <div style="font-size:12px; color:#888;">クリックまたはドラッグ＆ドロップで動画をアップロード</div>
+          <div id="videoFileName" style="font-size:11px; color:#16a34a; font-weight:700; margin-top:8px;"></div>
+        </div>
+        <input type="file" id="videoFileInput" accept="video/*" style="display:none;" onchange="onVideoSelected(this)">
+      </div>
+
+      <!-- Step 2: 写真 -->
+      <div>
+        <div style="display:flex; align-items:center; gap:10px; margin-bottom:14px;">
+          <div style="width:28px; height:28px; background:#000; color:#fff; display:flex; align-items:center; justify-content:center; font-size:11px; font-weight:700; flex-shrink:0;">2</div>
+          <span style="font-weight:700; font-size:13px;">写真パネル（最大10枚）</span>
+        </div>
+        <div id="photoList" style="display:flex; flex-direction:column; gap:10px;"></div>
+        <button onclick="addPhotoRow()" style="width:100%; padding:14px; border:2px dashed #ddd; background:#fff; font-size:12px; font-weight:700; color:#aaa; cursor:pointer; margin-top:10px; font-family:inherit;"
+          onmouseenter="this.style.borderColor='#000'; this.style.color='#000'; this.style.background='#f9f9f9';"
+          onmouseleave="this.style.borderColor='#ddd'; this.style.color='#aaa'; this.style.background='#fff';">
+          ＋ 写真を追加する
+        </button>
+      </div>
+    </div>
+
+    <div style="padding:16px 24px; background:#f9f9f9; border-top:1px solid #eee; display:flex; justify-content:flex-end; gap:10px;">
+      <button class="btn" style="padding:8px 24px;" onclick="closeUploadModal()">キャンセル</button>
+      <button class="btn-black" style="padding:8px 32px;" onclick="saveUpload()">アップロードを完了する</button>
+    </div>
+  </div>
+</div>
+
+<!-- ===== RE-SUBMIT CONFIRM MODAL ===== -->
+<div class="modal-bg" id="reSubmitConfirmModal">
+  <div class="modal" style="width:400px; text-align:center; padding:32px;">
+    <div style="width:64px; height:64px; background:#fffbeb; border:1px solid #d97706; display:flex; align-items:center; justify-content:center; margin:0 auto 20px; font-size:24px;">✈</div>
+    <h3 style="font-size:16px; font-weight:700; margin-bottom:8px;">審査へ提出しますか？</h3>
+    <p style="font-size:12px; color:#666; margin-bottom:28px; line-height:1.6;">アップロードした動画を審査へ提出しますか？<br>「いいえ」を選ぶと下書き保存されます。</p>
+    <div style="display:flex; gap:10px;">
+      <button class="btn" style="flex:1; padding:10px;" onclick="execReSubmit(false)">いいえ、保存のみ</button>
+      <button class="btn-black" style="flex:1; padding:10px;" onclick="execReSubmit(true)">はい、提出する</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  function openUploadModal(building, room) {
+    document.getElementById('upBuilding').textContent = building;
+    document.getElementById('upRoom').textContent = room;
+    document.getElementById('videoFileName').textContent = '';
+    document.getElementById('photoList').innerHTML = '';
+    addPhotoRow();
+    document.getElementById('uploadModal').classList.add('open');
+  }
+  function closeUploadModal() {
+    document.getElementById('uploadModal').classList.remove('open');
+  }
+  function onVideoSelected(input) {
+    if (input.files && input.files[0]) {
+      document.getElementById('videoFileName').textContent = '✓ ' + input.files[0].name;
+    }
+  }
+  function addPhotoRow() {
+    var list = document.getElementById('photoList');
+    if (list.children.length >= 10) return;
+    var row = document.createElement('div');
+    row.className = 'photo-row';
+    row.style.cssText = 'display:grid; grid-template-columns:100px 1fr 130px 32px; gap:12px; align-items:start; padding:12px; border:1px solid #e5e7eb; background:#fff;';
+    row.innerHTML = `
+      <div style="width:100%; aspect-ratio:4/3; background:#f3f4f6; border:1px solid #e5e7eb; display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:18px; color:#ccc;"
+        onmouseenter="this.style.background='#e9ecef';" onmouseleave="this.style.background='#f3f4f6';">+</div>
+      <div style="display:flex; flex-direction:column; gap:8px;">
+        <div>
+          <label style="font-size:10px; font-weight:700; color:#aaa; display:block; margin-bottom:3px;">撮影エリア・箇所</label>
+          <select style="width:100%; border:1px solid #000; padding:5px 8px; font-size:11px; font-family:inherit; background:#fff; outline:none;">
+            <option>玄関</option><option>キッチン</option><option>リビング</option>
+            <option>寝室</option><option>浴室/トイレ</option><option>バルコニー</option>
+            <option>眺望/外観</option><option>その他（設備等）</option>
+          </select>
+        </div>
+        <input type="text" placeholder="詳細メモ（例：キッチンの収納内部）"
+          style="width:100%; border:1px solid #000; padding:5px 8px; font-size:11px; font-family:inherit; outline:none;">
+      </div>
+      <div>
+        <label style="font-size:10px; font-weight:700; color:#aaa; display:block; margin-bottom:3px;">撮影日</label>
+        <input type="date" style="width:100%; border:1px solid #000; padding:5px 8px; font-size:11px; font-family:inherit; outline:none;">
+      </div>
+      <div style="display:flex; align-items:flex-end; padding-bottom:2px;">
+        <button onclick="this.closest('.photo-row').remove()"
+          style="background:none; border:none; cursor:pointer; color:#ccc; font-size:14px; padding:4px;"
+          onmouseenter="this.style.color='#dc2626';" onmouseleave="this.style.color='#ccc';">✕</button>
+      </div>`;
+    list.appendChild(row);
+  }
+  function saveUpload() {
+    closeUploadModal();
+    document.getElementById('reSubmitConfirmModal').classList.add('open');
+  }
+  function execReSubmit(submit) {
+    document.getElementById('reSubmitConfirmModal').classList.remove('open');
+    var msg = submit
+      ? '再提出が完了しました。審査中になります。'
+      : '下書きとして保存しました。';
+    var t = document.createElement('div');
+    t.textContent = '✓ ' + msg;
+    t.style.cssText = 'position:fixed;bottom:24px;right:24px;background:#333;color:#fff;padding:10px 18px;font-size:12px;z-index:999;font-family:inherit;';
+    document.body.appendChild(t);
+    setTimeout(function(){ t.remove(); }, 2800);
+  }
+  // close modal on backdrop click
+  document.addEventListener('click', function(e) {
+    if (e.target.id === 'uploadModal') closeUploadModal();
+    if (e.target.id === 'reSubmitConfirmModal') document.getElementById('reSubmitConfirmModal').classList.remove('open');
+  });
+
+  function toggleBell() {
+    var m = document.getElementById('bellMenu');
+    m.style.display = m.style.display === 'none' ? 'block' : 'none';
+    var u = document.getElementById('userMenu');
+    if (u) u.style.display = 'none';
+  }
+  function toggleUserMenu() {
+    var m = document.getElementById('userMenu');
+    m.style.display = m.style.display === 'none' ? 'block' : 'none';
+    var b = document.getElementById('bellMenu');
+    if (b) b.style.display = 'none';
+  }
+  document.addEventListener('click', function(e) {
+    var bellWrap = document.getElementById('bellWrap');
+    if (bellWrap && !bellWrap.contains(e.target)) {
+      var bm = document.getElementById('bellMenu');
+      if (bm) bm.style.display = 'none';
+    }
+    var wrap = document.getElementById('userMenuWrap');
+    if (wrap && !wrap.contains(e.target)) {
+      var um = document.getElementById('userMenu');
+      if (um) um.style.display = 'none';
+    }
+  });
+</script>
+</body>
+</html>

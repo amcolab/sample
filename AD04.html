@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>物件詳細 - カメラマンポータル</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet"/>
+  <style>
+    * { font-family: 'Noto Sans JP', sans-serif; border-radius: 0 !important; }
+    body { background: #fafafa; color: #000; }
+    .nav-item { display:block; padding:10px 24px; cursor:pointer; color:#333; font-size:13px; text-decoration:none; }
+    .nav-item:hover { background:#f0f0f0; }
+    .nav-active { font-weight:700; border-left:4px solid #000; background:#f9f9f9; padding:10px 20px; display:block; font-size:13px; color:#000; text-decoration:none; }
+    .wf { border: 1px solid #000; }
+    .detail-label {
+      background-color: #f9fafb; font-weight: 700; font-size: 11px; color: #4b5563;
+      width: 140px; min-width: 140px; padding: 8px 12px;
+      border-right: 1px solid #e5e7eb; display: flex; align-items: center;
+    }
+    .detail-value { padding: 8px 16px; font-size: 13px; flex: 1; }
+    .section-head { background:#f2f2f2; padding:10px 14px; border-bottom:1px solid #000; font-size:13px; font-weight:700; }
+    .badge-live { background:#d1fae5; color:#065f46; border:1px solid #6ee7b7; font-size:11px; padding:2px 8px; font-weight:700; display:inline-block; }
+  </style>
+</head>
+<body>
+<div style="display:flex; min-height:100vh;">
+
+  <!-- SIDEBAR -->
+  <aside style="width:200px; min-width:200px; border-right:1px solid #000; display:flex; flex-direction:column; min-height:100vh; background:#fff;">
+    <a href="CM0-01.html" style="padding:16px; border-bottom:1px solid #000; text-decoration:none; color:inherit; display:block;">
+      <div style="font-size:15px; font-weight:700;">MooM</div>
+      <div style="font-size:10px; color:#888; margin-top:2px;">カメラマンポータル</div>
+    </a>
+    <nav style="flex:1; padding:8px 0;">
+      <a href="CM0-01.html" class="nav-item">ダッシュボード</a>
+      <a href="CM2-01.html" class="nav-active">物件一覧</a>
+      <a href="CM07.html" class="nav-item">撮影案件</a>
+      <a href="CM4-01.html" class="nav-item">カレンダー</a>
+      <a href="PC2-01.html" class="nav-item">報酬管理</a>
+      <a href="AD24.html" class="nav-item">設定</a>
+    </nav>
+    <div style="padding:12px; border-top:1px solid #000;">
+      <div style="font-size:12px; color:#888; text-align:center;">佐藤 健太</div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main style="flex:1; display:flex; flex-direction:column; min-width:0; overflow-y:auto;">
+
+    <!-- Header -->
+    <header style="height:52px; border-bottom:1px solid #000; display:flex; align-items:center; justify-content:space-between; padding:0 24px; background:#fff; flex-shrink:0; position:sticky; top:0; z-index:100;">
+      <div style="width:240px;">
+        <input type="text" placeholder="検索..." style="border:1px solid #000; padding:6px 10px; font-size:12px; width:100%; outline:none; background:#fff; font-family:inherit;" />
+      </div>
+      <div style="display:flex; gap:16px; align-items:center;">
+        <div id="bellWrap" style="position:relative;">
+          <button onclick="toggleBell()" style="background:none; border:none; cursor:pointer; font-size:18px; padding:4px;">🔔</button>
+          <div id="bellDrop" style="display:none; position:absolute; right:0; top:36px; width:280px; background:#fff; border:1px solid #000; z-index:200; box-shadow:2px 2px 0 #000;">
+            <div style="padding:10px 14px; border-bottom:1px solid #000; font-size:12px; font-weight:700;">お知らせ</div>
+            <div style="padding:10px 14px; font-size:12px; border-bottom:1px solid #eee;">撮影案件SHT-033の予約が確定しました</div>
+            <div style="padding:10px 14px; font-size:12px; border-bottom:1px solid #eee;">SHT-021のアップロードが承認されました</div>
+            <div style="padding:10px 14px; font-size:12px;">新しい撮影依頼が届きました</div>
+          </div>
+        </div>
+        <button style="background:none; border:none; cursor:pointer; font-size:16px; padding:4px;">❓</button>
+        <div id="userMenuWrap" style="position:relative;">
+          <button onclick="toggleUserMenu()" style="background:none; border:1px solid #000; cursor:pointer; font-size:12px; padding:6px 12px; font-family:inherit;">佐藤 健太 ▾</button>
+          <div id="userMenuDrop" style="display:none; position:absolute; right:0; top:36px; width:180px; background:#fff; border:1px solid #000; z-index:200; box-shadow:2px 2px 0 #000;">
+            <a href="AD24.html" style="display:block; padding:10px 14px; font-size:12px; text-decoration:none; color:#333; border-bottom:1px solid #eee;">プロフィール更新</a>
+            <a href="AP0-01.html" style="display:block; padding:10px 14px; font-size:12px; text-decoration:none; color:#333;">ログアウト</a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <div style="padding:32px;">
+
+      <!-- Breadcrumb -->
+      <div style="font-size:11px; color:#888; margin-bottom:16px;">
+        <a href="CM2-01.html" style="color:#2563eb; text-decoration:none;">物件一覧</a>
+        <span style="margin:0 6px;">›</span>
+        <span>物件詳細</span>
+      </div>
+
+      <!-- Page Header -->
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:24px; flex-wrap:wrap; gap:12px;">
+        <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
+          <h2 style="font-size:22px; font-weight:700; margin:0;">サンシャイン・レジデンス A</h2>
+          <span class="badge-live">掲載中</span>
+          <span style="font-size:11px; color:#666; border:1px solid #ccc; padding:2px 8px;">12部屋</span>
+        </div>
+        <a href="CM2-01.html" style="border:1px solid #000; padding:7px 16px; font-size:12px; text-decoration:none; color:#000; background:#fff; white-space:nowrap;">← 物件一覧に戻る</a>
+      </div>
+
+      <!-- Two-column layout -->
+      <div style="display:grid; grid-template-columns:1fr 320px; gap:24px; align-items:start;">
+
+        <!-- Left -->
+        <div style="display:flex; flex-direction:column; gap:24px;">
+
+          <!-- 物件概要 -->
+          <section class="wf" style="background:#fff; overflow:hidden;">
+            <div class="section-head">物件概要</div>
+            <div style="padding:24px;">
+              <h3 style="font-size:17px; font-weight:700; margin:0 0 20px 0;">サンシャイン・レジデンス A</h3>
+              <div style="display:grid; grid-template-columns:1fr 1fr; gap:20px 32px;">
+                <div>
+                  <div style="font-size:10px; color:#999; font-weight:700; text-transform:uppercase; letter-spacing:.05em; margin-bottom:4px;">住所</div>
+                  <div style="font-size:13px; border-bottom:1px solid #eee; padding-bottom:8px;">東京都渋谷区神南1-2-3</div>
+                </div>
+                <div>
+                  <div style="font-size:10px; color:#999; font-weight:700; text-transform:uppercase; letter-spacing:.05em; margin-bottom:4px;">最寄駅</div>
+                  <div style="font-size:13px; border-bottom:1px solid #eee; padding-bottom:8px;">渋谷駅 徒歩8分</div>
+                </div>
+                <div>
+                  <div style="font-size:10px; color:#999; font-weight:700; text-transform:uppercase; letter-spacing:.05em; margin-bottom:4px;">管理会社</div>
+                  <div style="font-size:13px; border-bottom:1px solid #eee; padding-bottom:8px;">〇〇不動産レジデンシャル</div>
+                </div>
+                <div>
+                  <div style="font-size:10px; color:#999; font-weight:700; text-transform:uppercase; letter-spacing:.05em; margin-bottom:4px;">電話番号</div>
+                  <div style="font-size:13px; border-bottom:1px solid #eee; padding-bottom:8px;">03-1234-5678</div>
+                </div>
+              </div>
+              <div style="margin-top:24px; width:100%; height:140px; background:#f2f2f2; border:1px dashed #ccc; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:6px; opacity:.6;">
+                <span style="font-size:28px;">🗺</span>
+                <span style="font-size:11px; color:#888;">GOOGLE MAP PLACEHOLDER</span>
+              </div>
+            </div>
+          </section>
+
+          <!-- ルームタイプ -->
+          <section class="wf" style="background:#fff; overflow:hidden;">
+            <div class="section-head">ルームタイプ</div>
+            <div style="padding:20px; display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+              <!-- Room card template x2 -->
+              <div class="wf" style="display:flex; flex-direction:column; background:#fff;">
+                <div style="position:relative; height:140px; background:#f2f2f2; border-bottom:1px solid #000; display:flex; align-items:center; justify-content:center;">
+                  <span style="font-size:11px; color:#aaa;">間取り図</span>
+                  <button style="position:absolute; left:4px; top:50%; transform:translateY(-50%); background:#fff; border:1px solid #000; width:22px; height:22px; cursor:pointer;">‹</button>
+                  <button style="position:absolute; right:4px; top:50%; transform:translateY(-50%); background:#fff; border:1px solid #000; width:22px; height:22px; cursor:pointer;">›</button>
+                </div>
+                <div style="padding:8px; border-bottom:1px solid #000; display:grid; grid-template-columns:repeat(3,1fr); gap:4px; background:#f9f9f9;">
+                  <div style="aspect-ratio:1; background:#e5e7eb; border:1px solid #ccc;"></div>
+                  <div style="aspect-ratio:1; background:#e5e7eb; border:1px solid #ccc;"></div>
+                  <div style="aspect-ratio:1; background:#e5e7eb; border:1px solid #ccc;"></div>
+                </div>
+                <div style="padding:10px 12px; display:flex; justify-content:space-between; align-items:center; background:#fff;">
+                  <span style="font-weight:700; font-size:13px;">1K / 26.5㎡ / 8万円</span>
+                  <button onclick="showRoomDetail()" style="border:1px solid #000; padding:4px 10px; font-size:11px; cursor:pointer; background:#fff;">詳細</button>
+                </div>
+              </div>
+              <div class="wf" style="display:flex; flex-direction:column; background:#fff;">
+                <div style="position:relative; height:140px; background:#f2f2f2; border-bottom:1px solid #000; display:flex; align-items:center; justify-content:center;">
+                  <span style="font-size:11px; color:#aaa;">間取り図</span>
+                  <button style="position:absolute; left:4px; top:50%; transform:translateY(-50%); background:#fff; border:1px solid #000; width:22px; height:22px; cursor:pointer;">‹</button>
+                  <button style="position:absolute; right:4px; top:50%; transform:translateY(-50%); background:#fff; border:1px solid #000; width:22px; height:22px; cursor:pointer;">›</button>
+                </div>
+                <div style="padding:8px; border-bottom:1px solid #000; display:grid; grid-template-columns:repeat(3,1fr); gap:4px; background:#f9f9f9;">
+                  <div style="aspect-ratio:1; background:#e5e7eb; border:1px solid #ccc;"></div>
+                  <div style="aspect-ratio:1; background:#e5e7eb; border:1px solid #ccc;"></div>
+                  <div style="aspect-ratio:1; background:#e5e7eb; border:1px solid #ccc;"></div>
+                </div>
+                <div style="padding:10px 12px; display:flex; justify-content:space-between; align-items:center; background:#fff;">
+                  <span style="font-weight:700; font-size:13px;">2LDK / 58.0㎡ / 14万円</span>
+                  <button onclick="showRoomDetail()" style="border:1px solid #000; padding:4px 10px; font-size:11px; cursor:pointer; background:#fff;">詳細</button>
+                </div>
+              </div>
+            </div>
+          </section>
+
+        </div>
+
+        <!-- Right -->
+        <div style="display:flex; flex-direction:column; gap:20px;">
+
+          <!-- 物件外観画像 -->
+          <section class="wf" style="background:#fff; overflow:hidden;">
+            <div class="section-head">物件外観画像</div>
+            <div style="padding:16px; display:flex; flex-direction:column; gap:10px;">
+              <div style="position:relative; width:100%; aspect-ratio:16/9; background:#e5e7eb; border:1px solid #ccc; display:flex; align-items:center; justify-content:center; font-size:11px; color:#aaa;">
+                MAIN IMAGE
+                <button style="position:absolute; left:4px; top:50%; transform:translateY(-50%); background:#fff; border:1px solid #000; width:22px; height:22px; cursor:pointer;">‹</button>
+                <button style="position:absolute; right:4px; top:50%; transform:translateY(-50%); background:#fff; border:1px solid #000; width:22px; height:22px; cursor:pointer;">›</button>
+              </div>
+              <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:6px;">
+                <div style="aspect-ratio:1; background:#e5e7eb; border:1px solid #ccc;"></div>
+                <div style="aspect-ratio:1; background:#e5e7eb; border:1px solid #ccc;"></div>
+                <div style="aspect-ratio:1; background:#e5e7eb; border:1px solid #ccc;"></div>
+                <div style="aspect-ratio:1; background:#f2f2f2; border:1px solid #ccc; display:flex; align-items:center; justify-content:center; font-size:9px; color:#aaa; font-style:italic;">NO IMG</div>
+              </div>
+            </div>
+          </section>
+
+          <!-- CTA -->
+          <a href="CM2-01.html" onclick="event.preventDefault(); history.back();" style="display:block; width:100%; background:#000; color:#fff; border:none; padding:14px; font-size:14px; font-weight:700; cursor:pointer; text-align:center; text-decoration:none; letter-spacing:.02em;">
+            撮影を受注する →
+          </a>
+
+        </div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<!-- Room Detail Modal -->
+<div id="roomDetailModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,.5); z-index:300; align-items:center; justify-content:center; padding:16px;">
+  <div style="background:#fff; border:1px solid #000; max-width:760px; width:100%; max-height:90vh; display:flex; flex-direction:column; box-shadow:4px 4px 0 #000;">
+    <div style="background:#f2f2f2; padding:12px 16px; border-bottom:1px solid #000; display:flex; justify-content:space-between; align-items:center; flex-shrink:0;">
+      <div style="display:flex; align-items:center; gap:10px;">
+        <span style="background:#000; color:#fff; font-size:10px; padding:2px 8px; font-weight:700; letter-spacing:.05em;">ROOM DETAIL</span>
+        <span style="font-weight:700; font-size:14px;">サンシャイン・レジデンス A 101号室</span>
+      </div>
+      <button onclick="hideRoomDetail()" style="background:none; border:1px solid #000; padding:4px 10px; cursor:pointer; font-size:12px;">✕ 閉じる</button>
+    </div>
+    <div style="flex:1; overflow-y:auto; padding:24px; display:flex; flex-direction:column; gap:20px;">
+
+      <div class="wf" style="overflow:hidden;">
+        <div style="background:#f2f2f2; padding:8px 14px; border-bottom:1px solid #000; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:#555;">賃料・契約金</div>
+        <div style="background:#fff;">
+          <div style="display:flex; border-bottom:1px solid #e5e7eb;">
+            <div class="detail-label">賃料</div><div class="detail-value" style="color:#2563eb; font-weight:700;">80,000円</div>
+            <div class="detail-label" style="border-left:1px solid #e5e7eb;">管理費・共益費</div><div class="detail-value">管理費: 5,000円</div>
+          </div>
+          <div style="display:flex;">
+            <div class="detail-label">敷金・礼金</div><div class="detail-value">敷金: 1ヶ月 / 礼金: 1ヶ月</div>
+            <div class="detail-label" style="border-left:1px solid #e5e7eb;">広告費 (AD)</div><div class="detail-value">1ヶ月</div>
+          </div>
+        </div>
+      </div>
+
+      <div class="wf" style="overflow:hidden;">
+        <div style="background:#f2f2f2; padding:8px 14px; border-bottom:1px solid #000; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:#555;">所在地・交通</div>
+        <div style="background:#fff;">
+          <div style="display:flex; border-bottom:1px solid #e5e7eb;">
+            <div class="detail-label">所在地</div><div class="detail-value" style="font-size:12px; color:#555;">東京都渋谷区神南1-2-3</div>
+          </div>
+          <div style="display:flex;">
+            <div class="detail-label">アクセス</div>
+            <div class="detail-value" style="font-size:12px; line-height:1.7;">
+              JR山手線 渋谷駅 徒歩8分<br/>
+              <span style="color:#888;">東京メトロ副都心線 渋谷駅 徒歩9分</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="wf" style="overflow:hidden;">
+        <div style="background:#f2f2f2; padding:8px 14px; border-bottom:1px solid #000; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:#555;">部屋・建物詳細</div>
+        <div style="background:#fff; display:grid; grid-template-columns:1fr 1fr;">
+          <div style="display:flex; border-bottom:1px solid #e5e7eb; border-right:1px solid #e5e7eb;"><div class="detail-label">間取り</div><div class="detail-value">1K</div></div>
+          <div style="display:flex; border-bottom:1px solid #e5e7eb;"><div class="detail-label">専有面積</div><div class="detail-value">26.5㎡</div></div>
+          <div style="display:flex; border-bottom:1px solid #e5e7eb; border-right:1px solid #e5e7eb;"><div class="detail-label">所在階 / 階建</div><div class="detail-value" style="font-size:12px;">3階 / 10階建</div></div>
+          <div style="display:flex; border-bottom:1px solid #e5e7eb;"><div class="detail-label">主要採光面</div><div class="detail-value" style="font-size:12px;">南向き</div></div>
+          <div style="display:flex; border-right:1px solid #e5e7eb;"><div class="detail-label">建物種別</div><div class="detail-value" style="font-size:12px;">マンション</div></div>
+          <div style="display:flex;"><div class="detail-label">築年数</div><div class="detail-value" style="font-size:12px;">2010年3月 (築14年)</div></div>
+        </div>
+      </div>
+
+      <div class="wf" style="overflow:hidden;">
+        <div style="background:#f2f2f2; padding:8px 14px; border-bottom:1px solid #000; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:#555;">入居・契約条件</div>
+        <div style="background:#fff;">
+          <div style="display:flex; border-bottom:1px solid #e5e7eb;">
+            <div class="detail-label">入居・内見</div><div class="detail-value" style="color:#dc2626; font-weight:700;">即入居可 / 即内見可</div>
+          </div>
+          <div style="display:flex;">
+            <div class="detail-label">契約区分</div><div class="detail-value">普通借家 (2年間)</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+    <div style="background:#f9f9f9; border-top:1px solid #000; padding:12px 16px; display:flex; justify-content:flex-end; flex-shrink:0;">
+      <button onclick="hideRoomDetail()" style="border:1px solid #000; padding:8px 28px; font-weight:700; cursor:pointer; background:#fff; font-size:13px;">閉じる</button>
+    </div>
+  </div>
+</div>
+
+<script>
+  function toggleBell(){
+    const d=document.getElementById('bellDrop');
+    const u=document.getElementById('userMenuDrop');
+    if(u) u.style.display='none';
+    d.style.display=d.style.display==='block'?'none':'block';
+  }
+  function toggleUserMenu(){
+    const d=document.getElementById('userMenuDrop');
+    const b=document.getElementById('bellDrop');
+    if(b) b.style.display='none';
+    d.style.display=d.style.display==='block'?'none':'block';
+  }
+  document.addEventListener('click',function(e){
+    const bw=document.getElementById('bellWrap');
+    const uw=document.getElementById('userMenuWrap');
+    if(bw && !bw.contains(e.target)) document.getElementById('bellDrop').style.display='none';
+    if(uw && !uw.contains(e.target)) document.getElementById('userMenuDrop').style.display='none';
+  });
+  function showRoomDetail(){
+    const m=document.getElementById('roomDetailModal');
+    m.style.display='flex';
+  }
+  function hideRoomDetail(){
+    document.getElementById('roomDetailModal').style.display='none';
+  }
+</script>
+</body>
+</html>

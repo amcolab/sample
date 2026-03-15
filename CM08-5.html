@@ -1,0 +1,543 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>MooM - CM08-5 撮影案件詳細 (完了・公開中)</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Public+Sans:wght@400;500;700&display=swap" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet"/>
+  <style>
+    * { box-sizing: border-box; }
+    body { font-family: 'Noto Sans JP', sans-serif; background: #fafafa; color: #000; font-size: 13px; margin: 0; }
+    .wf { border: 1px solid #000; }
+    .wf2 { border: 1px solid #ccc; }
+    .nav-item { display:block; padding:10px 24px; cursor:pointer; color:#333; font-size:13px; text-decoration:none; }
+    .nav-item:hover { background:#f0f0f0; }
+    .nav-active { font-weight:700; border-left:4px solid #000; background:#f9f9f9; padding:10px 20px; display:block; font-size:13px; color:#000; text-decoration:none; }
+    .btn { border:1px solid #000; padding:6px 14px; background:#fff; font-size:12px; cursor:pointer; font-family:inherit; }
+    .btn:hover { background:#f2f2f2; }
+    .btn-black { background:#000; color:#fff; border:1px solid #000; padding:7px 18px; font-size:13px; cursor:pointer; font-family:inherit; font-weight:600; }
+    .btn-black:hover { background:#333; }
+    .btn-sm { border:1px solid #000; padding:4px 12px; background:#fff; font-size:12px; cursor:pointer; font-family:inherit; }
+    .btn-sm-black { background:#000; color:#fff; border:1px solid #000; padding:4px 12px; font-size:12px; cursor:pointer; font-family:inherit; }
+    .badge { display:inline-block; border:1px solid #000; padding:2px 9px; font-size:11px; white-space:nowrap; background:#fff; }
+    .badge-dark { background:#000; color:#fff; }
+    .badge-warn { background:#f5f5f5; color:#444; border-color:#999; }
+    .badge-ok { background:#f5f5f5; color:#444; border-color:#999; }
+    .badge-confirmed { background:#f5f5f5; color:#444; border-color:#999; }
+    .badge-rejected { background:#f5f5f5; color:#444; border-color:#999; }
+    .card { background:#fff; border:1px solid #000; margin-bottom:24px; }
+    .card-title {
+      font-size:13px; font-weight:700; padding:14px 20px;
+      border-bottom:1px solid #eee;
+      display:flex; justify-content:space-between; align-items:center;
+      cursor:pointer; user-select:none;
+    }
+    .card-title:hover { background:#fafafa; }
+    .card-toggle { font-size:12px; color:#888; font-weight:400; flex-shrink:0; margin-left:8px; }
+    .card-body { padding:18px 20px; }
+    .info-label { font-size:11px; color:#999; margin-bottom:2px; }
+    .info-value { font-size:13px; color:#000; font-weight:500; }
+    .room-card { border:1px solid #ccc; margin-bottom:14px; }
+    .room-header { padding:10px 16px; border-bottom:1px solid #ccc; display:flex; justify-content:space-between; align-items:center; background:#f9f9f9; }
+    .room-body { padding:16px; }
+    .media-preview { background:#1f2937; border:1px solid #ccc; display:flex; align-items:center; justify-content:center; color:#fff; font-size:24px; height:160px; margin-bottom:12px; position:relative; }
+    .media-play-btn { position:absolute; width:40px; height:40px; background:rgba(255,255,255,0.9); border-radius:50%; display:flex; align-items:center; justify-content:center; color:#1f2937; font-size:16px; }
+    .media-grid-thumb { background:#1f2937; border:1px solid #ccc; height:100px; display:flex; align-items:center; justify-content:center; color:#fff; font-size:12px; }
+    .media-grid { display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px; }
+    .approved-checkmark { position:absolute; top:4px; right:4px; background:#333; color:#fff; width:24px; height:24px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:14px; font-weight:bold; }
+    .log-row { display:grid; grid-template-columns:120px 170px 1fr; gap:10px; padding:9px 0; border-bottom:1px solid #f2f2f2; }
+    .log-row:last-child { border-bottom:none; }
+    .log-time { font-size:11px; color:#999; }
+    .log-event { font-size:12px; font-weight:700; }
+    .log-desc { font-size:12px; color:#444; line-height:1.5; }
+    .memo-item { border:1px solid #ccc; padding:10px 12px; margin-bottom:8px; }
+    .alert-banner-success { background:#f5f5f5; border-left:4px solid #000; padding:12px 16px; margin-bottom:20px; display:flex; gap:12px; align-items:flex-start; }
+    .alert-banner-text { flex:1; line-height:1.5; color:#000; }
+    .summary-row { display:grid; grid-template-columns:1fr 1fr; gap:12px; padding:12px 0; border-bottom:1px solid #eee; }
+    .summary-row:last-child { border-bottom:none; }
+    .bonus-row { background:#f5f5f5; border:1px solid #ccc; border-left:3px solid #000; padding:12px 14px; margin-top:12px; }
+    .bonus-calc { font-size:11px; color:#555; margin-top:3px; }
+    .reward-total { display:flex; justify-content:space-between; align-items:center; padding:12px 14px; background:#f9f9f9; border:1px solid #000; margin-top:10px; }
+    .reward-total-label { font-size:12px; font-weight:700; }
+    .reward-total-value { font-size:18px; font-weight:700; }
+
+    /* 内覧なし申込 ribbon */
+    .ribbon-nairan {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      background: #f5f5f5;
+      border: 1px solid #ccc;
+      border-left: 5px solid #000;
+      padding: 12px 18px;
+    }
+    .ribbon-nairan-icon {
+      font-size: 22px;
+      flex-shrink: 0;
+    }
+    .ribbon-nairan-body {}
+    .ribbon-nairan-title {
+      font-size: 13px;
+      font-weight: 700;
+      color: #000;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+    .ribbon-nairan-title .tag {
+      display: inline-block;
+      background: #000;
+      color: #fff;
+      font-size: 10px;
+      padding: 2px 8px;
+      font-weight: 700;
+      letter-spacing: 0.04em;
+    }
+    .ribbon-nairan-sub {
+      font-size: 11px;
+      color: #666;
+      margin-top: 3px;
+    }
+
+    /* Accordion section (承認済み撮影データ uses a section wrapper, not .card) */
+    .section-block { border:1px solid #000; margin-bottom:24px; background:#fff; }
+    .section-title {
+      font-size:14px; font-weight:700;
+      padding:14px 20px;
+      border-bottom:1px solid #eee;
+      display:flex; justify-content:space-between; align-items:center;
+      cursor:pointer; user-select:none;
+    }
+    .section-title:hover { background:#fafafa; }
+    .section-toggle { font-size:12px; color:#888; font-weight:400; flex-shrink:0; margin-left:8px; }
+    .section-body { padding:20px; }
+  </style>
+</head>
+<body style="display:flex;">
+  <!-- Sidebar -->
+  <aside style="width:200px; min-width:200px; border-right:1px solid #000; display:flex; flex-direction:column; background:#fff;">
+    <a href="CM0-01.html" style="padding:16px; border-bottom:1px solid #000; text-decoration:none; color:inherit; display:block;">
+      <div style="font-size:15px; font-weight:700;">MooM</div>
+      <div style="font-size:10px; color:#888; margin-top:2px;">カメラマンポータル</div>
+    </a>
+    <nav style="flex:1; padding:8px 0;">
+      <a href="CM0-01.html" class="nav-item">ダッシュボード</a>
+      <a href="CM2-01.html" class="nav-item">物件一覧</a>
+      <a href="CM07.html" class="nav-active">撮影案件</a>
+      <a href="CM4-01.html" class="nav-item">カレンダー</a>
+      <a href="PC2-01.html" class="nav-item">報酬管理</a>
+      <a href="AD24.html" class="nav-item">設定</a>
+    </nav>
+    <div style="padding:12px; border-top:1px solid #000;">
+      <div style="font-size:12px; color:#888; text-align:center;">佐藤 健太</div>
+    </div>
+  </aside>
+
+  <!-- Main Content -->
+  <main style="flex:1; display:flex; flex-direction:column;">
+    <!-- Top Header -->
+    <header style="height:52px; border-bottom:1px solid #000; display:flex; align-items:center; justify-content:space-between; padding:0 24px; background:#fff; flex-shrink:0;">
+      <div style="width:240px;">
+        <input type="text" placeholder="検索..." style="border:1px solid #000; padding:6px 10px; font-size:12px; width:100%; outline:none; background:#fff;" />
+      </div>
+      <div style="display:flex; gap:16px; align-items:center;">
+        <div style="position:relative; display:inline-block;" id="bellWrap">
+          <div onclick="toggleBell()" style="position:relative; cursor:pointer; font-size:18px;">🔔
+            <span style="position:absolute; top:-8px; right:-8px; background:#f44336; color:#fff; width:18px; height:18px; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700;">2</span>
+          </div>
+          <div id="bellMenu" style="display:none; position:absolute; right:0; top:calc(100% + 8px); background:#fff; border:1px solid #000; z-index:300; width:300px;">
+            <div style="padding:10px 14px; border-bottom:1px solid #000; font-weight:700; font-size:12px; background:#f9f9f9;">お知らせ <span style="color:#f44336;">(2)</span></div>
+            <a href="#" style="display:block; padding:10px 14px; border-bottom:1px solid #eee; text-decoration:none; color:#000;">
+              <div style="font-size:12px; font-weight:600;">撮影マニュアルが更新されました</div>
+              <div style="font-size:11px; color:#888; margin-top:2px;">2023/11/10 · MooM運営</div>
+            </a>
+            <a href="#" style="display:block; padding:10px 14px; border-bottom:1px solid #eee; text-decoration:none; color:#000;">
+              <div style="font-size:12px; font-weight:600;">報酬振込スケジュールのご案内</div>
+              <div style="font-size:11px; color:#888; margin-top:2px;">2023/11/05 · MooM運営</div>
+            </a>
+            <div style="padding:8px 14px; text-align:center; font-size:11px; color:#999; cursor:pointer;">すべて見る</div>
+          </div>
+        </div>
+        <div style="cursor:pointer; font-size:18px;">❓</div>
+        <div style="position:relative; display:inline-block;" id="userMenuWrap">
+          <button onclick="toggleUserMenu()" style="border:1px solid #000; padding:6px 14px; background:#fff; cursor:pointer; font-size:12px; font-weight:600; font-family:inherit;">佐藤 健太 ▾</button>
+          <div id="userMenu" style="display:none; position:absolute; right:0; top:100%; background:#fff; border:1px solid #000; z-index:200; min-width:160px;">
+            <a href="AD24.html" style="display:block; padding:9px 16px; font-size:12px; text-decoration:none; color:#000; border-bottom:1px solid #eee;">プロフィール更新</a>
+            <a href="AP0-01.html" style="display:block; padding:9px 16px; font-size:12px; text-decoration:none; color:#dc2626;">ログアウト</a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Content Header -->
+    <header style="border-bottom:1px solid #000; background:#fff; padding:20px 24px;">
+      <div style="font-size:11px; color:#999; margin-bottom:12px;">撮影案件 › 案件詳細 (完了)</div>
+      <div style="display:flex; justify-content:space-between; align-items:flex-start; gap:24px;">
+        <div>
+          <h2 style="font-size:18px; font-weight:700; margin:0 0 12px 0;">撮影案件詳細</h2>
+          <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
+            <span class="badge" style="font-weight:700;">SHT-012</span>
+            <a href="#" style="color:#0066cc; text-decoration:none; font-weight:500;">広尾アパートメント ↗</a>
+            <span class="badge badge-dark">公開中</span>
+            <span class="badge">Plan B（最大 5,000円）</span>
+          </div>
+        </div>
+        <!-- Engagement metrics -->
+        <div style="display:flex; gap:0; border:1px solid #e5e7eb; flex-shrink:0; align-self:flex-end;">
+          <div style="padding:8px 16px; border-right:1px solid #e5e7eb; text-align:center; min-width:72px;">
+            <div style="font-size:15px; font-weight:700;">1,284</div>
+            <div style="font-size:10px; color:#999; margin-top:2px;">👁 視聴数</div>
+          </div>
+          <div style="padding:8px 16px; border-right:1px solid #e5e7eb; text-align:center; min-width:72px;">
+            <div style="font-size:15px; font-weight:700;">97</div>
+            <div style="font-size:10px; color:#999; margin-top:2px;">♡ いいね</div>
+          </div>
+          <div style="padding:8px 16px; border-right:1px solid #e5e7eb; text-align:center; min-width:72px;">
+            <div style="font-size:15px; font-weight:700;">54</div>
+            <div style="font-size:10px; color:#999; margin-top:2px;">🔖 保存</div>
+          </div>
+          <div style="padding:8px 16px; border-right:1px solid #e5e7eb; text-align:center; min-width:72px;">
+            <div style="font-size:15px; font-weight:700;">18</div>
+            <div style="font-size:10px; color:#999; margin-top:2px;">🏠 内覧</div>
+          </div>
+          <div style="padding:8px 16px; text-align:center; min-width:72px;">
+            <div style="font-size:15px; font-weight:700; color:#333;">1</div>
+            <div style="font-size:10px; color:#999; margin-top:2px;">📝 申込</div>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Success Banner -->
+    <div class="alert-banner-success" style="margin:24px 24px 0 24px;">
+      <div style="font-size:16px; font-weight:700;">✓</div>
+      <div class="alert-banner-text">
+        <div style="font-weight:700;">撮影データが承認され、物件が公開されました。お疲れ様でした。</div>
+      </div>
+    </div>
+
+    <!-- 内覧なし申込 Ribbon -->
+    <div class="ribbon-nairan" style="margin:12px 24px 0 24px;">
+      <div class="ribbon-nairan-icon">🏆</div>
+      <div class="ribbon-nairan-body">
+        <div class="ribbon-nairan-title">
+          <span class="tag">内覧なし・直接申込</span>
+          動画視聴のみで入居申込が入りました！
+        </div>
+        <div class="ribbon-nairan-sub">内見不要で申込に至ったケースです。撮影クオリティが成約に貢献しました。</div>
+      </div>
+    </div>
+
+    <!-- Content Area -->
+    <div style="flex:1; padding:24px; display:grid; grid-template-columns:1fr 280px; gap:24px; overflow-auto;">
+      <!-- Left Column -->
+      <div>
+
+        <!-- 報酬サマリー Card (TOP) -->
+        <div class="card" id="card-reward">
+          <div class="card-title" onclick="toggleCard('card-reward-body', 'toggle-reward')">
+            <span>報酬サマリー</span>
+            <span class="card-toggle" id="toggle-reward">▲</span>
+          </div>
+          <div class="card-body" id="card-reward-body">
+            <div class="summary-row">
+              <div>
+                <div class="info-label">撮影報酬（固定）</div>
+                <div class="info-value">¥5,000</div>
+              </div>
+              <div>
+                <div class="info-label">支払いステータス</div>
+                <div class="info-value" style="display:flex; gap:8px; align-items:center;">
+                  <span class="badge" style="background:#f5f5f5; color:#333; border-color:#999;">支払い済み</span>
+                </div>
+              </div>
+            </div>
+            <!-- 契約成立報酬 bonus row -->
+            <div class="bonus-row">
+              <div style="display:flex; justify-content:space-between; align-items:flex-start;">
+                <div>
+                  <div style="font-size:12px; font-weight:700; color:#000; display:flex; align-items:center; gap:6px;">
+                    <span style="background:#000; color:#fff; font-size:10px; padding:1px 7px;">契約成立報酬</span>
+                    賃料 × 2%
+                  </div>
+                  <div class="bonus-calc">¥220,000（賃料） × 2% = <strong>¥4,400</strong></div>
+                  <div style="font-size:10px; color:#666; margin-top:4px;">内覧なし・直接申込により発生</div>
+                </div>
+                <div style="text-align:right;">
+                  <div style="font-size:20px; font-weight:700; color:#000;">¥4,400</div>
+                  <span class="badge badge-warn" style="font-size:10px;">精算待ち</span>
+                </div>
+              </div>
+            </div>
+            <!-- 合計 -->
+            <div class="reward-total">
+              <div class="reward-total-label">報酬合計（税抜）</div>
+              <div class="reward-total-value">¥9,400</div>
+            </div>
+            <div class="summary-row" style="margin-top:10px;">
+              <div>
+                <div class="info-label">契約成立報酬 精算予定日</div>
+                <div class="info-value">2023/12/01</div>
+              </div>
+            </div>
+            <div style="font-size:11px; color:#666; line-height:1.5; padding-top:12px; border-top:1px solid #eee;">
+              報酬の詳細は報酬管理画面でご確認いただけます
+            </div>
+          </div>
+        </div>
+
+        <!-- 物件概要 Card -->
+        <div class="card" id="card-property">
+          <div class="card-title" onclick="toggleCard('card-property-body', 'toggle-property')">
+            <span>物件概要</span>
+            <span class="card-toggle" id="toggle-property">▲</span>
+          </div>
+          <div class="card-body" id="card-property-body">
+            <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px; margin-bottom:16px;">
+              <div>
+                <div class="info-label">建物名</div>
+                <div class="info-value">グランドパレス渋谷神南</div>
+              </div>
+              <div>
+                <div class="info-label">住所</div>
+                <div class="info-value">東京都渋谷区神南1-2-3</div>
+              </div>
+              <div>
+                <div class="info-label">管理会社</div>
+                <div class="info-value">株式会社サンプル不動産</div>
+              </div>
+              <div>
+                <div class="info-label">電話番号</div>
+                <div class="info-value">03-1234-5678</div>
+              </div>
+              <div>
+                <div class="info-label">最寄り駅</div>
+                <div class="info-value">渋谷駅 徒歩5分</div>
+              </div>
+            </div>
+            <div style="background:#eee; border:1px solid #ccc; height:120px; display:flex; align-items:center; justify-content:center; color:#666; font-weight:600; margin-bottom:12px;">Map Placeholder</div>
+            <div style="border-top:1px solid #eee; padding-top:12px;">
+              <div class="info-label">撮影日程</div>
+              <div class="info-value">2023/11/10 10:00（完了）</div>
+            </div>
+          </div>
+        </div>
+
+        <!-- 承認済みの撮影データ Section -->
+        <div class="section-block" id="card-media">
+          <div class="section-title" onclick="toggleCard('card-media-body', 'toggle-media')">
+            <div style="display:flex; align-items:center; gap:12px;">
+              <span>承認済みの撮影データ</span>
+              <span class="badge badge-ok">全室承認済み</span>
+            </div>
+            <span class="section-toggle" id="toggle-media">▲</span>
+          </div>
+          <div class="section-body" id="card-media-body">
+            <!-- Room 1 -->
+            <div class="room-card">
+              <div class="room-header">
+                <div style="font-weight:700;">2LDK - 101号室</div>
+                <span class="badge badge-dark">公開中</span>
+              </div>
+              <div class="room-body">
+                <!-- Video Preview -->
+                <div style="margin-bottom:16px;">
+                  <div class="info-label" style="margin-bottom:8px;">動画</div>
+                  <div class="media-preview">
+                    <img src="main.jpg" alt="video thumbnail" style="width:100%; height:100%; object-fit:cover; position:absolute;">
+                    <div class="media-play-btn">
+                      <i class="fas fa-play"></i>
+                    </div>
+                  </div>
+                </div>
+                <!-- Floorplan -->
+                <div style="margin-bottom:12px;">
+                  <div class="info-label" style="margin-bottom:8px;">平面図</div>
+                  <div class="media-grid-thumb">
+                    <img src="roomtype.png" alt="floorplan" style="width:100%; height:100%; object-fit:cover;">
+                  </div>
+                </div>
+                <!-- Photos Grid -->
+                <div style="margin-bottom:12px;">
+                  <div class="info-label" style="margin-bottom:8px;">室内写真</div>
+                  <div class="media-grid">
+                    <div class="media-grid-thumb">
+                      <img src="inside1.jpg" alt="photo 1" style="width:100%; height:100%; object-fit:cover;">
+                    </div>
+                    <div class="media-grid-thumb">
+                      <img src="inside2.jpg" alt="photo 2" style="width:100%; height:100%; object-fit:cover;">
+                    </div>
+                    <div class="media-grid-thumb">
+                      <img src="inside3.jpg" alt="photo 3" style="width:100%; height:100%; object-fit:cover;">
+                    </div>
+                  </div>
+                </div>
+                <div style="font-size:11px; color:#333; font-weight:600; background:#f0f0f0; padding:8px 12px; border-radius:2px;">
+                  ✓ 承認済み
+                </div>
+              </div>
+            </div>
+
+            <!-- Room 2 -->
+            <div class="room-card">
+              <div class="room-header">
+                <div style="font-weight:700;">1LDK - 202号室</div>
+                <span class="badge badge-dark">公開中</span>
+              </div>
+              <div class="room-body">
+                <!-- Video Preview -->
+                <div style="margin-bottom:16px;">
+                  <div class="info-label" style="margin-bottom:8px;">動画</div>
+                  <div class="media-preview">
+                    <img src="main.jpg" alt="video thumbnail" style="width:100%; height:100%; object-fit:cover; position:absolute;">
+                    <div class="media-play-btn">
+                      <i class="fas fa-play"></i>
+                    </div>
+                  </div>
+                </div>
+                <!-- Floorplan -->
+                <div style="margin-bottom:12px;">
+                  <div class="info-label" style="margin-bottom:8px;">平面図</div>
+                  <div class="media-grid-thumb">
+                    <img src="roomtype.png" alt="floorplan" style="width:100%; height:100%; object-fit:cover;">
+                  </div>
+                </div>
+                <!-- Photos Grid -->
+                <div style="margin-bottom:12px;">
+                  <div class="info-label" style="margin-bottom:8px;">室内写真</div>
+                  <div class="media-grid">
+                    <div class="media-grid-thumb">
+                      <img src="inside1.jpg" alt="photo 1" style="width:100%; height:100%; object-fit:cover;">
+                    </div>
+                    <div class="media-grid-thumb">
+                      <img src="inside2.jpg" alt="photo 2" style="width:100%; height:100%; object-fit:cover;">
+                    </div>
+                    <div class="media-grid-thumb">
+                      <img src="inside3.jpg" alt="photo 3" style="width:100%; height:100%; object-fit:cover;">
+                    </div>
+                  </div>
+                </div>
+                <div style="font-size:11px; color:#333; font-weight:600; background:#f0f0f0; padding:8px 12px; border-radius:2px;">
+                  ✓ 承認済み
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- アクティビティログ Card -->
+        <div class="card" id="card-log">
+          <div class="card-title" onclick="toggleCard('card-log-body', 'toggle-log')">
+            <span>アクティビティログ</span>
+            <span class="card-toggle" id="toggle-log">▲</span>
+          </div>
+          <div class="card-body" id="card-log-body">
+            <div class="log-row">
+              <div class="log-time">23/11/18 10:00</div>
+              <div class="log-event">Approved & Published</div>
+              <div class="log-desc">全室の撮影データが承認され、物件が公開されました</div>
+            </div>
+            <div class="log-row">
+              <div class="log-time">23/11/15 12:30</div>
+              <div class="log-event">Media Submitted</div>
+              <div class="log-desc">全室の撮影データをアップロードしました</div>
+            </div>
+            <div class="log-row">
+              <div class="log-time">23/11/10 10:00</div>
+              <div class="log-event">Shooting Completed</div>
+              <div class="log-desc">現地での撮影が完了しました</div>
+            </div>
+            <div class="log-row">
+              <div class="log-time">23/11/08 10:00</div>
+              <div class="log-event">Project Created</div>
+              <div class="log-desc">新規撮影依頼が届きました</div>
+            </div>
+          </div>
+        </div>
+
+      </div>
+
+      <!-- Right Column -->
+      <div>
+        <!-- 建物外観画像 Card -->
+        <div class="card" id="card-exterior">
+          <div class="card-title" onclick="toggleCard('card-exterior-body', 'toggle-exterior')">
+            <span>建物外観画像</span>
+            <span class="card-toggle" id="toggle-exterior">▲</span>
+          </div>
+          <div class="card-body" id="card-exterior-body">
+            <div style="background:#e8e8e8; height:200px; display:flex; align-items:center; justify-content:center; margin-bottom:12px;">
+              <img src="outside2.jpg" alt="外観" style="width:100%; height:100%; object-fit:cover;">
+            </div>
+            <div style="display:grid; grid-template-columns:1fr 1fr 1fr; gap:8px;">
+              <div style="background:#e8e8e8; height:60px; cursor:pointer; border:1px solid #ccc;">
+                <img src="outside.jpg" alt="thumbnail" style="width:100%; height:100%; object-fit:cover;">
+              </div>
+              <div style="background:#e8e8e8; height:60px; cursor:pointer; border:1px solid #ccc;">
+                <img src="outside2.jpg" alt="thumbnail" style="width:100%; height:100%; object-fit:cover;">
+              </div>
+              <div style="background:#e8e8e8; height:60px; cursor:pointer; border:1px solid #ccc;">
+                <img src="outsite3.png" alt="thumbnail" style="width:100%; height:100%; object-fit:cover;">
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- メモ Card -->
+        <div class="card" id="card-memo">
+          <div class="card-title" onclick="toggleCard('card-memo-body', 'toggle-memo')">
+            <span>メモ</span>
+            <span class="card-toggle" id="toggle-memo">▲</span>
+          </div>
+          <div class="card-body" id="card-memo-body">
+            <textarea style="width:100%; border:1px solid #ccc; padding:10px; font-size:12px; font-family:inherit; resize:vertical; min-height:120px; outline:none;" placeholder="自由メモを入力できます..."></textarea>
+            <button class="btn" style="margin-top:10px; width:100%;">保存する</button>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </main>
+<script>
+  function toggleCard(bodyId, toggleId) {
+    var body = document.getElementById(bodyId);
+    var tog = document.getElementById(toggleId);
+    if (!body) return;
+    if (body.style.display === 'none') {
+      body.style.display = '';
+      if (tog) tog.textContent = '▲';
+    } else {
+      body.style.display = 'none';
+      if (tog) tog.textContent = '▼';
+    }
+  }
+
+  function toggleBell() {
+    var m = document.getElementById('bellMenu');
+    m.style.display = m.style.display === 'none' ? 'block' : 'none';
+    var u = document.getElementById('userMenu');
+    if (u) u.style.display = 'none';
+  }
+  function toggleUserMenu() {
+    var m = document.getElementById('userMenu');
+    m.style.display = m.style.display === 'none' ? 'block' : 'none';
+    var b = document.getElementById('bellMenu');
+    if (b) b.style.display = 'none';
+  }
+  document.addEventListener('click', function(e) {
+    var bellWrap = document.getElementById('bellWrap');
+    if (bellWrap && !bellWrap.contains(e.target)) {
+      var bm = document.getElementById('bellMenu');
+      if (bm) bm.style.display = 'none';
+    }
+    var wrap = document.getElementById('userMenuWrap');
+    if (wrap && !wrap.contains(e.target)) {
+      var um = document.getElementById('userMenu');
+      if (um) um.style.display = 'none';
+    }
+  });
+</script>
+</body>
+</html>

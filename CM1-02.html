@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8"/>
+  <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+  <title>本人確認 | MooM カメラマン</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet"/>
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet"/>
+  <style>
+    * { box-sizing: border-box; border-radius: 0 !important; }
+    body { font-family: 'Noto Sans JP', sans-serif; background: #f3f4f6; color: #000; font-size: 13px; margin: 0; }
+
+    /* ── Step bar ── */
+    .step-bar { display: flex; align-items: center; justify-content: center; gap: 0; margin-bottom: 36px; }
+    .step { display: flex; flex-direction: column; align-items: center; gap: 6px; min-width: 100px; }
+    .step-circle { width: 28px; height: 28px; border: 2px solid #ccc; background: #fff; display: flex; align-items: center; justify-content: center; font-size: 11px; font-weight: 700; color: #999; }
+    .step-circle.done { background: #000; border-color: #000; color: #fff; }
+    .step-circle.active { border: 2px solid #000; background: #fff; color: #000; }
+    .step-label { font-size: 10px; color: #999; white-space: nowrap; }
+    .step-label.done { color: #000; }
+    .step-label.active { color: #000; font-weight: 700; }
+    .step-line { flex: 1; height: 2px; background: #ccc; max-width: 50px; margin-bottom: 22px; }
+    .step-line.done { background: #000; }
+
+    /* ── Form wrap ── */
+    .form-wrap { background: #fff; border: 1px solid #000; padding: 36px 40px; max-width: 660px; width: 100%; margin: 0 auto; }
+    .section-header { font-size: 13px; font-weight: 700; border-bottom: 2px solid #000; padding-bottom: 8px; margin-bottom: 20px; margin-top: 28px; }
+    .section-header:first-of-type { margin-top: 0; }
+
+    /* ── Document type selector ── */
+    .doc-type-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-bottom: 24px; }
+    .doc-type-card { border: 1px solid #ccc; padding: 14px 16px; cursor: pointer; display: flex; align-items: center; gap: 12px; background: #fff; transition: all 0.15s; }
+    .doc-type-card:hover { border-color: #000; }
+    .doc-type-card.selected { border: 2px solid #000; background: #f9f9f9; }
+    .doc-type-card input[type=radio] { accent-color: #000; width: 15px; height: 15px; flex-shrink: 0; }
+    .doc-type-icon { font-size: 22px; color: #666; width: 28px; text-align: center; }
+    .doc-type-label { font-size: 13px; font-weight: 700; }
+    .doc-type-sub { font-size: 10px; color: #999; margin-top: 2px; }
+
+    /* ── Upload area ── */
+    .upload-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; margin-bottom: 16px; }
+    .upload-box { border: 1px dashed #000; background: #fafafa; min-height: 170px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; cursor: pointer; position: relative; overflow: hidden; transition: background 0.15s; }
+    .upload-box:hover { background: #f0f0f0; }
+    .upload-box.has-file { border-style: solid; border-color: #000; }
+    .upload-box input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+    .upload-box .upload-icon { font-size: 28px; color: #bbb; pointer-events: none; }
+    .upload-box .upload-label { font-size: 12px; color: #888; text-align: center; line-height: 1.5; pointer-events: none; }
+    .upload-box .upload-tag { font-size: 10px; font-weight: 700; color: #fff; background: #000; padding: 3px 8px; position: absolute; top: 10px; left: 10px; pointer-events: none; }
+    .upload-box .upload-hint { font-size: 10px; color: #bbb; pointer-events: none; }
+    .upload-box img.preview { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; }
+
+    /* ── Selfie note ── */
+    .selfie-box { border: 1px dashed #000; background: #fafafa; min-height: 200px; display: flex; flex-direction: column; align-items: center; justify-content: center; gap: 10px; cursor: pointer; position: relative; overflow: hidden; }
+    .selfie-box:hover { background: #f0f0f0; }
+    .selfie-box input[type=file] { position: absolute; inset: 0; opacity: 0; cursor: pointer; width: 100%; height: 100%; }
+    .selfie-box img.preview { width: 100%; height: 100%; object-fit: cover; position: absolute; inset: 0; }
+
+    /* ── Notice box ── */
+    .notice-box { border: 1px solid #000; background: #f9f9f9; padding: 14px 16px; margin-bottom: 20px; }
+    .notice-box ul { margin: 8px 0 0 0; padding-left: 16px; font-size: 12px; color: #444; line-height: 2; }
+
+    /* ── Submit ── */
+    .submit-area { margin-top: 32px; border-top: 1px solid #e5e7eb; padding-top: 24px; display: flex; justify-content: flex-end; gap: 12px; }
+    .btn { border: 1px solid #000; padding: 10px 24px; background: #fff; font-size: 13px; cursor: pointer; font-family: 'Noto Sans JP', sans-serif; font-weight: 600; }
+    .btn:hover { background: #f2f2f2; }
+    .btn-black { background: #000; color: #fff; border: 1px solid #000; padding: 10px 32px; font-size: 13px; cursor: pointer; font-family: 'Noto Sans JP', sans-serif; font-weight: 700; }
+    .btn-black:hover { background: #333; }
+
+    /* ── Toast ── */
+    .toast { position: fixed; bottom: 24px; right: 24px; border: 1px solid #000; background: #fff; padding: 12px 20px; font-size: 13px; z-index: 9999; display: none; align-items: center; gap: 10px; min-width: 260px; }
+    .toast.show { display: flex; }
+  </style>
+</head>
+<body>
+<div style="min-height:100vh; padding:40px 16px;">
+
+  <!-- Logo -->
+  <div style="text-align:center; margin-bottom:28px;">
+    <div style="font-size:20px; font-weight:700; letter-spacing:1px;">MooM</div>
+    <div style="font-size:11px; color:#888; margin-top:3px;">カメラマンパートナー登録</div>
+  </div>
+
+  <!-- Step bar -->
+  <div class="step-bar">
+    <div class="step">
+      <div class="step-circle done"><i class="fas fa-check" style="font-size:10px;"></i></div>
+      <div class="step-label done">招待確認</div>
+    </div>
+    <div class="step-line done"></div>
+    <div class="step">
+      <div class="step-circle done"><i class="fas fa-check" style="font-size:10px;"></i></div>
+      <div class="step-label done">パスワード設定</div>
+    </div>
+    <div class="step-line done"></div>
+    <div class="step">
+      <div class="step-circle done"><i class="fas fa-check" style="font-size:10px;"></i></div>
+      <div class="step-label done">プロフィール登録</div>
+    </div>
+    <div class="step-line done"></div>
+    <div class="step">
+      <div class="step-circle active">4</div>
+      <div class="step-label active">本人確認</div>
+    </div>
+    <div class="step-line"></div>
+    <div class="step">
+      <div class="step-circle">5</div>
+      <div class="step-label">審査・完了</div>
+    </div>
+  </div>
+
+  <!-- Form card -->
+  <div class="form-wrap">
+    <div style="margin-bottom:24px;">
+      <h1 style="font-size:18px; font-weight:700; margin:0 0 6px 0;">本人確認書類のアップロード</h1>
+      <p style="font-size:12px; color:#666; margin:0;">本人確認のため、有効な公的身分証明書の写真をアップロードしてください。アップロードされた画像はMooM運営のみが確認します。</p>
+    </div>
+
+    <form id="kycForm" onsubmit="handleSubmit(event)">
+
+      <!-- §1 書類の種類 -->
+      <div class="section-header">書類の種類を選択</div>
+
+      <div class="doc-type-grid">
+        <label class="doc-type-card" id="card-license" onclick="selectDoc('license')">
+          <input type="radio" name="docType" value="license" required/>
+          <div class="doc-type-icon"><i class="fas fa-id-card"></i></div>
+          <div>
+            <div class="doc-type-label">運転免許証</div>
+            <div class="doc-type-sub">表面・裏面が必要</div>
+          </div>
+        </label>
+        <label class="doc-type-card" id="card-mynumber" onclick="selectDoc('mynumber')">
+          <input type="radio" name="docType" value="mynumber"/>
+          <div class="doc-type-icon"><i class="fas fa-address-card"></i></div>
+          <div>
+            <div class="doc-type-label">マイナンバーカード</div>
+            <div class="doc-type-sub">表面のみ（番号面は不要）</div>
+          </div>
+        </label>
+        <label class="doc-type-card" id="card-passport" onclick="selectDoc('passport')">
+          <input type="radio" name="docType" value="passport"/>
+          <div class="doc-type-icon"><i class="fas fa-passport"></i></div>
+          <div>
+            <div class="doc-type-label">パスポート</div>
+            <div class="doc-type-sub">顔写真ページのみ</div>
+          </div>
+        </label>
+        <label class="doc-type-card" id="card-residence" onclick="selectDoc('residence')">
+          <input type="radio" name="docType" value="residence"/>
+          <div class="doc-type-icon"><i class="fas fa-file-alt"></i></div>
+          <div>
+            <div class="doc-type-label">在留カード</div>
+            <div class="doc-type-sub">表面・裏面が必要</div>
+          </div>
+        </label>
+      </div>
+
+      <!-- Notice -->
+      <div class="notice-box">
+        <div style="font-size:12px; font-weight:700; display:flex; align-items:center; gap:6px;">
+          <i class="fas fa-info-circle"></i> アップロード時の注意事項
+        </div>
+        <ul>
+          <li>有効期限内の書類のみ受付可能です</li>
+          <li>画像全体が鮮明に写っていること（切れ・ぼけなし）</li>
+          <li>ファイル形式：JPG / PNG / PDF（各10MB以内）</li>
+          <li>光の反射やフラッシュで文字が見えなくならないよう注意してください</li>
+          <li>個人番号（マイナンバー）が記載された面はアップロード不要です</li>
+        </ul>
+      </div>
+
+      <!-- §2 書類アップロード -->
+      <div class="section-header">書類の写真をアップロード</div>
+
+      <div class="upload-grid" id="uploadGrid">
+        <!-- 表面 -->
+        <div>
+          <div style="font-size:11px; font-weight:700; margin-bottom:8px; display:flex; align-items:center; gap:5px;">
+            表面（おもて）<span style="color:#dc2626; font-size:11px;">*</span>
+          </div>
+          <div class="upload-box" id="box-front">
+            <div class="upload-tag">表面</div>
+            <input type="file" accept="image/*,application/pdf" onchange="previewFile(event,'front')">
+            <i class="fas fa-cloud-upload-alt upload-icon"></i>
+            <div class="upload-label">クリックまたは<br>ドラッグ＆ドロップ</div>
+            <div class="upload-hint">JPG / PNG / PDF・10MB以内</div>
+          </div>
+        </div>
+        <!-- 裏面 -->
+        <div id="back-col">
+          <div style="font-size:11px; font-weight:700; margin-bottom:8px; display:flex; align-items:center; gap:5px;">
+            裏面（うら）<span style="color:#dc2626; font-size:11px;">*</span>
+            <span id="back-opt" style="color:#999; font-size:10px; font-weight:400; display:none;">任意</span>
+          </div>
+          <div class="upload-box" id="box-back">
+            <div class="upload-tag">裏面</div>
+            <input type="file" accept="image/*,application/pdf" onchange="previewFile(event,'back')">
+            <i class="fas fa-cloud-upload-alt upload-icon"></i>
+            <div class="upload-label">クリックまたは<br>ドラッグ＆ドロップ</div>
+            <div class="upload-hint">JPG / PNG / PDF・10MB以内</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- §3 顔写真付き自撮り -->
+      <div class="section-header">
+        本人確認用の自撮り写真
+        <span style="font-size:10px; color:#999; font-weight:400; margin-left:8px;">任意（推奨）</span>
+      </div>
+
+      <div style="margin-bottom:16px; font-size:12px; color:#555; line-height:1.8;">
+        書類を持った状態での自撮り写真があると審査がスムーズになります。<br>
+        <span style="color:#999; font-size:11px;">※ 顔・書類の両方が鮮明に写るようにしてください</span>
+      </div>
+
+      <!-- Selfie example illustration -->
+      <div style="display:flex; gap:20px; align-items:flex-start; margin-bottom:20px;">
+        <!-- Good example -->
+        <div style="flex:1;">
+          <div style="font-size:11px; font-weight:700; margin-bottom:8px; color:#16a34a;"><i class="fas fa-check-circle" style="margin-right:4px;"></i>良い例</div>
+          <div style="border:1px solid #ccc; height:120px; background:#f0fdf4; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px;">
+            <i class="fas fa-user-circle" style="font-size:32px; color:#16a34a; opacity:0.5;"></i>
+            <div style="font-size:10px; color:#888; text-align:center; line-height:1.5;">顔全体が見える<br>書類がはっきり写っている</div>
+          </div>
+        </div>
+        <!-- Bad example -->
+        <div style="flex:1;">
+          <div style="font-size:11px; font-weight:700; margin-bottom:8px; color:#dc2626;"><i class="fas fa-times-circle" style="margin-right:4px;"></i>悪い例</div>
+          <div style="border:1px solid #ccc; height:120px; background:#fef2f2; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:8px;">
+            <i class="fas fa-ban" style="font-size:32px; color:#dc2626; opacity:0.4;"></i>
+            <div style="font-size:10px; color:#888; text-align:center; line-height:1.5;">顔・書類が不鮮明<br>書類の一部が隠れている</div>
+          </div>
+        </div>
+        <!-- Upload -->
+        <div style="flex:2;">
+          <div style="font-size:11px; font-weight:700; margin-bottom:8px;">書類を持った自撮り写真</div>
+          <div class="selfie-box" id="box-selfie">
+            <input type="file" accept="image/*" onchange="previewFile(event,'selfie')">
+            <i class="fas fa-camera upload-icon" style="font-size:28px; color:#bbb;"></i>
+            <div class="upload-label">書類を持って正面を向いた<br>自撮り写真をアップロード</div>
+            <div style="font-size:10px; color:#bbb;">JPG / PNG・10MB以内</div>
+          </div>
+        </div>
+      </div>
+
+      <!-- Submit -->
+      <div class="submit-area">
+        <button type="button" class="btn" onclick="location.href='CM1-01.html'">戻る</button>
+        <button type="submit" class="btn-black">提出して審査へ進む　→</button>
+      </div>
+
+    </form>
+  </div>
+
+  <div style="text-align:center; margin-top:20px; font-size:11px; color:#aaa; padding-bottom:40px;">
+    アップロードされた情報はSSL暗号化により安全に送信されます
+  </div>
+</div>
+
+<!-- Toast -->
+<div class="toast" id="toast">
+  <i class="fas fa-check-circle" style="color:#16a34a;"></i>
+  <span id="toastMsg"></span>
+</div>
+
+<script>
+  // 書類タイプ切替
+  function selectDoc(type) {
+    document.querySelectorAll('.doc-type-card').forEach(c => c.classList.remove('selected'));
+    document.getElementById('card-' + type).classList.add('selected');
+    const backCol = document.getElementById('back-col');
+    const backOpt = document.getElementById('back-opt');
+    if (type === 'mynumber' || type === 'passport') {
+      // 裏面任意
+      backOpt.style.display = 'inline';
+      backCol.querySelector('.upload-tag').textContent = '裏面';
+    } else {
+      backOpt.style.display = 'none';
+    }
+  }
+
+  // ファイルプレビュー
+  function previewFile(event, side) {
+    const file = event.target.files[0];
+    if (!file) return;
+    const boxId = side === 'selfie' ? 'box-selfie' : (side === 'front' ? 'box-front' : 'box-back');
+    const box = document.getElementById(boxId);
+
+    if (file.type.startsWith('image/')) {
+      const reader = new FileReader();
+      reader.onload = function(e) {
+        // remove old preview
+        const old = box.querySelector('img.preview');
+        if (old) old.remove();
+        const img = document.createElement('img');
+        img.src = e.target.result;
+        img.className = 'preview';
+        box.appendChild(img);
+        box.classList.add('has-file');
+        // hide icon/label
+        box.querySelectorAll('.upload-icon, .upload-label, .upload-hint').forEach(el => el.style.opacity = '0');
+      };
+      reader.readAsDataURL(file);
+    } else {
+      // PDF
+      box.classList.add('has-file');
+      const old = box.querySelector('img.preview');
+      if (old) old.remove();
+      box.querySelectorAll('.upload-icon').forEach(el => {
+        el.className = 'fas fa-file-pdf upload-icon';
+        el.style.color = '#dc2626';
+        el.style.opacity = '1';
+      });
+      box.querySelectorAll('.upload-label').forEach(el => {
+        el.textContent = file.name;
+        el.style.opacity = '1';
+      });
+      box.querySelectorAll('.upload-hint').forEach(el => el.style.opacity = '0');
+    }
+    showToast(side === 'selfie' ? '自撮り写真をアップロードしました' : (side === 'front' ? '表面をアップロードしました' : '裏面をアップロードしました'));
+  }
+
+  function handleSubmit(e) {
+    e.preventDefault();
+    const front = document.getElementById('box-front').classList.contains('has-file');
+    if (!front) {
+      showToast('表面の書類をアップロードしてください');
+      return;
+    }
+    showToast('提出完了！審査結果をメールでご連絡します');
+    setTimeout(() => {
+      location.href = 'AP1-10.html';
+    }, 1500);
+  }
+
+  function showToast(msg) {
+    const t = document.getElementById('toast');
+    document.getElementById('toastMsg').textContent = msg;
+    t.classList.add('show');
+    setTimeout(() => t.classList.remove('show'), 3000);
+  }
+</script>
+</body>
+</html>

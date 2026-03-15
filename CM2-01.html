@@ -1,0 +1,951 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8" />
+  <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+  <title>MooM - 物件一覧</title>
+  <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+  <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet" />
+  <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet" />
+  <style>
+    * { box-sizing: border-box; border-radius: 0 !important; }
+    body { font-family: 'Noto Sans JP', sans-serif; background: #fafafa; color: #000; font-size: 13px; margin: 0; }
+
+    .nav-item { display:block; padding:10px 24px; cursor:pointer; color:#333; font-size:13px; text-decoration:none; }
+    .nav-item:hover { background:#f0f0f0; }
+    .nav-active { font-weight:700; border-left:4px solid #000; background:#f9f9f9; padding:10px 20px; display:block; font-size:13px; color:#000; text-decoration:none; }
+
+    .btn { border: 1px solid #000; padding: 6px 14px; background: #fff; font-size: 12px; cursor: pointer; font-family: inherit; }
+    .btn:hover { background: #f2f2f2; }
+    .btn-black { background: #000; color: #fff; border: 1px solid #000; padding: 6px 14px; font-size: 12px; cursor: pointer; font-family: inherit; font-weight: 600; }
+    .btn-black:hover { background: #333; }
+    .btn-sm { border: 1px solid #000; padding: 3px 10px; background: #fff; font-size: 11px; cursor: pointer; font-family: inherit; }
+    .btn-sm:hover { background: #f2f2f2; }
+    .btn-accent { background: #000; color: #fff; border: 1px solid #000; padding: 5px 14px; font-size: 11px; cursor: pointer; font-family: inherit; font-weight: 700; }
+    .btn-accent:hover { background: #333; }
+
+    input[type=text], input[type=date], select {
+      border: 1px solid #000; padding: 6px 10px; font-size: 12px;
+      outline: none; background: #fff; font-family: inherit; width: 100%;
+    }
+    select { appearance: none; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='10' height='6'%3E%3Cpath d='M0 0l5 6 5-6z' fill='%23333'/%3E%3C/svg%3E"); background-repeat: no-repeat; background-position: right 8px center; padding-right: 24px !important; }
+
+    .badge-urgent { display: inline-block; background: #fef2f2; border: 1px solid #dc2626; color: #dc2626; font-size: 10px; padding: 1px 6px; font-weight: 400; }
+    .badge-normal { display: inline-block; background: #f3f4f6; border: 1px solid #6b7280; color: #6b7280; font-size: 10px; padding: 1px 6px; }
+
+    /* Table */
+    .COLS { display:grid; grid-template-columns: 64px 1fr 120px 110px 110px 100px 130px; align-items:center; }
+    .tbl-row { padding: 12px 16px; border-bottom: 1px solid #eee; }
+    .tbl-row:hover { background: #fafafa; }
+    .tbl-head { padding: 8px 16px; background: #f2f2f2; border-bottom: 1px solid #000; font-size: 11px; font-weight: 700; color: #555; }
+
+    /* Sort button */
+    .sort-btn { cursor:pointer; display:inline-flex; align-items:center; gap:3px; user-select:none; }
+    .sort-btn:hover { color:#000; }
+    .sort-icon { font-size:9px; color:#aaa; }
+    .sort-asc .sort-icon-asc  { color:#000; }
+    .sort-desc .sort-icon-desc { color:#000; }
+
+    /* Modal */
+    .modal-bg { display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 500; align-items: center; justify-content: center; }
+    .modal-bg.open { display: flex; }
+    .modal { background: #fff; border: 1px solid #000; }
+
+    /* Step indicator */
+    .step-dot { width: 28px; height: 28px; border: 2px solid #000; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: 700; background: #fff; flex-shrink: 0; }
+    .step-dot.active { background: #000; color: #fff; }
+    .step-dot.done { background: #000; color: #fff; }
+    .step-line { flex: 1; height: 2px; background: #e5e7eb; }
+    .step-line.done { background: #000; }
+
+    /* Calendar */
+    .cal-cell { width: 60px; height: 48px; border: 1px solid #e5e7eb; cursor: pointer; display: flex; align-items: center; justify-content: center; font-size: 12px; transition: all 0.15s; }
+    .cal-cell.available:hover { border-color: #000; background: #f9f9f9; }
+    .cal-cell.selected { background: #000; color: #fff; border-color: #000; }
+    .cal-cell.unavailable { background: #f9f9f9; color: #ccc; cursor: default; }
+    .cal-cell.partial { background: #fffbeb; color: #d97706; border-color: #d97706; }
+
+    /* Date range */
+    .date-err { border-color: #dc2626 !important; }
+    .date-err-msg { color:#dc2626; font-size:10px; margin-top:2px; display:none; }
+    .date-err-msg.show { display:block; }
+
+    /* ── Urgency row styles ── */
+    .row-urgent { border-left: 3px solid #dc2626 !important; background: #fff8f8; }
+    .row-urgent:hover { background: #fff0f0 !important; }
+    .row-warning { border-left: 3px solid #d97706 !important; background: #fffcf2; }
+    .row-warning:hover { background: #fff8e4 !important; }
+
+    /* Countdown timer */
+    .countdown-urgent { color: #dc2626; font-size: 12px; font-weight: 400; font-variant-numeric: tabular-nums; }
+    .countdown-warning { color: #d97706; font-size: 12px; font-weight: 400; font-variant-numeric: tabular-nums; }
+
+    /* FOMO viewers badge */
+    .viewers-badge { display:inline-flex; align-items:center; gap:3px; font-size:10px; color:#b45309; background:#fffbeb; border:1px solid #fcd34d; padding:1px 6px; font-weight:400; margin-top:4px; }
+
+    /* Pulse button for urgent */
+    @keyframes pulse-red {
+      0%, 100% { box-shadow: 0 0 0 0 rgba(220,38,38,0.3); }
+      50% { box-shadow: 0 0 0 4px rgba(220,38,38,0); }
+    }
+    .btn-urgent { background: #dc2626 !important; color: #fff !important; border: 1px solid #b91c1c !important; animation: pulse-red 2.4s infinite; }
+    .btn-urgent:hover { background: #b91c1c !important; }
+
+    /* Urgency alert banner */
+    .urgent-banner { display:flex; align-items:center; gap:10px; padding:10px 16px; background:#fef2f2; border:1px solid #dc2626; font-size:12px; color:#991b1b; }
+    .urgent-banner .banner-icon { font-size:16px; flex-shrink:0; }
+    .urgent-banner strong { color:#dc2626; font-weight:400; }
+  </style>
+</head>
+<body>
+<div style="display:flex; min-height:100vh;">
+
+  <!-- SIDEBAR -->
+  <aside style="width:200px; min-width:200px; border-right:1px solid #000; display:flex; flex-direction:column; min-height:100vh; background:#fff;">
+    <a href="CM0-01.html" style="padding:16px; border-bottom:1px solid #000; text-decoration:none; color:inherit; display:block;">
+      <div style="font-size:15px; font-weight:700;">MooM</div>
+      <div style="font-size:10px; color:#888; margin-top:2px;">カメラマンポータル</div>
+    </a>
+    <nav style="flex:1; padding:8px 0;">
+      <a href="CM0-01.html" class="nav-item">ダッシュボード</a>
+      <a href="CM2-01.html" class="nav-active">物件一覧</a>
+      <a href="CM07.html" class="nav-item">撮影案件</a>
+      <a href="CM4-01.html" class="nav-item">カレンダー</a>
+      <a href="PC2-01.html" class="nav-item">報酬管理</a>
+      <a href="AD24.html" class="nav-item">設定</a>
+    </nav>
+    <div style="padding:12px; border-top:1px solid #000;">
+      <div style="font-size:12px; color:#888; text-align:center;">佐藤 健太</div>
+    </div>
+  </aside>
+
+  <!-- MAIN -->
+  <main style="flex:1; display:flex; flex-direction:column; overflow:hidden;">
+
+    <!-- Header -->
+    <header style="height:52px; border-bottom:1px solid #000; display:flex; align-items:center; justify-content:space-between; padding:0 24px; background:#fff; flex-shrink:0;">
+      <div style="width:240px;">
+        <input type="text" placeholder="検索..." style="width:100%;" />
+      </div>
+      <div style="display:flex; gap:16px; align-items:center;">
+        <div style="position:relative; display:inline-block;" id="bellWrap">
+          <div onclick="toggleBell()" style="position:relative; cursor:pointer; font-size:18px;">🔔
+            <span style="position:absolute; top:-8px; right:-8px; background:#f44336; color:#fff; width:18px; height:18px; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700;">2</span>
+          </div>
+          <div id="bellMenu" style="display:none; position:absolute; right:0; top:calc(100% + 8px); background:#fff; border:1px solid #000; z-index:300; width:300px;">
+            <div style="padding:10px 14px; border-bottom:1px solid #000; font-weight:700; font-size:12px; background:#f9f9f9;">お知らせ <span style="color:#f44336;">(2)</span></div>
+            <a href="#" style="display:block; padding:10px 14px; border-bottom:1px solid #eee; text-decoration:none; color:#000;">
+              <div style="font-size:12px; font-weight:600;">撮影マニュアルが更新されました</div>
+              <div style="font-size:11px; color:#888; margin-top:2px;">2023/11/10 · MooM運営</div>
+            </a>
+            <a href="#" style="display:block; padding:10px 14px; border-bottom:1px solid #eee; text-decoration:none; color:#000;">
+              <div style="font-size:12px; font-weight:600;">報酬振込スケジュールのご案内</div>
+              <div style="font-size:11px; color:#888; margin-top:2px;">2023/11/05 · MooM運営</div>
+            </a>
+            <div style="padding:8px 14px; text-align:center; font-size:11px; color:#999; cursor:pointer;">すべて見る</div>
+          </div>
+        </div>
+        <div style="cursor:pointer; font-size:18px;">❓</div>
+        <div style="position:relative; display:inline-block;" id="userMenuWrap">
+          <button onclick="toggleUserMenu()" style="border:1px solid #000; padding:6px 14px; background:#fff; cursor:pointer; font-size:12px; font-weight:600; font-family:inherit;">佐藤 健太 ▾</button>
+          <div id="userMenu" style="display:none; position:absolute; right:0; top:100%; background:#fff; border:1px solid #000; z-index:200; min-width:160px;">
+            <a href="AD24.html" style="display:block; padding:9px 16px; font-size:12px; text-decoration:none; color:#000; border-bottom:1px solid #eee;">プロフィール更新</a>
+            <a href="AP0-01.html" style="display:block; padding:9px 16px; font-size:12px; text-decoration:none; color:#dc2626;">ログアウト</a>
+          </div>
+        </div>
+      </div>
+    </header>
+
+    <!-- Content -->
+    <div style="flex:1; overflow-y:auto; padding:20px 24px; display:flex; flex-direction:column; gap:14px;">
+
+      <!-- Title -->
+      <div>
+        <div style="font-size:11px; color:#999; margin-bottom:4px;">物件一覧</div>
+        <h2 style="font-size:22px; font-weight:700; margin:0;">物件一覧（掲載中）</h2>
+        <div style="font-size:11px; color:#888; margin-top:3px;">撮影受注が可能な掲載中の物件です</div>
+      </div>
+
+      <!-- ⚠ Urgent alert banner (dynamic) -->
+      <div class="urgent-banner" id="urgentBanner" style="display:none;">
+        <span class="banner-icon">⚠</span>
+        <div>
+          <strong id="urgentBannerCount"></strong>
+          他のカメラマンも閲覧中です。先に受注されるとこのチャンスを失う可能性があります。
+        </div>
+        <button onclick="this.parentElement.style.display='none'" style="margin-left:auto; background:none; border:none; color:#dc2626; cursor:pointer; font-size:14px; flex-shrink:0; padding:0 4px;">✕</button>
+      </div>
+
+      <!-- Filter -->
+      <div style="border:1px solid #000; background:#fff; padding:14px 16px;">
+        <!-- Row 1 -->
+        <div style="display:grid; grid-template-columns:2fr 1fr 1fr 1fr; gap:10px; margin-bottom:10px;">
+          <div>
+            <div style="font-size:11px; font-weight:600; margin-bottom:4px; color:#555;">キーワード</div>
+            <input type="text" id="f-keyword" placeholder="建物名・住所" oninput="applyFilters()" />
+          </div>
+          <div>
+            <div style="font-size:11px; font-weight:600; margin-bottom:4px; color:#555;">都道府県</div>
+            <select id="f-pref" onchange="applyFilters()">
+              <option value="">すべて</option>
+              <option>東京都</option>
+              <option>神奈川県</option>
+              <option>大阪府</option>
+            </select>
+          </div>
+          <div>
+            <div style="font-size:11px; font-weight:600; margin-bottom:4px; color:#555;">市区町村</div>
+            <select id="f-ward" onchange="applyFilters()">
+              <option value="">すべて</option>
+              <option>渋谷区</option>
+              <option>港区</option>
+              <option>目黒区</option>
+              <option>新宿区</option>
+              <option>世田谷区</option>
+              <option>横浜市</option>
+            </select>
+          </div>
+          <div>
+            <div style="font-size:11px; font-weight:600; margin-bottom:4px; color:#555;">間取り</div>
+            <select id="f-madori" onchange="applyFilters()">
+              <option value="">すべて</option>
+              <option>1K</option>
+              <option>1DK</option>
+              <option>1LDK</option>
+              <option>2LDK</option>
+              <option>3LDK</option>
+            </select>
+          </div>
+        </div>
+        <!-- Row 2 -->
+        <div style="display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:10px; align-items:end;">
+          <div>
+            <div style="font-size:11px; font-weight:600; margin-bottom:4px; color:#555;">管理会社</div>
+            <select id="f-company" onchange="applyFilters()">
+              <option value="">すべて</option>
+              <option>東急住宅管理</option>
+              <option>積水ハウスSI</option>
+              <option>三井不動産リアルティ</option>
+              <option>大和ライフネクスト</option>
+            </select>
+          </div>
+          <div>
+            <div style="font-size:11px; font-weight:600; margin-bottom:4px; color:#555;">撮影期限</div>
+            <select id="f-deadline" onchange="applyFilters()">
+              <option value="">すべて</option>
+              <option value="urgent">至急のみ</option>
+              <option value="normal">通常のみ</option>
+            </select>
+          </div>
+          <div>
+            <div style="font-size:11px; font-weight:600; margin-bottom:4px; color:#555;">掲載日 範囲指定</div>
+            <div style="display:flex; align-items:center; gap:4px;">
+              <input type="date" id="f-date-from" style="flex:1;" oninput="validateFilterDates()" />
+              <span style="font-size:11px; flex-shrink:0;">〜</span>
+              <input type="date" id="f-date-to" style="flex:1;" oninput="validateFilterDates()" />
+            </div>
+            <div class="date-err-msg" id="f-date-err">※ 開始日は終了日以前にしてください</div>
+          </div>
+          <div style="display:flex; gap:6px; justify-content:flex-end;">
+            <button class="btn" onclick="resetFilters()">リセット</button>
+            <button class="btn-black" onclick="applyFilters()">検索</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- Table -->
+      <div style="border:1px solid #000; background:#fff;">
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 16px; border-bottom:1px solid #000; background:#f9f9f9;">
+          <div style="font-weight:700; font-size:14px;">掲載中の物件 <span style="font-weight:400; font-size:11px; color:#888;" id="result-count">全 5 件</span></div>
+          <div style="font-size:11px; color:#666;">
+            表示件数: <select style="width:auto; padding:2px 20px 2px 6px; font-size:11px; border:1px solid #000;"><option>20件</option><option>50件</option></select>
+          </div>
+        </div>
+
+        <!-- Column headers -->
+        <div class="COLS tbl-head">
+          <div>画像</div>
+          <div>建物名・住所</div>
+          <div>管理会社</div>
+          <div>間取り/部屋数</div>
+          <div>
+            <span class="sort-btn" id="sort-btn-date" onclick="toggleSort()" title="掲載日で並び替え">
+              掲載日
+              <span style="display:inline-flex; flex-direction:column; gap:0; line-height:1; margin-left:2px;">
+                <span class="sort-icon sort-icon-asc" style="font-size:8px;">▲</span>
+                <span class="sort-icon sort-icon-desc" style="font-size:8px;">▼</span>
+              </span>
+            </span>
+          </div>
+          <div>撮影期限</div>
+          <div style="text-align:right;">アクション</div>
+        </div>
+
+        <!-- Table body -->
+        <div id="tableBody"></div>
+
+        <!-- No result -->
+        <div id="noResult" style="display:none; padding:48px 20px; text-align:center; color:#aaa; font-size:13px;">
+          <div style="font-size:28px; margin-bottom:12px;">🔍</div>
+          条件に一致する物件が見つかりませんでした
+        </div>
+
+        <!-- Pagination -->
+        <div style="padding:12px 16px; border-top:1px solid #000; display:flex; justify-content:space-between; align-items:center;">
+          <div style="font-size:12px; color:#666;" id="paginationInfo">1〜5件 / 全5件</div>
+          <div style="display:flex; gap:4px;">
+            <div style="width:30px; height:30px; border:1px solid #ccc; display:flex; align-items:center; justify-content:center; font-size:10px; color:#ccc;">‹</div>
+            <div style="width:30px; height:30px; border:1px solid #000; display:flex; align-items:center; justify-content:center; font-size:12px; background:#000; color:#fff;">1</div>
+            <div style="width:30px; height:30px; border:1px solid #ccc; display:flex; align-items:center; justify-content:center; font-size:10px; color:#ccc;">›</div>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+</div>
+
+<!-- ========== STEP 1: 規約確認 MODAL ========== -->
+<div class="modal-bg" id="regulationModal">
+  <div class="modal" style="width:560px; max-height:90vh; display:flex; flex-direction:column;">
+    <div style="padding:20px 24px; border-bottom:1px solid #000; background:#f9f9f9; display:flex; justify-content:space-between; align-items:center;">
+      <div>
+        <div style="font-size:10px; color:#888; font-weight:700; text-transform:uppercase; margin-bottom:4px;">撮影受注フロー</div>
+        <div style="font-size:16px; font-weight:700;" id="reg-building-name">—</div>
+      </div>
+      <button onclick="closeAll()" style="font-size:20px; cursor:pointer; background:none; border:none; color:#555;">×</button>
+    </div>
+    <div style="padding:16px 24px; border-bottom:1px solid #eee; display:flex; align-items:center; gap:0;">
+      <div class="step-dot active" id="s1-dot">1</div>
+      <div style="flex:1; height:2px; background:#e5e7eb;" id="s1-line"></div>
+      <div class="step-dot" id="s2-dot">2</div>
+      <div style="flex:1; height:2px; background:#e5e7eb;" id="s2-line"></div>
+      <div class="step-dot" id="s3-dot">3</div>
+      <div style="margin-left:12px; font-size:11px; color:#888; white-space:nowrap;">規約確認 → プラン確認 → 日程選択</div>
+    </div>
+    <div style="flex:1; overflow-y:auto; padding:24px;">
+      <div style="font-size:14px; font-weight:700; margin-bottom:12px;">撮影規約・注意事項</div>
+      <div style="border:1px solid #ccc; padding:16px; height:260px; overflow-y:auto; font-size:12px; line-height:1.8; background:#fafafa; color:#333;">
+        <div style="font-weight:700; margin-bottom:8px;">第1条（撮影業務について）</div>
+        <p>カメラマンパートナーは、MooMが指定する物件において、定められた撮影基準に従い、物件の動画および写真を撮影するものとします。</p>
+        <div style="font-weight:700; margin:12px 0 8px;">第2条（撮影品質基準）</div>
+        <p>提出する動画・写真は以下の基準を満たす必要があります：</p>
+        <ul style="padding-left:16px; margin-top:4px;">
+          <li>解像度：動画は1080p以上、写真は5MP以上</li>
+          <li>手ブレ補正：必須（三脚またはジンバルの使用を推奨）</li>
+          <li>明るさ：適正露出（暗すぎる・白飛びは不可）</li>
+          <li>各部屋・箇所の撮影漏れなし</li>
+        </ul>
+        <div style="font-weight:700; margin:12px 0 8px;">第3条（提出期限）</div>
+        <p>撮影完了後、48時間以内に動画・写真をシステムへアップロードしてください。期限を超過した場合、案件のキャンセル扱いとなる場合があります。</p>
+        <div style="font-weight:700; margin:12px 0 8px;">第4条（個人情報の取り扱い）</div>
+        <p>撮影中に知り得た居住者・管理会社の個人情報は、業務目的以外に使用しないものとします。第三者への開示は固く禁じます。</p>
+        <div style="font-weight:700; margin:12px 0 8px;">第5条（キャンセルポリシー）</div>
+        <p>確定した撮影予約を前日または当日にキャンセルした場合、キャンセル料が発生する場合があります。緊急の場合はMooMサポートへご連絡ください。</p>
+        <div style="font-weight:700; margin:12px 0 8px;">第6条（報酬について）</div>
+        <p>報酬は撮影完了・写真承認後、翌月末に指定口座へ振込みます。差し戻しが生じた場合は修正完了後に精算対象となります。</p>
+      </div>
+      <div style="margin-top:16px; padding:12px; border:1px solid #000; display:flex; align-items:center; gap:10px; cursor:pointer;" onclick="toggleRegCheck()">
+        <input type="checkbox" id="regCheck" style="width:16px; height:16px; cursor:pointer;" />
+        <label for="regCheck" style="font-size:13px; font-weight:600; cursor:pointer;">上記の規約および注意事項をすべて確認しました</label>
+      </div>
+    </div>
+    <div style="padding:16px 24px; border-top:1px solid #000; display:flex; justify-content:flex-end; gap:8px; background:#fff;">
+      <button class="btn" onclick="closeAll()">キャンセル</button>
+      <button class="btn-black" id="reg-next-btn" disabled style="opacity:0.4; cursor:not-allowed;" onclick="openPlanModal()">次へ：プラン確認 →</button>
+    </div>
+  </div>
+</div>
+
+<!-- ========== STEP 2: プラン確認 MODAL ========== -->
+<div class="modal-bg" id="planModal">
+  <div class="modal" style="width:520px;">
+    <div style="padding:20px 24px; border-bottom:1px solid #000; background:#f9f9f9; display:flex; justify-content:space-between; align-items:center;">
+      <div>
+        <div style="font-size:10px; color:#888; font-weight:700; text-transform:uppercase; margin-bottom:4px;">撮影受注フロー</div>
+        <div style="font-size:16px; font-weight:700;" id="plan-building-name">—</div>
+      </div>
+      <button onclick="closeAll()" style="font-size:20px; cursor:pointer; background:none; border:none; color:#555;">×</button>
+    </div>
+    <div style="padding:16px 24px; border-bottom:1px solid #eee; display:flex; align-items:center; gap:0;">
+      <div class="step-dot done">✓</div>
+      <div style="flex:1; height:2px; background:#000;"></div>
+      <div class="step-dot active">2</div>
+      <div style="flex:1; height:2px; background:#e5e7eb;"></div>
+      <div class="step-dot">3</div>
+      <div style="margin-left:12px; font-size:11px; color:#888; white-space:nowrap;">規約確認 → プラン確認 → 日程選択</div>
+    </div>
+    <div style="padding:24px;">
+      <div style="font-size:14px; font-weight:700; margin-bottom:16px;">撮影プランの確認</div>
+      <div style="border:2px solid #000; padding:16px; margin-bottom:16px; background:#f9f9f9;">
+        <div style="font-size:10px; font-weight:700; background:#000; color:#fff; display:inline-block; padding:2px 8px; margin-bottom:8px;">適用プラン</div>
+        <div style="font-size:18px; font-weight:700;" id="plan-name-display">Plan A</div>
+        <div style="font-size:24px; font-weight:700; color:#059669; margin-top:4px;" id="plan-price-display">¥5,000 / 件</div>
+        <div style="font-size:11px; color:#666; margin-top:8px;">・撮影完了後、写真承認をもって報酬確定<br>・差し戻しがあった場合も修正完了後に支払い</div>
+      </div>
+      <div style="font-size:12px; font-weight:600; margin-bottom:8px;">プランを変更する（任意）</div>
+      <div style="display:flex; flex-direction:column; gap:8px;">
+        <label style="display:flex; align-items:center; gap:10px; padding:12px; border:1px solid #000; cursor:pointer; background:#fff;" id="planOptA">
+          <input type="radio" name="planSelect" value="A" checked style="width:14px; height:14px;" onchange="updatePlan('A')" />
+          <div>
+            <div style="font-weight:700; font-size:13px;">Plan A <span style="font-size:12px; color:#059669; margin-left:8px;">¥5,000/件</span></div>
+            <div style="font-size:11px; color:#888; margin-top:2px;">スタンダード・固定報酬型</div>
+          </div>
+        </label>
+        <label style="display:flex; align-items:center; gap:10px; padding:12px; border:1px solid #ccc; cursor:pointer; background:#fff;" id="planOptB">
+          <input type="radio" name="planSelect" value="B" style="width:14px; height:14px;" onchange="updatePlan('B')" />
+          <div>
+            <div style="font-weight:700; font-size:13px;">Plan B <span style="font-size:12px; color:#059669; margin-left:8px;">¥8,000/件</span></div>
+            <div style="font-size:11px; color:#888; margin-top:2px;">プレミアム・高単価物件向け</div>
+          </div>
+        </label>
+      </div>
+    </div>
+    <div style="padding:16px 24px; border-top:1px solid #000; display:flex; justify-content:space-between; align-items:center;">
+      <button class="btn" onclick="backToRegulation()">← 戻る</button>
+      <div style="display:flex; gap:8px;">
+        <button class="btn" onclick="closeAll()">キャンセル</button>
+        <button class="btn-black" onclick="openBookingModal()">次へ：日程選択 →</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== STEP 3: 撮影日程選択 MODAL ========== -->
+<div class="modal-bg" id="bookingModal">
+  <div class="modal" style="width:980px; max-width:96vw; height:88vh; display:flex; flex-direction:column;">
+    <div style="padding:16px 24px; border-bottom:1px solid #000; background:#f9f9f9; display:flex; justify-content:space-between; align-items:center; flex-shrink:0;">
+      <div>
+        <div style="font-size:10px; color:#888; font-weight:700; text-transform:uppercase; margin-bottom:4px;">撮影受注フロー · Step 3</div>
+        <div style="font-size:16px; font-weight:700;" id="booking-building-name">—</div>
+      </div>
+      <button onclick="closeAll()" style="font-size:20px; cursor:pointer; background:none; border:none; color:#555;">×</button>
+    </div>
+    <div style="padding:12px 24px; border-bottom:1px solid #eee; display:flex; align-items:center; gap:0; flex-shrink:0;">
+      <div class="step-dot done">✓</div>
+      <div style="flex:1; height:2px; background:#000;"></div>
+      <div class="step-dot done">✓</div>
+      <div style="flex:1; height:2px; background:#000;"></div>
+      <div class="step-dot active">3</div>
+      <div style="margin-left:12px; font-size:11px; color:#888; white-space:nowrap;">規約確認 → プラン確認 → 日程選択</div>
+    </div>
+    <div style="flex:1; overflow:hidden; display:flex;">
+      <div style="flex:1; padding:20px 24px; overflow-y:auto;">
+        <div style="border:1px solid #000; padding:20px; background:#fff;">
+          <div style="font-size:14px; font-weight:700; margin-bottom:4px;">候補日時を選択してください（1週間分）</div>
+          <div style="font-size:11px; color:#888; margin-bottom:16px;">撮影可能な日時を <strong>3つ</strong> 選んでください。確定後、MooMが最適な日時を調整します。</div>
+          <div style="overflow-x:auto;">
+            <table id="calTable" style="border-collapse:collapse; font-size:12px; min-width:600px;">
+              <thead id="calHead"></thead>
+              <tbody id="calBody"></tbody>
+            </table>
+          </div>
+          <div style="margin-top:16px; display:flex; gap:20px; font-size:11px; color:#666; border-top:1px solid #eee; padding-top:12px;">
+            <div style="display:flex; align-items:center; gap:6px;"><div style="width:20px; height:20px; border:1px solid #ccc; background:#fff; display:flex; align-items:center; justify-content:center; font-size:10px;">○</div> 予約可能</div>
+            <div style="display:flex; align-items:center; gap:6px;"><div style="width:20px; height:20px; border:1px solid #d97706; background:#fffbeb; display:flex; align-items:center; justify-content:center; font-size:10px; color:#d97706;">△</div> 残りわずか</div>
+            <div style="display:flex; align-items:center; gap:6px;"><div style="width:20px; height:20px; border:1px solid #ccc; background:#f9f9f9; display:flex; align-items:center; justify-content:center; font-size:10px; color:#ccc;">×</div> 予約不可</div>
+            <div style="display:flex; align-items:center; gap:6px;"><div style="width:20px; height:20px; border:1px solid #000; background:#000;"></div> 選択中</div>
+          </div>
+        </div>
+      </div>
+      <div style="width:300px; border-left:1px solid #e5e7eb; padding:20px; display:flex; flex-direction:column; background:#fff; overflow-y:auto;">
+        <div style="border:1px solid #e5e7eb; padding:12px; background:#f0f9ff; margin-bottom:16px; font-size:11px; color:#1e40af; line-height:1.6;">
+          <i class="fas fa-info-circle" style="margin-right:4px;"></i>
+          候補日を提出後、MooMが管理会社と調整し、確定日時をメールにてお知らせします。
+        </div>
+        <div style="font-weight:700; font-size:13px; margin-bottom:4px;">選択中の候補</div>
+        <div style="font-size:10px; color:#888; font-weight:700; text-transform:uppercase; margin-bottom:12px;">3候補を選択してください</div>
+        <div style="flex:1; overflow-y:auto;" id="selectedSlots">
+          <div style="border:2px dashed #e5e7eb; padding:24px; text-align:center; font-size:11px; color:#ccc;" id="emptySlotsMsg">
+            カレンダーから枠を選択してください
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="padding:14px 24px; border-top:1px solid #000; display:flex; justify-content:space-between; align-items:center; background:#fff; flex-shrink:0;">
+      <div style="display:flex; align-items:center; gap:12px;">
+        <div style="font-size:13px;">選択した候補: <strong id="candidateCount" style="font-size:20px; margin-left:4px;">0</strong> / 3件</div>
+        <div id="countAlert" style="display:none; font-size:11px; color:#dc2626; font-weight:700; background:#fef2f2; padding:3px 8px; border:1px solid #dc2626;">※ 3候補が必要です</div>
+      </div>
+      <div style="display:flex; gap:8px;">
+        <button class="btn" onclick="backToPlan()">← 戻る</button>
+        <button class="btn" onclick="closeAll()">キャンセル</button>
+        <button class="btn-black" id="confirmBookingBtn" disabled style="opacity:0.4; cursor:not-allowed; padding:6px 24px;" onclick="confirmBooking()">候補を確定して受注する</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ========== SUCCESS MODAL ========== -->
+<div class="modal-bg" id="successModal">
+  <div class="modal" style="width:440px; padding:40px; text-align:center;">
+    <div style="width:64px; height:64px; background:#f0fdf4; border:2px solid #059669; display:flex; align-items:center; justify-content:center; font-size:28px; margin:0 auto 20px;">✓</div>
+    <div style="font-size:18px; font-weight:700; margin-bottom:8px;">受注リクエストを送信しました</div>
+    <div style="font-size:12px; color:#666; line-height:1.8; margin-bottom:20px;">
+      MooMが管理会社と日程を調整します。<br>
+      確定した撮影日時はメールおよびカレンダーへ通知します。
+    </div>
+    <div style="border:1px solid #000; padding:14px; background:#f9f9f9; margin-bottom:24px; text-align:left;">
+      <div style="font-size:10px; color:#888; font-weight:700; text-transform:uppercase; margin-bottom:6px;">受注内容</div>
+      <div style="font-size:13px; font-weight:700;" id="success-building">—</div>
+      <div style="font-size:12px; color:#666; margin-top:4px;" id="success-plan">—</div>
+      <div style="font-size:12px; color:#666; margin-top:4px;" id="success-slots">—</div>
+    </div>
+    <button class="btn-black" style="width:100%; padding:10px;" onclick="location.href='CM07.html'">撮影案件一覧で確認する</button>
+  </div>
+</div>
+
+<script>
+  // ─── Data ─────────────────────────────────────────────
+  var ALL_ROWS = [
+    {
+      id: 1,
+      name: 'サンシャイン・レジデンス A',
+      address: '東京都渋谷区神南1-2-3',
+      pref: '東京都', ward: '渋谷区',
+      company: '東急住宅管理',
+      madori: '1K', rooms: 12,
+      listedDate: '2023-10-15',
+      deadlineType: 'urgent', deadlineDays: 2,
+      plan: 'Plan A', price: '¥5,000',
+      viewers: 4   // 他のカメラマンが閲覧中
+    },
+    {
+      id: 2,
+      name: 'パークヒルズ C',
+      address: '東京都港区赤坂3-4-5',
+      pref: '東京都', ward: '港区',
+      company: '積水ハウスSI',
+      madori: '3LDK', rooms: 5,
+      listedDate: '2023-11-01',
+      deadlineType: 'normal', deadlineDays: 7,
+      plan: 'Plan B', price: '¥8,000',
+      viewers: 1
+    },
+    {
+      id: 3,
+      name: '代官山レジデンス B',
+      address: '東京都渋谷区代官山町8-3',
+      pref: '東京都', ward: '渋谷区',
+      company: '三井不動産リアルティ',
+      madori: '2LDK', rooms: 8,
+      listedDate: '2023-10-28',
+      deadlineType: 'normal', deadlineDays: 5,
+      plan: 'Plan A', price: '¥5,000',
+      viewers: 2
+    },
+    {
+      id: 4,
+      name: '恵比寿グリーンコート',
+      address: '東京都渋谷区恵比寿2-7-1',
+      pref: '東京都', ward: '渋谷区',
+      company: '東急住宅管理',
+      madori: '1LDK', rooms: 10,
+      listedDate: '2023-11-10',
+      deadlineType: 'urgent', deadlineDays: 3,
+      plan: 'Plan A', price: '¥5,000',
+      viewers: 3
+    },
+    {
+      id: 5,
+      name: '目黒ガーデンテラス',
+      address: '東京都目黒区中目黒3-5-2',
+      pref: '東京都', ward: '目黒区',
+      company: '大和ライフネクスト',
+      madori: '2LDK', rooms: 6,
+      listedDate: '2023-11-05',
+      deadlineType: 'normal', deadlineDays: 10,
+      plan: 'Plan B', price: '¥8,000',
+      viewers: 0
+    }
+  ];
+
+  var sortDir = null; // null=none, 'asc', 'desc'
+  var filteredRows = ALL_ROWS.slice();
+
+  // ─── Countdown state (seconds remaining per row) ─────
+  var countdownState = {};
+  ALL_ROWS.forEach(function(r) {
+    // deadlineDays * 24 * 3600 as starting seconds
+    countdownState[r.id] = r.deadlineDays * 24 * 3600;
+  });
+
+  function formatCountdown(secs) {
+    var d = Math.floor(secs / 86400);
+    var h = Math.floor((secs % 86400) / 3600);
+    var m = Math.floor((secs % 3600) / 60);
+    var s = secs % 60;
+    var hh = String(h).padStart(2,'0'), mm = String(m).padStart(2,'0'), ss = String(s).padStart(2,'0');
+    if (d > 0) return d + '日 ' + hh + ':' + mm + ':' + ss;
+    return hh + ':' + mm + ':' + ss;
+  }
+
+  // Tick every second
+  setInterval(function() {
+    ALL_ROWS.forEach(function(r) {
+      if (countdownState[r.id] > 0) {
+        countdownState[r.id]--;
+        var el = document.getElementById('cd-' + r.id);
+        if (el) el.textContent = formatCountdown(countdownState[r.id]);
+      }
+    });
+  }, 1000);
+
+  // ─── Update urgent banner ────────────────────────────
+  function updateUrgentBanner(rows) {
+    var urgentCount = rows.filter(function(r){ return r.deadlineType === 'urgent'; }).length;
+    var banner = document.getElementById('urgentBanner');
+    var countEl = document.getElementById('urgentBannerCount');
+    if (urgentCount > 0) {
+      countEl.textContent = '至急案件が ' + urgentCount + '件 あります。';
+      banner.style.display = 'flex';
+    } else {
+      banner.style.display = 'none';
+    }
+  }
+
+  // ─── Render table ───────────────────────────────────
+  function renderTable(rows) {
+    var body = document.getElementById('tableBody');
+    var noResult = document.getElementById('noResult');
+    var count = document.getElementById('result-count');
+    var pageInfo = document.getElementById('paginationInfo');
+
+    count.textContent = '全 ' + rows.length + ' 件';
+    pageInfo.textContent = '1〜' + rows.length + '件 / 全' + rows.length + '件';
+    updateUrgentBanner(rows);
+
+    if (rows.length === 0) {
+      body.innerHTML = '';
+      noResult.style.display = 'block';
+      return;
+    }
+    noResult.style.display = 'none';
+
+    var html = '';
+    rows.forEach(function(r) {
+      var isUrgent  = r.deadlineType === 'urgent';
+      var isWarning = !isUrgent && r.deadlineDays <= 5;
+      var rowClass  = isUrgent ? 'row-urgent' : (isWarning ? 'row-warning' : '');
+
+      // Deadline cell: badge + live countdown
+      var badgeHtml = isUrgent
+        ? '<span class="badge-urgent">至急: ' + r.deadlineDays + '日</span>'
+        : '<span class="badge-normal">通常: ' + r.deadlineDays + '日</span>';
+      var cdClass   = isUrgent ? 'countdown-urgent' : 'countdown-warning';
+      var deadlineHtml = badgeHtml
+        + '<div style="margin-top:4px; display:flex; align-items:center; gap:3px;">'
+        + '<span style="font-size:10px; color:#999;">残り</span>'
+        + '<span class="' + cdClass + '" id="cd-' + r.id + '">' + formatCountdown(countdownState[r.id]) + '</span>'
+        + '</div>';
+
+      // FOMO: 他のカメラマンが確認中
+      var viewersHtml = r.viewers > 0
+        ? '<div class="viewers-badge">👀 現在 ' + r.viewers + '人が確認中</div>'
+        : '';
+
+      // CTA button
+      var btnClass = isUrgent ? 'btn-urgent' : 'btn-accent';
+      var btnLabel = isUrgent ? '今すぐ受注する !' : '撮影を受注する';
+
+      var listedFormatted = r.listedDate.replace(/-/g, '/');
+
+      html += '<div class="COLS tbl-row ' + rowClass + '">' +
+        '<div><div style="width:52px;height:40px;background:#e5e7eb;border:1px solid #ccc;display:flex;align-items:center;justify-content:center;font-size:9px;color:#888;">IMAGE</div></div>' +
+        '<div>' +
+          '<a href="AD04.html" style="font-weight:700;color:#2563eb;text-decoration:none;">' + r.name + '</a>' +
+          '<div style="font-size:11px;color:#666;">' + r.address + '</div>' +
+          viewersHtml +
+        '</div>' +
+        '<div style="font-size:12px; color:#444;">' + r.company + '</div>' +
+        '<div>' + r.madori + '<br><span style="font-size:11px;color:#666;">' + r.rooms + '部屋</span></div>' +
+        '<div style="font-size:12px;">' + listedFormatted + '</div>' +
+        '<div>' + deadlineHtml + '</div>' +
+        '<div style="text-align:right;">' +
+          '<button class="' + btnClass + ' btn-accent" onclick="openRegulationModal(\'' + r.name.replace(/'/g, "\\'") + '\',\'' + r.plan + '\',\'' + r.price + '\')">' + btnLabel + '</button>' +
+        '</div>' +
+      '</div>';
+    });
+    body.innerHTML = html;
+  }
+
+  // ─── Sort ────────────────────────────────────────────
+  function toggleSort() {
+    if (sortDir === null || sortDir === 'desc') {
+      sortDir = 'asc';
+    } else {
+      sortDir = 'desc';
+    }
+    updateSortIcon();
+    applyFilters();
+  }
+
+  function updateSortIcon() {
+    var btn = document.getElementById('sort-btn-date');
+    btn.classList.remove('sort-asc', 'sort-desc');
+    var ascIcon = btn.querySelector('.sort-icon-asc');
+    var descIcon = btn.querySelector('.sort-icon-desc');
+    ascIcon.style.color = '#aaa';
+    descIcon.style.color = '#aaa';
+    if (sortDir === 'asc') {
+      btn.classList.add('sort-asc');
+      ascIcon.style.color = '#000';
+    } else if (sortDir === 'desc') {
+      btn.classList.add('sort-desc');
+      descIcon.style.color = '#000';
+    }
+  }
+
+  // ─── Filter ──────────────────────────────────────────
+  function validateFilterDates() {
+    var from = document.getElementById('f-date-from').value;
+    var to   = document.getElementById('f-date-to').value;
+    var err  = document.getElementById('f-date-err');
+    var fi   = document.getElementById('f-date-from');
+    var ti   = document.getElementById('f-date-to');
+    if (from && to && from > to) {
+      err.classList.add('show');
+      fi.classList.add('date-err'); ti.classList.add('date-err');
+      return false;
+    }
+    err.classList.remove('show');
+    fi.classList.remove('date-err'); ti.classList.remove('date-err');
+    return true;
+  }
+
+  function applyFilters() {
+    if (!validateFilterDates()) return;
+
+    var kw       = document.getElementById('f-keyword').value.toLowerCase();
+    var pref     = document.getElementById('f-pref').value;
+    var ward     = document.getElementById('f-ward').value;
+    var madori   = document.getElementById('f-madori').value;
+    var company  = document.getElementById('f-company').value;
+    var deadline = document.getElementById('f-deadline').value;
+    var dateFrom = document.getElementById('f-date-from').value;
+    var dateTo   = document.getElementById('f-date-to').value;
+
+    filteredRows = ALL_ROWS.filter(function(r) {
+      if (kw && !r.name.toLowerCase().includes(kw) && !r.address.toLowerCase().includes(kw)) return false;
+      if (pref && r.pref !== pref) return false;
+      if (ward && r.ward !== ward) return false;
+      if (madori && r.madori !== madori) return false;
+      if (company && r.company !== company) return false;
+      if (deadline && r.deadlineType !== deadline) return false;
+      if (dateFrom && r.listedDate < dateFrom) return false;
+      if (dateTo   && r.listedDate > dateTo)   return false;
+      return true;
+    });
+
+    // Sort
+    if (sortDir === 'asc') {
+      filteredRows.sort(function(a,b){ return a.listedDate.localeCompare(b.listedDate); });
+    } else if (sortDir === 'desc') {
+      filteredRows.sort(function(a,b){ return b.listedDate.localeCompare(a.listedDate); });
+    }
+
+    renderTable(filteredRows);
+  }
+
+  function resetFilters() {
+    ['f-keyword','f-pref','f-ward','f-madori','f-company','f-deadline','f-date-from','f-date-to'].forEach(function(id) {
+      var el = document.getElementById(id);
+      if (el) { el.value = ''; el.classList.remove('date-err'); }
+    });
+    document.getElementById('f-date-err').classList.remove('show');
+    filteredRows = ALL_ROWS.slice();
+    if (sortDir) { filteredRows.sort(function(a,b){ return sortDir==='asc'?a.listedDate.localeCompare(b.listedDate):b.listedDate.localeCompare(a.listedDate); }); }
+    renderTable(filteredRows);
+  }
+
+  // Initial render
+  renderTable(ALL_ROWS);
+
+  // ─── Dropdown toggles ────────────────────────────────
+  function toggleBell() {
+    var m = document.getElementById('bellMenu');
+    m.style.display = m.style.display === 'none' ? 'block' : 'none';
+    document.getElementById('userMenu').style.display = 'none';
+  }
+  function toggleUserMenu() {
+    var m = document.getElementById('userMenu');
+    m.style.display = m.style.display === 'none' ? 'block' : 'none';
+    document.getElementById('bellMenu').style.display = 'none';
+  }
+  document.addEventListener('click', function(e) {
+    var b = document.getElementById('bellWrap');
+    if (b && !b.contains(e.target)) document.getElementById('bellMenu').style.display = 'none';
+    var u = document.getElementById('userMenuWrap');
+    if (u && !u.contains(e.target)) document.getElementById('userMenu').style.display = 'none';
+  });
+
+  // ─── State ───────────────────────────────────────────
+  var currentBuilding = '', currentPlan = '', currentPrice = '';
+  var selectedSlotKeys = [];
+  var slotData = {};
+
+  // ─── Modal flow ──────────────────────────────────────
+  function openRegulationModal(building, plan, price) {
+    currentBuilding = building; currentPlan = plan; currentPrice = price;
+    document.getElementById('reg-building-name').textContent = building;
+    document.getElementById('regCheck').checked = false;
+    document.getElementById('reg-next-btn').disabled = true;
+    document.getElementById('reg-next-btn').style.opacity = '0.4';
+    document.getElementById('reg-next-btn').style.cursor = 'not-allowed';
+    document.getElementById('regulationModal').classList.add('open');
+  }
+
+  function toggleRegCheck() {
+    var cb = document.getElementById('regCheck');
+    cb.checked = !cb.checked;
+    var btn = document.getElementById('reg-next-btn');
+    btn.disabled = !cb.checked;
+    btn.style.opacity = cb.checked ? '1' : '0.4';
+    btn.style.cursor = cb.checked ? 'pointer' : 'not-allowed';
+  }
+
+  function openPlanModal() {
+    if (!document.getElementById('regCheck').checked) return;
+    document.getElementById('regulationModal').classList.remove('open');
+    document.getElementById('plan-building-name').textContent = currentBuilding;
+    var planLetter = currentPlan.replace('Plan ','');
+    var radio = document.querySelector('input[name="planSelect"][value="' + planLetter + '"]');
+    if (radio) { radio.checked = true; updatePlan(planLetter); }
+    document.getElementById('planModal').classList.add('open');
+  }
+
+  function updatePlan(v) {
+    currentPlan = 'Plan ' + v;
+    currentPrice = v === 'A' ? '¥5,000' : '¥8,000';
+    document.getElementById('plan-name-display').textContent = currentPlan;
+    document.getElementById('plan-price-display').textContent = currentPrice + ' / 件';
+    document.getElementById('planOptA').style.borderColor = v === 'A' ? '#000' : '#ccc';
+    document.getElementById('planOptB').style.borderColor = v === 'B' ? '#000' : '#ccc';
+  }
+
+  function backToRegulation() {
+    document.getElementById('planModal').classList.remove('open');
+    document.getElementById('regulationModal').classList.add('open');
+  }
+
+  function openBookingModal() {
+    document.getElementById('planModal').classList.remove('open');
+    document.getElementById('booking-building-name').textContent = currentBuilding + ' · ' + currentPlan;
+    selectedSlotKeys = [];
+    renderCalendar();
+    updateSlotPanel();
+    document.getElementById('bookingModal').classList.add('open');
+  }
+
+  function backToPlan() {
+    document.getElementById('bookingModal').classList.remove('open');
+    document.getElementById('planModal').classList.add('open');
+  }
+
+  function closeAll() {
+    ['regulationModal','planModal','bookingModal','successModal'].forEach(function(id){
+      document.getElementById(id).classList.remove('open');
+    });
+  }
+
+  // ─── Calendar ─────────────────────────────────────────
+  var TIME_SLOTS = [
+    { label: '午前', range: '09:00〜12:00' },
+    { label: '昼',   range: '12:00〜14:00' },
+    { label: '午後', range: '14:00〜17:00' },
+    { label: '夕方', range: '17:00〜19:00' },
+  ];
+  var DAYS = ['月','火','水','木','金','土','日'];
+  var AVAIL = [
+    [0,1,1,2,1,1,0],
+    [1,1,0,1,1,2,0],
+    [1,0,1,1,0,1,0],
+    [2,1,1,0,1,1,0],
+  ];
+
+  function renderCalendar() {
+    var today = new Date();
+    var dates = [];
+    for (var i=1; i<=7; i++) {
+      var d = new Date(today); d.setDate(today.getDate()+i); dates.push(d);
+    }
+    var head = '<tr><th style="border:1px solid #e5e7eb;background:#f9f9f9;padding:8px 12px;font-size:11px;font-weight:700;min-width:88px;">時間枠</th>';
+    dates.forEach(function(d,i){
+      var isSat=d.getDay()===6, isSun=d.getDay()===0;
+      var color=isSat?'color:#0066cc;':isSun?'color:#dc2626;':'';
+      head+='<th style="border:1px solid #e5e7eb;background:#f9f9f9;padding:8px 12px;font-size:11px;font-weight:700;text-align:center;min-width:64px;'+color+'">'+
+        DAYS[i]+'<br><span style="font-weight:400;font-size:10px;">'+(d.getMonth()+1)+'/'+d.getDate()+'</span></th>';
+    });
+    head+='</tr>';
+    document.getElementById('calHead').innerHTML=head;
+
+    var body='';
+    TIME_SLOTS.forEach(function(t,ti){
+      body+='<tr><td style="border:1px solid #e5e7eb;background:#f9f9f9;padding:8px 12px;font-size:11px;font-weight:700;white-space:nowrap;">'+
+        '<div style="font-size:12px;">'+t.label+'</div>'+
+        '<div style="font-size:10px;color:#888;font-weight:400;">'+t.range+'</div></td>';
+      for(var di=0;di<7;di++){
+        var key=ti+'_'+di, av=AVAIL[ti][di], isSel=selectedSlotKeys.indexOf(key)>=0;
+        var cs,cc;
+        if(isSel){cs='border:1px solid #000;background:#000;color:#fff;cursor:pointer;';cc='✓';}
+        else if(av===0){cs='border:1px solid #e5e7eb;background:#f9f9f9;color:#ccc;cursor:default;';cc='×';}
+        else if(av===2){cs='border:1px solid #d97706;background:#fffbeb;color:#d97706;cursor:pointer;';cc='△';}
+        else{cs='border:1px solid #e5e7eb;background:#fff;cursor:pointer;';cc='○';}
+        body+='<td style="'+cs+' padding:10px;text-align:center;font-size:13px;min-width:64px;"'+
+          (av!==0?' onclick="toggleSlot(\''+key+'\','+di+')"':'')+'>'+cc+'</td>';
+      }
+      body+='</tr>';
+    });
+    document.getElementById('calBody').innerHTML=body;
+  }
+
+  function toggleSlot(key, dayIdx) {
+    var idx=selectedSlotKeys.indexOf(key);
+    if(idx>=0){ selectedSlotKeys.splice(idx,1); delete slotData[key]; }
+    else{
+      if(selectedSlotKeys.length>=3){ alert('候補は3つまで選択できます'); return; }
+      selectedSlotKeys.push(key);
+      var today=new Date(), d=new Date(today); d.setDate(today.getDate()+dayIdx+1);
+      var ts=TIME_SLOTS[parseInt(key.split('_')[0])];
+      slotData[key]=(d.getMonth()+1)+'/'+d.getDate()+'（'+DAYS[dayIdx]+'） '+ts.label+' '+ts.range;
+    }
+    renderCalendar(); updateSlotPanel();
+  }
+
+  function updateSlotPanel() {
+    var count=selectedSlotKeys.length;
+    document.getElementById('candidateCount').textContent=count;
+    var btn=document.getElementById('confirmBookingBtn'), alert=document.getElementById('countAlert');
+    if(count>=3){
+      btn.disabled=false; btn.style.opacity='1'; btn.style.cursor='pointer'; alert.style.display='none';
+    } else {
+      btn.disabled=true; btn.style.opacity='0.4'; btn.style.cursor='not-allowed';
+      alert.style.display=count>0?'block':'none';
+    }
+    var container=document.getElementById('selectedSlots');
+    if(count===0){
+      container.innerHTML='<div style="border:2px dashed #e5e7eb;padding:24px;text-align:center;font-size:11px;color:#ccc;">カレンダーから枠を選択してください</div>';
+    } else {
+      var html='';
+      selectedSlotKeys.forEach(function(key,i){
+        html+='<div style="border:1px solid #000;padding:10px 14px;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center;background:#f9f9f9;">'+
+          '<div><div style="font-size:10px;color:#888;font-weight:700;">候補 '+(i+1)+'</div>'+
+          '<div style="font-size:12px;font-weight:600;margin-top:2px;">'+slotData[key]+'</div></div>'+
+          '<button onclick="toggleSlot(\''+key+'\')" style="background:none;border:none;cursor:pointer;color:#999;font-size:14px;">×</button></div>';
+      });
+      container.innerHTML=html;
+    }
+  }
+
+  function confirmBooking() {
+    if(selectedSlotKeys.length<3) return;
+    document.getElementById('bookingModal').classList.remove('open');
+    document.getElementById('success-building').textContent=currentBuilding;
+    document.getElementById('success-plan').textContent=currentPlan+' · '+currentPrice+'/件';
+    var slotList=selectedSlotKeys.map(function(k,i){ return '候補'+(i+1)+': '+slotData[k]; }).join('  /  ');
+    document.getElementById('success-slots').textContent=slotList;
+    document.getElementById('successModal').classList.add('open');
+  }
+</script>
+</body>
+</html>

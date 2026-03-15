@@ -1,0 +1,571 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>MooM - カレンダー</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet">
+    <style>
+        * { font-family: 'Noto Sans JP', sans-serif; border-radius: 0 !important; }
+        .nav-item { display:block; padding:10px 24px; cursor:pointer; color:#333; font-size:13px; text-decoration:none; }
+        .nav-item:hover { background:#f0f0f0; }
+        .nav-active { font-weight:700; border-left:4px solid #000; background:#f9f9f9; padding:10px 20px; display:block; font-size:13px; color:#000; text-decoration:none; }
+
+        /* Dropdown */
+        .dropdown-wrap { position:relative; }
+        .dropdown-menu { display:none; position:absolute; right:0; top:calc(100% + 4px); background:#fff; border:1px solid #000; min-width:160px; z-index:50; }
+        .dropdown-item { display:block; padding:8px 14px; font-size:12px; cursor:pointer; color:#333; text-decoration:none; }
+        .dropdown-item:hover { background:#f5f5f5; }
+
+        /* Calendar table */
+        .cal-table { width:100%; border-collapse:collapse; table-layout:fixed; }
+        .cal-table th { border:1px solid #ddd; background:#f2f2f2; font-size:12px; font-weight:700; padding:8px 6px; text-align:center; }
+        .cal-table td { border:1px solid #ddd; vertical-align:top; padding:4px 5px; height:96px; width:calc(100%/7); }
+        .cal-table td.other-month { background:#f9f9f9; }
+        .cal-table td.today-cell { background:#f0f4ff; }
+        .cal-date { text-align:right; font-size:12px; color:#333; margin-bottom:3px; }
+        .cal-date.today { font-weight:700; color:#1a202c; }
+        .cal-date.sat { color:#1a6eb5; }
+        .cal-date.sun { color:#b52020; }
+        .cal-date.other { color:#ccc; }
+        .ev-bar { font-size:10px; padding:2px 5px; margin-bottom:2px; overflow:hidden; white-space:nowrap; text-overflow:ellipsis; border:1px solid #ccc; }
+        .ev-bar.ev-done { background:#f0f0f0; color:#aaa; text-decoration:line-through; }
+        .ev-bar.ev-active { background:#fff; color:#000; border-color:#888; cursor:pointer; }
+        .ev-bar.ev-active:hover { background:#f5f5f5; }
+
+        /* Event blocks */
+        .ev-active {
+            background: #1a202c;
+            color: #fff;
+            padding: 5px 7px;
+            font-size: 10px;
+            cursor: pointer;
+            display: block;
+            line-height: 1.4;
+        }
+        .ev-active:hover { background: #2d3748; }
+        .ev-done {
+            background: #ececec;
+            color: #b0b0b0;
+            padding: 5px 7px;
+            font-size: 10px;
+            cursor: pointer;
+            display: block;
+            line-height: 1.4;
+        }
+
+        /* Settings drawer */
+        #settingsOverlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.35);
+            z-index: 200;
+        }
+        #settingsPanel {
+            position: absolute;
+            top: 0; right: 0;
+            width: 380px;
+            height: 100%;
+            background: #fff;
+            border-left: 1px solid #000;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Toggle switch */
+        .switch { position:relative; display:inline-block; width:40px; height:20px; }
+        .switch input { opacity:0; width:0; height:0; }
+        .slider { position:absolute; cursor:pointer; top:0; left:0; right:0; bottom:0; background:#ccc; transition:.3s; border:1px solid #000; }
+        .slider:before { position:absolute; content:""; height:14px; width:14px; left:2px; bottom:2px; background:#fff; transition:.3s; border:1px solid #000; }
+        input:checked + .slider { background:#000; }
+        input:checked + .slider:before { transform:translateX(20px); }
+
+        /* Upcoming table */
+
+        /* Slot row avail indicator */
+        .slot-avail { background:#f9f9f9; }
+
+        /* Event detail popup */
+        #evPopupOverlay {
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 600;
+            align-items: center; justify-content: center;
+        }
+        #evPopupOverlay.open { display: flex; }
+        #evPopup {
+            background: #fff; border: 1px solid #ccc; width: 580px; max-width: 92vw;
+            max-height: 88vh; overflow-y: auto; box-shadow: 0 4px 24px rgba(0,0,0,0.15);
+        }
+        .pop-row {
+            display: flex; align-items: stretch; min-height: 46px;
+            border-bottom: 1px solid #e8e8e8;
+        }
+        .pop-row:last-child { border-bottom: none; }
+        .pop-key {
+            width: 230px; flex-shrink: 0; display: flex; align-items: center; gap: 8px;
+            padding: 10px 14px; background: #f9f9f9; font-size: 12px; font-weight: 700;
+            border-left: 4px solid #3b82f6;
+        }
+        .pop-key .picon { font-size: 15px; width: 20px; text-align: center; }
+        .pop-val {
+            flex: 1; padding: 10px 14px; font-size: 13px; display: flex; align-items: center;
+            line-height: 1.6;
+        }
+    </style>
+</head>
+<body style="margin:0; background:#fff;">
+<div style="display:flex; min-height:100vh;">
+
+    <!-- ===== SIDEBAR ===== -->
+    <aside style="width:200px; min-width:200px; border-right:1px solid #000; display:flex; flex-direction:column; min-height:100vh; background:#fff;">
+        <a href="CM0-01.html" style="padding:16px; border-bottom:1px solid #000; text-decoration:none; color:inherit; display:block;">
+            <div style="font-size:15px; font-weight:700;">MooM</div>
+            <div style="font-size:10px; color:#888; margin-top:2px;">カメラマンポータル</div>
+        </a>
+        <nav style="flex:1; padding:8px 0;">
+            <a href="CM0-01.html" class="nav-item">ダッシュボード</a>
+            <a href="CM2-01.html" class="nav-item">物件一覧</a>
+            <a href="CM07.html" class="nav-item">撮影案件</a>
+            <a href="CM4-01.html" class="nav-active">カレンダー</a>
+            <a href="PC2-01.html" class="nav-item">報酬管理</a>
+            <a href="AD24.html" class="nav-item">設定</a>
+        </nav>
+        <div style="padding:12px; border-top:1px solid #000;">
+            <div style="border:1px solid #000; padding:8px 12px; text-align:center; cursor:pointer; font-size:12px;">佐藤 健太</div>
+        </div>
+    </aside>
+
+    <!-- ===== MAIN ===== -->
+    <main style="flex:1; display:flex; flex-direction:column; min-width:0;">
+
+        <!-- HEADER -->
+        <header style="position:sticky; top:0; height:52px; border-bottom:1px solid #000; background:#fff; display:flex; align-items:center; padding:0 20px; z-index:10; gap:16px;">
+            <div style="flex:1;">
+                <input type="text" placeholder="グローバル検索..." style="border:1px solid #000; padding:6px 12px; width:280px; font-size:12px; background:#fff;">
+            </div>
+            <div style="display:flex; gap:14px; align-items:center;">
+                <!-- Bell -->
+                <div class="dropdown-wrap" id="bellWrap">
+                    <div onclick="toggleBell()" style="cursor:pointer; border:1px solid #000; width:28px; height:28px; display:flex; align-items:center; justify-content:center; font-size:14px;">🔔</div>
+                    <div class="dropdown-menu" id="bellDrop" style="min-width:200px;">
+                        <div style="padding:8px 14px; font-size:11px; color:#888; border-bottom:1px solid #eee;">通知</div>
+                        <div class="dropdown-item">新しい撮影依頼があります</div>
+                        <div class="dropdown-item">予約が確定しました</div>
+                    </div>
+                </div>
+                <!-- Help -->
+                <div style="cursor:pointer; border:1px solid #000; width:28px; height:28px; display:flex; align-items:center; justify-content:center; font-size:13px; font-weight:700;">?</div>
+                <!-- User -->
+                <div class="dropdown-wrap" id="userMenuWrap">
+                    <div onclick="toggleUserMenu()" style="cursor:pointer; border:1px solid #000; padding:4px 12px; font-size:12px; display:flex; align-items:center; gap:6px;">佐藤 健太 <span style="font-size:10px;">▾</span></div>
+                    <div class="dropdown-menu" id="userMenuDrop">
+                        <a class="dropdown-item" href="AD24.html">プロフィール設定</a>
+                        <a class="dropdown-item" href="#">ログアウト</a>
+                    </div>
+                </div>
+            </div>
+        </header>
+
+        <!-- BREADCRUMB -->
+        <div style="height:40px; border-bottom:1px solid #000; display:flex; align-items:center; padding:0 20px; font-size:13px; font-weight:700;">
+            ホーム &gt; カレンダー
+        </div>
+
+        <!-- PAGE CONTENT -->
+        <div style="flex:1; overflow-y:auto; padding:20px; background:#fafafa;">
+
+            <!-- Page toolbar -->
+            <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:16px;">
+                <h1 style="font-size:17px; font-weight:700; margin:0;">カレンダー</h1>
+                <button onclick="openSettings()" style="border:1px solid #000; padding:6px 16px; background:#fff; cursor:pointer; font-size:12px; font-weight:700; display:flex; align-items:center; gap:6px;">
+                    <span>⚙</span> 設定 / Google連携
+                </button>
+            </div>
+
+            <!-- ===== CALENDAR CARD ===== -->
+            <div style="border:1px solid #000; padding:16px; background:#fff; margin-bottom:20px;">
+
+                <!-- Calendar controls -->
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px; flex-wrap:wrap; gap:10px;">
+                    <div style="display:flex; align-items:center; gap:10px;">
+                        <div style="display:flex; border:1px solid #000;">
+                            <button onclick="prevMonth()" style="padding:4px 10px; border-right:1px solid #000; background:#fff; cursor:pointer; font-size:13px; font-weight:700;">&lt;</button>
+                            <button onclick="nextMonth()" style="padding:4px 10px; background:#fff; cursor:pointer; font-size:13px; font-weight:700;">&gt;</button>
+                        </div>
+                        <span id="calTitle" style="font-size:15px; font-weight:700;"></span>
+                        <button onclick="goToday()" style="border:1px solid #000; padding:3px 10px; font-size:11px; background:#fff; cursor:pointer;">今日</button>
+                    </div>
+                    <!-- Legend -->
+                    <div style="display:flex; gap:14px; align-items:center; font-size:11px;">
+                        <div style="display:flex; align-items:center; gap:5px;">
+                            <div style="width:14px; height:14px; background:#1a202c; border:1px solid #000; flex-shrink:0;"></div>
+                            <span>未完了（アクティブ）</span>
+                        </div>
+                        <div style="display:flex; align-items:center; gap:5px;">
+                            <div style="width:14px; height:14px; background:#ececec; border:1px solid #ccc; flex-shrink:0;"></div>
+                            <span>完了済み</span>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Calendar table rendered by JS -->
+                <table class="cal-table" id="calTable"></table>
+            </div>
+
+        </div><!-- /page content -->
+    </main>
+</div>
+
+<!-- ===== SETTINGS DRAWER ===== -->
+<div id="settingsOverlay" onclick="handleOverlayClick(event)">
+    <div id="settingsPanel">
+        <!-- Drawer header -->
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:14px 16px; border-bottom:1px solid #000; position:sticky; top:0; background:#fff; z-index:1; flex-shrink:0;">
+            <div style="font-size:14px; font-weight:700;">設定 / Google連携</div>
+            <button onclick="closeSettings()" style="border:1px solid #000; padding:4px 12px; background:#fff; cursor:pointer; font-size:12px;">✕ 閉じる</button>
+        </div>
+
+        <!-- Drawer body -->
+        <div style="padding:16px; display:flex; flex-direction:column; gap:20px; overflow-y:auto;">
+
+            <!-- Google Calendar 連携 -->
+            <div style="border:1px solid #000; padding:14px;">
+                <h3 style="font-size:13px; font-weight:700; margin-bottom:12px;">Googleカレンダー連携</h3>
+                <div style="border:1px solid #000; padding:10px; background:#f9f9f9; margin-bottom:12px;">
+                    <div style="font-size:12px; font-weight:700; display:flex; align-items:center; gap:6px;">
+                        <span style="color:#2a7a2a;">●</span> 連携済み
+                    </div>
+                    <div style="font-size:11px; color:#555; margin-top:4px;">xxx@gmail.com</div>
+                    <div style="font-size:10px; color:#888; margin-top:3px;">自動同期が有効です</div>
+                </div>
+                <div style="display:flex; gap:8px;">
+                    <button style="flex:1; border:1px solid #000; padding:7px; background:#f2f2f2; cursor:pointer; font-size:11px;">再連携</button>
+                    <button style="flex:1; border:1px solid #000; padding:7px; background:#fff; cursor:pointer; font-size:11px;">連携解除</button>
+                </div>
+            </div>
+
+            <!-- 稼働可能枠設定 -->
+            <div style="border:1px solid #000; padding:14px;">
+                <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:14px;">
+                    <h3 style="font-size:13px; font-weight:700; margin:0;">稼働可能枠設定</h3>
+                    <div style="display:flex; align-items:center; gap:6px;">
+                        <span style="font-size:11px;">稼働</span>
+                        <label class="switch">
+                            <input type="checkbox" checked>
+                            <span class="slider"></span>
+                        </label>
+                        <span style="font-size:11px; font-weight:700;" id="availOnOff">ON</span>
+                    </div>
+                </div>
+                <div id="availSettings" style="display:flex; flex-direction:column; gap:8px;"></div>
+                <div style="display:flex; gap:8px; margin-top:14px;">
+                    <button style="flex:3; border:1px solid #000; padding:8px; background:#1a202c; color:#fff; cursor:pointer; font-size:12px; font-weight:700;">保存</button>
+                    <button style="flex:2; border:1px solid #000; padding:8px; background:#fff; cursor:pointer; font-size:12px;">リセット</button>
+                </div>
+            </div>
+
+        </div><!-- /drawer body -->
+    </div><!-- /settingsPanel -->
+</div><!-- /settingsOverlay -->
+
+<script>
+/* ===== HEADER DROPDOWNS ===== */
+function toggleBell() {
+    var bell = document.getElementById('bellDrop');
+    var user = document.getElementById('userMenuDrop');
+    var isOpen = bell.style.display === 'block';
+    user.style.display = 'none';
+    bell.style.display = isOpen ? 'none' : 'block';
+}
+function toggleUserMenu() {
+    var user = document.getElementById('userMenuDrop');
+    var bell = document.getElementById('bellDrop');
+    var isOpen = user.style.display === 'block';
+    bell.style.display = 'none';
+    user.style.display = isOpen ? 'none' : 'block';
+}
+document.addEventListener('click', function(e) {
+    if (!document.getElementById('bellWrap').contains(e.target))
+        document.getElementById('bellDrop').style.display = 'none';
+    if (!document.getElementById('userMenuWrap').contains(e.target))
+        document.getElementById('userMenuDrop').style.display = 'none';
+});
+
+/* ===== SETTINGS DRAWER ===== */
+function openSettings() {
+    document.getElementById('settingsOverlay').style.display = 'block';
+    renderAvailSettings();
+}
+function closeSettings() {
+    document.getElementById('settingsOverlay').style.display = 'none';
+}
+function handleOverlayClick(e) {
+    if (e.target === document.getElementById('settingsOverlay')) closeSettings();
+}
+
+/* ===== AVAILABILITY SETTINGS ===== */
+var DAYS = ['月曜日','火曜日','水曜日','木曜日','金曜日','土曜日','日曜日'];
+var SLOTS_LABEL = ['午前 09-12','昼 12-14','午後 14-17','夕方 17-20'];
+var availData = {
+    '月曜日': [true,  true,  false, false],
+    '火曜日': [true,  false, true,  false],
+    '水曜日': [true,  true,  true,  false],
+    '木曜日': [true,  false, false, false],
+    '金曜日': [true,  true,  false, true],
+    '土曜日': [false, false, false, false],
+    '日曜日': [false, false, false, false],
+};
+
+function renderAvailSettings() {
+    var container = document.getElementById('availSettings');
+    container.innerHTML = '';
+    DAYS.forEach(function(day) {
+        var dayDiv = document.createElement('div');
+        dayDiv.style.cssText = 'border:1px solid #000; padding:8px;';
+
+        var header = document.createElement('div');
+        header.style.cssText = 'font-size:11px; font-weight:700; margin-bottom:6px; padding-bottom:4px; border-bottom:1px solid #eee;';
+        header.textContent = day;
+        dayDiv.appendChild(header);
+
+        var grid = document.createElement('div');
+        grid.style.cssText = 'display:grid; grid-template-columns:1fr 1fr; gap:4px;';
+        SLOTS_LABEL.forEach(function(sl, i) {
+            var label = document.createElement('label');
+            label.style.cssText = 'border:1px solid #ccc; padding:4px 6px; display:flex; align-items:center; gap:4px; font-size:10px; cursor:pointer;';
+            var cb = document.createElement('input');
+            cb.type = 'checkbox';
+            cb.checked = availData[day][i];
+            cb.style.cssText = 'margin:0; cursor:pointer;';
+            label.appendChild(cb);
+            label.appendChild(document.createTextNode(sl));
+            grid.appendChild(label);
+        });
+        dayDiv.appendChild(grid);
+        container.appendChild(dayDiv);
+    });
+}
+
+/* ===== CALENDAR DATA ===== */
+var WEEK_DAYS_JP = ['月','火','水','木','金','土','日'];
+function hh(n) { return String(n).padStart(2,'0') + ':00'; }
+
+var EVENTS = [
+    // ── 3月上旬（完了済み） ──
+    { date:'2026-03-02', startHour:10, endHour:13, title:'パークヒルズ 渋谷 301',    done:true },
+    { date:'2026-03-03', startHour:14, endHour:16, title:'グリーンテラス 目黒 205',  done:true },
+    { date:'2026-03-04', startHour:9,  endHour:11, title:'サンライズ 新宿 1102',     done:true },
+    { date:'2026-03-05', startHour:13, endHour:15, title:'ラ・テール 恵比寿 403',    done:true },
+    { date:'2026-03-07', startHour:10, endHour:12, title:'オークウッド 港区 801',    done:true },
+    { date:'2026-03-09', startHour:9,  endHour:12, title:'サンシャイン・レジデンス A', done:true },
+    { date:'2026-03-10', startHour:14, endHour:17, title:'Oakwood Tower 204',        done:true },
+    { date:'2026-03-11', startHour:10, endHour:12, title:'代官山ヒルズ 501',         done:true },
+    { date:'2026-03-12', startHour:9,  endHour:11, title:'グリーン マンション 306',  done:true },
+    { date:'2026-03-12', startHour:14, endHour:16, title:'プレミア 目黒 102',        done:true },
+    { date:'2026-03-13', startHour:13, endHour:15, title:'代官山レジデンス B 201',   done:true },
+    { date:'2026-03-14', startHour:10, endHour:13, title:'パークヒルズ C 703',       done:true },
+    { date:'2026-03-14', startHour:15, endHour:17, title:'青山フラッツ 305',         done:true },
+    // ── 今日（3/15） ──
+    { date:'2026-03-15', startHour:14, endHour:17, title:'パークビュー 渋谷 401', done:false,
+      担当者:'今井千夏', 家賃:'22万円', 所在地:'東京都渋谷区代々木5丁目57-2', 広告費:'100%', 取引態様:'貸主',
+      内見方法:'【鍵取】案内鍵は現地設置しております。イタンジBBにて内見予約をお取りください。', 内見方法詳細:'', 内見時注意事項:'' },
+    // ── 3月下旬（未完了） ──
+    { date:'2026-03-16', startHour:9,  endHour:12, title:'ラ・テール 恵比寿 302', done:false,
+      担当者:'田中 雄介', 家賃:'18万円', 所在地:'東京都渋谷区恵比寿1丁目12-5', 広告費:'100%', 取引態様:'代理',
+      内見方法:'【現地集合】担当者と現地にてお待ちしております。', 内見方法詳細:'', 内見時注意事項:'' },
+    { date:'2026-03-16', startHour:14, endHour:16, title:'ザ・プレイス 港区 1201', done:false,
+      担当者:'鈴木 美咲', 家賃:'35万円', 所在地:'東京都港区南青山3丁目8-10', 広告費:'50%', 取引態様:'媒介',
+      内見方法:'【鍵取】管理室にて鍵をお受け取りください。', 内見方法詳細:'管理室：1F ロビー右手', 内見時注意事項:'撮影前に管理人への挨拶をお願いします。' },
+    { date:'2026-03-17', startHour:10, endHour:13, title:'プレミア 目黒 508', done:false,
+      担当者:'佐々木 直樹', 家賃:'16万円', 所在地:'東京都目黒区目黒2丁目4-7', 広告費:'100%', 取引態様:'貸主',
+      内見方法:'【現地集合】担当者と現地にてお待ちしております。', 内見方法詳細:'', 内見時注意事項:'' },
+    { date:'2026-03-18', startHour:9,  endHour:11, title:'ヒルズ レジデンス 201', done:false,
+      担当者:'山田 花子', 家賃:'12万円', 所在地:'東京都新宿区西新宿6丁目3-1', 広告費:'100%', 取引態様:'貸主',
+      内見方法:'【鍵取】案内鍵は現地設置しております。', 内見方法詳細:'', 内見時注意事項:'' },
+    { date:'2026-03-18', startHour:14, endHour:16, title:'目黒グリーンヒルズ 404', done:false,
+      担当者:'今井千夏', 家賃:'19万円', 所在地:'東京都目黒区中目黒2丁目5-9', 広告費:'100%', 取引態様:'貸主',
+      内見方法:'【現地集合】担当者が現地でお迎えします。', 内見方法詳細:'', 内見時注意事項:'' },
+    { date:'2026-03-19', startHour:15, endHour:18, title:'サクラ 代々木 603', done:false,
+      担当者:'今井千夏', 家賃:'25万円', 所在地:'東京都渋谷区代々木3丁目22-8', 広告費:'100%', 取引態様:'貸主',
+      内見方法:'【鍵取】イタンジBBにて内見予約をお取りください。', 内見方法詳細:'', 内見時注意事項:'' },
+    { date:'2026-03-20', startHour:13, endHour:15, title:'恵比寿グリーンコート 302', done:false,
+      担当者:'田中 雄介', 家賃:'28万円', 所在地:'東京都渋谷区恵比寿4丁目1-18', 広告費:'50%', 取引態様:'代理',
+      内見方法:'【現地集合】担当者が現地でお迎えします。', 内見方法詳細:'', 内見時注意事項:'ペット不可物件のため撮影時ご注意ください。' },
+    { date:'2026-03-21', startHour:9,  endHour:11, title:'サンシャイン・レジデンス B 105', done:false,
+      担当者:'鈴木 美咲', 家賃:'14万円', 所在地:'東京都豊島区東池袋3丁目1-5', 広告費:'100%', 取引態様:'貸主',
+      内見方法:'【鍵取】案内鍵は現地設置しております。', 内見方法詳細:'', 内見時注意事項:'' },
+    { date:'2026-03-23', startHour:10, endHour:13, title:'アーバン代官山 801', done:false,
+      担当者:'佐々木 直樹', 家賃:'30万円', 所在地:'東京都渋谷区代官山町8-14', 広告費:'100%', 取引態様:'貸主',
+      内見方法:'【鍵取】管理室にて鍵をお受け取りください。', 内見方法詳細:'', 内見時注意事項:'' },
+    { date:'2026-03-24', startHour:14, endHour:17, title:'六本木レジデンス 1503', done:false,
+      担当者:'山田 花子', 家賃:'45万円', 所在地:'東京都港区六本木6丁目10-1', 広告費:'50%', 取引態様:'媒介',
+      内見方法:'【現地集合】担当者と現地にてお待ちしております。', 内見方法詳細:'', 内見時注意事項:'高層階・要身分証明書' },
+    { date:'2026-03-25', startHour:9,  endHour:11, title:'白金テラス 205', done:false,
+      担当者:'今井千夏', 家賃:'20万円', 所在地:'東京都港区白金3丁目2-8', 広告費:'100%', 取引態様:'貸主',
+      内見方法:'【鍵取】案内鍵は現地設置しております。', 内見方法詳細:'', 内見時注意事項:'' },
+    { date:'2026-03-26', startHour:13, endHour:15, title:'渋谷ヒルサイド 407', done:false,
+      担当者:'田中 雄介', 家賃:'17万円', 所在地:'東京都渋谷区道玄坂1丁目4-3', 広告費:'100%', 取引態様:'貸主',
+      内見方法:'【現地集合】担当者が現地でお迎えします。', 内見方法詳細:'', 内見時注意事項:'' },
+    { date:'2026-03-28', startHour:10, endHour:12, title:'表参道フラッツ 602', done:false,
+      担当者:'鈴木 美咲', 家賃:'26万円', 所在地:'東京都港区北青山3丁目6-12', 広告費:'100%', 取引態様:'貸主',
+      内見方法:'【鍵取】案内鍵は現地設置しております。', 内見方法詳細:'', 内見時注意事項:'' },
+];
+
+/* ===== MONTHLY CALENDAR RENDER ===== */
+var currentMonth = null;
+
+function formatDate(d) {
+    var mm = String(d.getMonth()+1).padStart(2,'0');
+    var dd = String(d.getDate()).padStart(2,'0');
+    return d.getFullYear() + '-' + mm + '-' + dd;
+}
+
+function renderCalendar() {
+    var year  = currentMonth.getFullYear();
+    var month = currentMonth.getMonth();
+    var todayStr = formatDate(new Date());
+
+    document.getElementById('calTitle').textContent = year + '年' + (month + 1) + '月';
+
+    var table = document.getElementById('calTable');
+    table.innerHTML = '';
+
+    // ── THEAD ──
+    var thead = document.createElement('thead');
+    var htr   = document.createElement('tr');
+    var dayColors = ['','','','','','color:#1a6eb5;','color:#b52020;'];
+    WEEK_DAYS_JP.forEach(function(day, i) {
+        var th = document.createElement('th');
+        th.style.cssText = dayColors[i];
+        th.textContent = day;
+        htr.appendChild(th);
+    });
+    thead.appendChild(htr);
+    table.appendChild(thead);
+
+    // ── TBODY ──
+    var tbody = document.createElement('tbody');
+
+    // First day of month: what weekday (Mon=0 … Sun=6)
+    var firstDay  = new Date(year, month, 1);
+    var fdow      = firstDay.getDay(); // 0=Sun
+    var startOffset = (fdow === 0) ? 6 : fdow - 1; // convert to Mon-first
+
+    // Iterate 6 rows max
+    for (var row = 0; row < 6; row++) {
+        var tr = document.createElement('tr');
+        var anyInMonth = false;
+
+        for (var col = 0; col < 7; col++) {
+            var dayNum   = 1 - startOffset + row * 7 + col;
+            var cellDate = new Date(year, month, dayNum);
+            var cellStr  = formatDate(cellDate);
+            var inMonth  = cellDate.getMonth() === month;
+            var isToday  = cellStr === todayStr;
+            var isSat    = col === 5, isSun = col === 6;
+
+            if (inMonth) anyInMonth = true;
+
+            var td = document.createElement('td');
+            if (!inMonth)  td.classList.add('other-month');
+            if (isToday)   td.classList.add('today-cell');
+
+            // Date number
+            var dateDiv = document.createElement('div');
+            dateDiv.className = 'cal-date'
+                + (isToday  ? ' today' : '')
+                + (isSat && inMonth ? ' sat' : '')
+                + (isSun && inMonth ? ' sun' : '')
+                + (!inMonth ? ' other' : '');
+            dateDiv.textContent = cellDate.getDate() + '日';
+            td.appendChild(dateDiv);
+
+            // Events for this day
+            var dayEvs = EVENTS.filter(function(e) { return e.date === cellStr; });
+            dayEvs.sort(function(a, b) { return a.startHour - b.startHour; });
+            dayEvs.forEach(function(ev) {
+                var bar = document.createElement('div');
+                bar.className = 'ev-bar ' + (ev.done ? 'ev-done' : 'ev-active');
+                bar.textContent = hh(ev.startHour) + ' ' + ev.title;
+                if (!ev.done) {
+                    (function(evRef) {
+                        bar.onclick = function() { openEvPopup(evRef); };
+                    })(ev);
+                }
+                td.appendChild(bar);
+            });
+
+            tr.appendChild(td);
+        }
+
+        // Skip row if it's entirely outside current month (last row check)
+        if (row >= 4 && !anyInMonth) break;
+        tbody.appendChild(tr);
+    }
+
+    table.appendChild(tbody);
+}
+
+function prevMonth() {
+    currentMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() - 1, 1);
+    renderCalendar();
+}
+function nextMonth() {
+    currentMonth = new Date(currentMonth.getFullYear(), currentMonth.getMonth() + 1, 1);
+    renderCalendar();
+}
+function goToday() {
+    var t = new Date();
+    currentMonth = new Date(t.getFullYear(), t.getMonth(), 1);
+    renderCalendar();
+}
+
+/* ===== INIT ===== */
+var t0 = new Date();
+currentMonth = new Date(t0.getFullYear(), t0.getMonth(), 1);
+renderCalendar();
+
+/* ===== EVENT POPUP ===== */
+function openEvPopup(ev) {
+    var d = new Date(ev.date);
+    var label = (d.getMonth()+1) + '月' + d.getDate() + '日 ' + hh(ev.startHour) + ' — ' + (d.getMonth()+1) + '月' + d.getDate() + '日 ' + hh(ev.endHour);
+    var rows = [
+        ['📅', '予約日時',               label],
+        ['👤', '担当者',                 ev.担当者 || '—'],
+        ['¥',  '家賃',                   ev.家賃 || '—'],
+        ['📍', '所在地',                 ev.所在地 || '—'],
+        ['📋', '広告費',                 ev.広告費 || '—'],
+        ['👥', '取引態様',               ev.取引態様 || '—'],
+        ['👁', '内見方法（鍵取・現地 等）', ev.内見方法 || ''],
+        ['🔐', '内見方法詳細（鍵情報等）', ev.内見方法詳細 || ''],
+        ['⚠',  '内見時注意事項',         ev.内見時注意事項 || ''],
+    ];
+    var html = rows.map(function(r) {
+        return '<div class="pop-row">'
+            + '<div class="pop-key"><span class="picon">' + r[0] + '</span>' + r[1] + '</div>'
+            + '<div class="pop-val">' + r[2] + '</div>'
+            + '</div>';
+    }).join('');
+    document.getElementById('evPopupBody').innerHTML = html;
+    document.getElementById('evPopupOverlay').classList.add('open');
+}
+function closeEvPopup() {
+    document.getElementById('evPopupOverlay').classList.remove('open');
+}
+</script>
+
+<!-- Event Detail Popup -->
+<div id="evPopupOverlay" onclick="if(event.target===this) closeEvPopup()">
+    <div id="evPopup">
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:18px 20px; border-bottom:1px solid #000;">
+            <div style="font-size:16px; font-weight:700;">内見予約の概要</div>
+            <button onclick="closeEvPopup()" style="border:1px solid #000; padding:4px 12px; background:#fff; cursor:pointer; font-size:14px; font-family:inherit; line-height:1;">✕</button>
+        </div>
+        <div id="evPopupBody"></div>
+    </div>
+</div>
+
+</body>
+</html>

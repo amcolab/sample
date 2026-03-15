@@ -1,0 +1,359 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+<meta charset="utf-8"/>
+<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+<title>COM-04 チャット - MooM Admin</title>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet"/>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{font-family:'Noto Sans JP',sans-serif;background:#fafafa;color:#000;font-size:13px;overflow:hidden;}
+.app-shell{display:flex;height:100vh;overflow:hidden}
+
+/* Sidebar */
+aside{width:200px;min-width:200px;border-right:1px solid #000;display:flex;flex-direction:column;background:#fff;flex-shrink:0}
+.logo{padding:16px;border-bottom:1px solid #000;font-size:15px;font-weight:700;text-decoration:none;color:inherit;display:block}
+nav{flex:1;padding:6px 0}
+.nav-item{display:block;padding:9px 16px;cursor:pointer;color:#333;font-size:13px;text-decoration:none}
+.nav-item:hover{background:#f5f5f5}
+.nav-active{font-weight:700;border:1px solid #000;background:#fff;margin:2px 8px;padding:8px 12px;display:block;font-size:13px;text-decoration:none;color:#000}
+
+/* Buttons */
+.btn{border:1px solid #000;padding:6px 14px;background:#fff;font-size:12px;cursor:pointer;font-family:inherit}
+.btn:hover{background:#f2f2f2}
+.btn-black{background:#000;color:#fff;border:1px solid #000;padding:7px 18px;font-size:12px;cursor:pointer;font-family:inherit;font-weight:700}
+.btn-black:hover{background:#333}
+.btn-sm{border:1px solid #ccc;padding:3px 10px;background:#fff;font-size:11px;cursor:pointer;font-family:inherit}
+.btn-sm:hover{background:#f5f5f5}
+
+/* Main layout */
+.main-shell{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+.top-header{height:52px;border-bottom:1px solid #000;display:flex;align-items:center;justify-content:space-between;padding:0 24px;background:#fff;flex-shrink:0}
+
+/* Chat shell — 2 pane */
+.chat-shell{flex:1;display:flex;overflow:hidden}
+
+/* Thread list */
+.thread-pane{width:280px;min-width:280px;border-right:1px solid #ddd;display:flex;flex-direction:column;background:#fff;flex-shrink:0}
+.t-search{padding:10px 12px;border-bottom:1px solid #f0f0f0}
+.t-search input{width:100%;border:1px solid #ccc;padding:5px 10px;font-size:12px;font-family:inherit;outline:none}
+.t-search input:focus{border-color:#000}
+.t-filters{padding:8px 12px;border-bottom:1px solid #f0f0f0;display:flex;gap:4px;flex-wrap:wrap}
+.fb{border:1px solid #ccc;padding:2px 9px;font-size:11px;background:#fff;cursor:pointer;font-family:inherit}
+.fb.on{background:#000;color:#fff;border-color:#000}
+.fb:hover:not(.on){background:#f5f5f5}
+.t-list{flex:1;overflow-y:auto}
+.ti{padding:11px 14px;border-bottom:1px solid #f5f5f5;cursor:pointer}
+.ti:hover{background:#f9f9f9}
+.ti.sel{background:#f5f5f5;border-left:3px solid #000}
+.ti-case{font-size:11px;font-weight:700;margin-bottom:1px;color:#000}
+.ti-user{font-size:11px;color:#666;margin-bottom:2px}
+.ti-prev{font-size:11px;color:#bbb;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ti-time{font-size:10px;color:#bbb}
+.ti-unread{display:inline-flex;align-items:center;justify-content:center;background:#000;color:#fff;font-size:9px;font-weight:700;width:16px;height:16px;flex-shrink:0}
+.stag{display:inline-block;border:1px solid #ccc;padding:1px 6px;font-size:10px;font-weight:700;margin-top:4px;color:#555}
+
+/* Chat pane */
+.chat-pane{flex:1;display:flex;flex-direction:column;overflow:hidden;min-width:0}
+
+/* Summary strip */
+.summary-strip{border-bottom:2px solid #000;background:#fff;flex-shrink:0;padding:14px 24px}
+.summary-row1{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px}
+.summary-title{font-size:16px;font-weight:700}
+.summary-meta{display:flex;gap:20px;flex-wrap:wrap}
+.sm-cell{font-size:11px;color:#888}
+.sm-cell strong{color:#000;font-weight:700}
+.sm-status{display:inline-block;background:#000;color:#fff;font-size:10px;font-weight:700;padding:2px 10px}
+
+/* Tabs */
+.tab-bar{display:flex;border-bottom:1px solid #ddd;background:#fafafa;flex-shrink:0}
+.ct{padding:10px 22px;font-size:12px;font-weight:500;color:#888;cursor:pointer;border-bottom:3px solid transparent}
+.ct.on{color:#000;font-weight:700;border-bottom:3px solid #000;background:#fff}
+.ct:hover:not(.on){background:#f0f0f0}
+
+/* Messages */
+.msgs{flex:1;overflow-y:auto;padding:20px 24px;display:flex;flex-direction:column;gap:14px;background:#fafafa}
+.sys{align-self:center;font-size:11px;color:#aaa;background:#efefef;border:1px solid #e0e0e0;padding:3px 14px;max-width:80%;text-align:center}
+.ml{align-self:flex-start;max-width:62%}
+.mr{align-self:flex-end;max-width:62%}
+.sndr{font-size:10px;font-weight:700;color:#888;margin-bottom:3px}
+.bub{padding:10px 14px;font-size:12px;line-height:1.7}
+.bub-l{background:#fff;border:1px solid #e0e0e0}
+.bub-r{background:#000;color:#fff}
+.mt{font-size:10px;color:#bbb;margin-top:4px}
+.mt-r{text-align:right}
+
+/* Footer */
+.chat-foot{border-top:1px solid #ddd;padding:14px 24px;background:#fff;flex-shrink:0}
+.chat-foot textarea{width:100%;border:1px solid #ccc;padding:8px 12px;font-size:12px;font-family:inherit;resize:none;outline:none;line-height:1.5;display:block;margin-bottom:8px}
+.chat-foot textarea:focus{border-color:#000}
+.foot-hint{font-size:10px;color:#aaa;margin-bottom:8px;line-height:1.5}
+.foot-row{display:flex;align-items:center;gap:8px}
+.sender-label{font-size:11px;color:#aaa;margin-left:auto;margin-right:8px}
+</style>
+</head>
+<body>
+<div class="app-shell">
+
+<!-- SIDEBAR -->
+<aside>
+  <a href="AD0-01.html" class="logo">MooM Admin</a>
+  <nav>
+    <a href="AD0-01.html" class="nav-item">ダッシュボード</a>
+    <a href="AD03.html" class="nav-item">物件管理</a>
+    <a href="AD07.html" class="nav-item">撮影管理</a>
+    <a href="AD70.html" class="nav-item">投稿管理</a>
+    <a href="AD10.html" class="nav-item">内覧管理</a>
+    <a href="AD12.html" class="nav-active">申込管理</a>
+    <a href="COM-04.html" class="nav-item" style="font-size:12px;">お知らせ・お問い合わせ</a>
+    <a href="AD21.html" class="nav-item">ユーザー管理</a>
+    <a href="AD23.html" class="nav-item">パートナー管理</a>
+    <a href="AF1-01.html" class="nav-item">売上・精算</a>
+    <a href="AD50.html" class="nav-item">ポリシー管理</a>
+    <a href="AD60.html" class="nav-item">連携・ログ</a>
+    <a href="AD38.html" class="nav-item">設定</a>
+  </nav>
+</aside>
+
+<!-- MAIN -->
+<div class="main-shell">
+
+  <!-- Top header -->
+  <header class="top-header">
+    <div style="flex:1;max-width:360px;">
+      <input type="text" placeholder="グローバル検索..." style="width:100%;border:1px solid #ccc;padding:5px 10px;font-size:12px;font-family:inherit;outline:none;">
+    </div>
+    <div style="display:flex;gap:8px;align-items:center;">
+      <button class="btn" style="border:none;color:#aaa;font-size:16px;">🔔</button>
+      <div style="border:1px solid #000;padding:3px 12px;font-size:12px;font-weight:700;cursor:pointer;">アカウント</div>
+    </div>
+  </header>
+
+  <!-- Chat shell -->
+  <div class="chat-shell">
+
+    <!-- Thread list -->
+    <div class="thread-pane">
+      <div class="t-search">
+        <input type="text" placeholder="案件・ユーザー名で検索...">
+      </div>
+      <div class="t-filters">
+        <button class="fb on" onclick="setF(this)">すべて</button>
+        <button class="fb" onclick="setF(this)">未読</button>
+        <button class="fb" onclick="setF(this)">本日</button>
+        <button class="fb" onclick="setF(this)">申込中</button>
+      </div>
+      <div class="t-list">
+
+        <div class="ti sel" onclick="selT(this, {
+          caseId:'案件#12345', prop:'メゾン目黒 101', user:'山田花子', status:'申込中',
+          date:'2023/10/25 14:00', area:'目黒区', partner:'山田 要子', kanri:'グランド・エステート'
+        })">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:2px">
+            <div class="ti-case">案件#12345｜メゾン目黒 101</div>
+            <div style="display:flex;align-items:center;gap:4px;flex-shrink:0">
+              <span class="ti-time">14:20</span>
+              <span class="ti-unread">2</span>
+            </div>
+          </div>
+          <div class="ti-user">山田花子</div>
+          <div class="ti-prev">承知いたしました。エントランス前にいます。</div>
+          <span class="stag">申込中</span>
+        </div>
+
+        <div class="ti" onclick="selT(this, {
+          caseId:'案件#12344', prop:'渋谷ハイツ 203', user:'佐藤次郎', status:'契約中',
+          date:'2023/10/24 13:00', area:'渋谷区', partner:'佐藤 健一', kanri:'東京都市不動産'
+        })">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:2px">
+            <div class="ti-case">案件#12344｜渋谷ハイツ 203</div>
+            <span class="ti-time">11:05</span>
+          </div>
+          <div class="ti-user">佐藤次郎</div>
+          <div class="ti-prev">鍵の場所について教えてください。</div>
+          <span class="stag">契約中</span>
+        </div>
+
+        <div class="ti" onclick="selT(this, {
+          caseId:'案件#12340', prop:'代々木テラス 4F', user:'鈴木一郎', status:'契約準備中',
+          date:'2023/10/23 15:00', area:'渋谷区', partner:'田中 美咲', kanri:'渋谷プロパティ'
+        })">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:2px">
+            <div class="ti-case">案件#12340｜代々木テラス 4F</div>
+            <span class="ti-time" style="color:#ccc">昨日</span>
+          </div>
+          <div class="ti-user">鈴木一郎</div>
+          <div class="ti-prev">ご対応ありがとうございました。</div>
+          <span class="stag">契約準備中</span>
+        </div>
+
+        <div class="ti" onclick="selT(this, {
+          caseId:'案件#12338', prop:'恵比寿ビル 501', user:'高橋三郎', status:'審査中',
+          date:'', area:'渋谷区', partner:'高橋 龍馬', kanri:'港区ハウジング'
+        })">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:2px">
+            <div class="ti-case">案件#12338｜恵比寿ビル 501</div>
+            <span class="ti-time" style="color:#ccc">2/10</span>
+          </div>
+          <div class="ti-user">高橋三郎</div>
+          <div class="ti-prev">キャンセルとなりました。</div>
+          <span class="stag">審査中</span>
+        </div>
+
+        <div class="ti" onclick="selT(this, {
+          caseId:'案件#12335', prop:'中目黒レジデンス', user:'田中よしこ', status:'申込中',
+          date:'', area:'目黒区', partner:'伊藤 健太', kanri:'目黒総合管理'
+        })">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:2px">
+            <div class="ti-case">案件#12335｜中目黒レジデンス</div>
+            <span class="ti-time" style="color:#ccc">2/09</span>
+          </div>
+          <div class="ti-user">田中よしこ</div>
+          <div class="ti-prev">資料送付します。</div>
+          <span class="stag">申込中</span>
+        </div>
+
+        <div class="ti" onclick="selT(this, {
+          caseId:'案件#12330', prop:'五反田アパート', user:'伊藤健太', status:'申込中',
+          date:'', area:'品川区', partner:'山田 要子', kanri:'グランド・エステート'
+        })">
+          <div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:2px">
+            <div class="ti-case">案件#12330｜五反田アパート</div>
+            <span class="ti-time" style="color:#ccc">2/08</span>
+          </div>
+          <div class="ti-user">伊藤健太</div>
+          <div class="ti-prev">到着しました。</div>
+          <span class="stag">申込中</span>
+        </div>
+
+      </div>
+    </div>
+
+    <!-- Chat pane -->
+    <div class="chat-pane">
+
+      <!-- ① Summary strip -->
+      <div class="summary-strip">
+        <div class="summary-row1">
+          <div style="display:flex;align-items:center;gap:10px;">
+            <span class="summary-title" id="s-title">案件#12345｜メゾン目黒 101</span>
+            <span class="sm-status" id="s-status">申込中</span>
+          </div>
+          <a href="AD14-8-kanryo.html" style="font-size:11px;color:#000;text-decoration:underline;">案件詳細 →</a>
+        </div>
+        <div class="summary-meta">
+          <div class="sm-cell">ユーザー: <strong id="s-user">山田花子</strong></div>
+          <div class="sm-cell">内覧日時: <strong id="s-date">2023/10/25 14:00</strong></div>
+          <div class="sm-cell">エリア: <strong id="s-area">目黒区</strong></div>
+          <div class="sm-cell">パートナー: <strong id="s-partner">山田 要子</strong></div>
+          <div class="sm-cell">管理会社: <strong id="s-kanri">グランド・エステート</strong></div>
+        </div>
+      </div>
+
+      <!-- ② Tabs -->
+      <div class="tab-bar">
+        <div class="ct on" onclick="swTab(this,'kanri')">管理会社</div>
+        <div class="ct" onclick="swTab(this,'user')">ユーザー</div>
+      </div>
+
+      <!-- ③ Tab: 管理会社 -->
+      <div id="pane-kanri" style="display:flex;flex-direction:column;flex:1;overflow:hidden;">
+        <div class="msgs">
+          <div class="sys">[システム] 案件が作成されました。</div>
+          <div class="ml">
+            <div class="sndr">管理会社担当（佐藤 健）</div>
+            <div class="bub bub-l">本日の内覧について確認させてください。鍵の場所はエントランス横のキーボックスです。暗証番号は 1234 です。</div>
+            <div class="mt">10:30</div>
+          </div>
+          <div class="mr">
+            <div class="bub bub-r">了解いたしました。内覧者には事前にお伝えします。ありがとうございます。</div>
+            <div class="mt mt-r">10:35</div>
+          </div>
+          <div class="ml">
+            <div class="sndr">管理会社担当（佐藤 健）</div>
+            <div class="bub bub-l">署名完了を確認しました。書面の郵送をお願いします。送付先は渋谷オフィスになります。</div>
+            <div class="mt">本日 10:45</div>
+          </div>
+          <div class="mr">
+            <div class="bub bub-r">承知しました。本日中に郵送手配します。</div>
+            <div class="mt mt-r">本日 10:50</div>
+          </div>
+        </div>
+        <div class="chat-foot">
+          <textarea rows="2" placeholder="管理会社へメッセージを送信..."></textarea>
+          <div class="foot-row">
+            <button class="btn-sm">添付</button>
+            <span class="sender-label">送信者: Admin（MooM）</span>
+            <button class="btn-black">送信</button>
+          </div>
+        </div>
+      </div>
+
+      <!-- ③ Tab: ユーザー -->
+      <div id="pane-user" style="display:none;flex-direction:column;flex:1;overflow:hidden;">
+        <div class="msgs">
+          <div class="sys">[システム] 案件が作成されました。</div>
+          <div class="ml">
+            <div class="sndr">パートナー（山田 要子）</div>
+            <div class="bub bub-l">こんにちは。本日の内覧の件で、5分ほど遅れるかもしれません。</div>
+            <div class="mt">13:45</div>
+          </div>
+          <div class="mr">
+            <div class="bub bub-r">承知いたしました。お気をつけてお越しください。エントランス前におります。</div>
+            <div class="mt mt-r">13:50</div>
+          </div>
+          <div class="sys">[システム] パートナーが到着を報告しました。</div>
+          <div class="ml">
+            <div class="sndr">パートナー（山田 要子）</div>
+            <div class="bub bub-l">お待たせいたしました。今到着しました。</div>
+            <div class="mt">14:02</div>
+          </div>
+          <div class="mr">
+            <div class="bub bub-r">請求書を受け取りました。期限までに振込します。</div>
+            <div class="mt mt-r">本日 11:20</div>
+          </div>
+        </div>
+        <div class="chat-foot">
+          <textarea rows="2" placeholder="ユーザーへメッセージを送信..."></textarea>
+          <div class="foot-hint">「重要通知送信」はユーザーの入居進捗画面に表示されます。チャット内には表示されません。</div>
+          <div class="foot-row">
+            <button class="btn-sm">添付</button>
+            <button class="btn-sm">重要通知送信</button>
+            <span class="sender-label">送信者: Admin（MooM）</span>
+            <button class="btn-black">送信</button>
+          </div>
+        </div>
+      </div>
+
+    </div><!-- /chat-pane -->
+  </div><!-- /chat-shell -->
+</div><!-- /main-shell -->
+</div><!-- /app-shell -->
+
+<script>
+function swTab(el, tab) {
+  document.querySelectorAll('.ct').forEach(t => t.classList.remove('on'));
+  el.classList.add('on');
+  document.getElementById('pane-kanri').style.display = tab === 'kanri' ? 'flex' : 'none';
+  document.getElementById('pane-user').style.display  = tab === 'user'  ? 'flex' : 'none';
+}
+
+function selT(el, d) {
+  document.querySelectorAll('.ti').forEach(t => t.classList.remove('sel'));
+  el.classList.add('sel');
+  document.getElementById('s-title').textContent   = d.caseId + '｜' + d.prop;
+  document.getElementById('s-status').textContent  = d.status;
+  document.getElementById('s-user').textContent    = d.user;
+  document.getElementById('s-date').textContent    = d.date || '—';
+  document.getElementById('s-area').textContent    = d.area;
+  document.getElementById('s-partner').textContent = d.partner;
+  document.getElementById('s-kanri').textContent   = d.kanri;
+}
+
+function setF(el) {
+  document.querySelectorAll('.fb').forEach(b => b.classList.remove('on'));
+  el.classList.add('on');
+}
+</script>
+</body>
+</html>

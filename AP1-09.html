@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+
+<html lang="ja"><head>
+<meta charset="utf-8"/>
+<meta content="width=device-width, initial-scale=1.0" name="viewport"/>
+<title>初回パスワード設定 - Initial Password Setup</title>
+<!-- Tailwind CSS v3 CDN -->
+<script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+<!-- Google Fonts: Noto Sans JP -->
+<link href="https://fonts.googleapis.com" rel="preconnect"/>
+<link crossorigin="" href="https://fonts.gstatic.com" rel="preconnect"/>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&amp;display=swap" rel="stylesheet"/>
+<style data-purpose="base-typography">
+    body {
+      font-family: 'Noto Sans JP', sans-serif;
+      background-color: #f3f4f6; /* Gray 100 */
+    }
+  </style>
+<style data-purpose="wireframe-styles">
+    /* Ensuring strict grayscale and wireframe look */
+    .wireframe-container {
+      background-color: #ffffff;
+      border: 1px solid #000000;
+      max-width: 500px;
+      width: 100%;
+    }
+    .input-placeholder {
+      border: 1px solid #d1d5db;
+      background-color: #ffffff;
+      padding: 0.75rem;
+      width: 100%;
+    }
+    .primary-button {
+      background-color: #000000;
+      color: #ffffff;
+      width: 100%;
+      padding: 1rem;
+      font-weight: bold;
+      text-align: center;
+    }
+    .divider {
+      border-top: 1px solid #e5e7eb;
+      margin: 2rem 0;
+    }
+  </style>
+</head>
+<body class="min-h-screen flex items-center justify-center p-4">
+<!-- BEGIN: InitialPasswordSetupCard -->
+<main class="wireframe-container p-8 md:p-12" data-purpose="auth-card">
+<!-- BEGIN: HeaderSection -->
+<header class="text-center mb-8">
+<h1 class="text-2xl font-bold mb-4">初回パスワード設定</h1>
+<p class="text-sm text-gray-600 leading-relaxed">
+        アカウントを安全にご利用いただくため、<br/>
+        新しいパスワードを設定してください。
+      </p>
+</header>
+<!-- END: HeaderSection -->
+<!-- BEGIN: PasswordForm -->
+<form action="#" class="space-y-6" method="POST">
+<!-- New Password Field -->
+<div class="space-y-2">
+<label class="block text-sm font-bold" for="new_password">新しいパスワード</label>
+<input class="input-placeholder text-sm focus:ring-0 focus:border-black outline-none" id="new_password" name="new_password" placeholder="8文字以上の英数字" type="password"/>
+</div>
+<!-- Confirm Password Field -->
+<div class="space-y-2">
+<label class="block text-sm font-bold" for="confirm_password">パスワード（確認用）</label>
+<input class="input-placeholder text-sm focus:ring-0 focus:border-black outline-none" id="confirm_password" name="confirm_password" placeholder="パスワードを再入力してください" type="password"/>
+</div>
+<!-- Password Complexity Note -->
+<p class="text-xs text-gray-500 leading-normal">
+        ※パスワードは英大文字、英小文字、数字を含む8文字以上で設定してください。
+      </p>
+<!-- BEGIN: ActionArea -->
+<div class="pt-4 space-y-4">
+<button class="primary-button hover:bg-gray-800 transition-colors" type="button" onclick="location.href='CM1-01.html'">
+          パスワードを設定して次へ
+        </button>
+<div class="text-center">
+<a class="text-sm underline text-gray-600 hover:text-black" href="#">キャンセル</a>
+</div>
+</div>
+<!-- END: ActionArea -->
+</form>
+<!-- END: PasswordForm -->
+<div class="divider"></div>
+<!-- BEGIN: FooterNote -->
+<footer class="text-center">
+<p class="text-xs text-gray-500">
+        この設定後、LINE連携画面へ進みます。
+      </p>
+</footer>
+<!-- END: FooterNote -->
+</main>
+<!-- END: InitialPasswordSetupCard -->
+</body></html>
