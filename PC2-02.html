@@ -225,13 +225,38 @@
         <main style="flex: 1; display: flex; flex-direction: column;">
             <!-- HEADER -->
             <header class="header-sticky">
-                <div style="flex: 1;">
-                    <input type="text" placeholder="検索..." class="input-text" style="width: 240px;">
+                <div style="flex: 1; display: flex; align-items: center;">
+                    <input type="text" placeholder="検索..." style="border: 1px solid #000; padding: 6px 12px; width: 240px; font-size: 12px; background: #fff;">
                 </div>
-                <div style="display: flex; gap: 8px;">
-                    <button class="btn-outline">通知</button>
-                    <button class="btn-outline">ヘルプ</button>
-                    <button class="btn-outline">アカウント</button>
+                <div style="display: flex; gap: 20px; align-items: center;">
+                    <!-- Notification Bell -->
+                    <div style="position:relative; display:inline-block;" id="bellWrap">
+                        <button onclick="toggleBell()" style="position:relative; cursor:pointer; font-size:18px; background:none; border:none; color:inherit;">🔔
+                            <span style="position:absolute; top:-8px; right:-8px; background:#f44336; color:#fff; border-radius:0px; width:20px; height:20px; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700;">2</span>
+                        </button>
+                        <div id="bellMenu" style="display:none; position:absolute; right:0; top:calc(100% + 8px); background:#fff; border:1px solid #000; z-index:300; width:300px; box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+                            <div style="padding:10px 14px; border-bottom:1px solid #000; font-weight:700; font-size:12px; background:#f9f9f9;">お知らせ <span style="color:#f44336;">(2)</span></div>
+                            <a href="#" style="display:block; padding:10px 14px; border-bottom:1px solid #eee; text-decoration:none; color:#000;">
+                                <div style="font-size:12px; font-weight:600;">撮影マニュアルが更新されました</div>
+                                <div style="font-size:11px; color:#888; margin-top:2px;">2023/11/10 · MooM運営</div>
+                            </a>
+                            <a href="#" style="display:block; padding:10px 14px; border-bottom:1px solid #eee; text-decoration:none; color:#000;">
+                                <div style="font-size:12px; font-weight:600;">報酬振込スケジュールのご案内</div>
+                                <div style="font-size:11px; color:#888; margin-top:2px;">2023/11/05 · MooM運営</div>
+                            </a>
+                            <div style="padding:8px 14px; text-align:center; font-size:11px; color:#999; cursor:pointer;">すべて見る</div>
+                        </div>
+                    </div>
+                    <!-- Help link -->
+                    <a href="HC0-01.html" class="w-7 h-7 flex items-center justify-center border border-black bg-white text-black text-sm font-bold hover:bg-black hover:text-white transition-colors" title="ヘルプセンター">?</a>
+                    <!-- User Menu Dropdown -->
+                    <div style="position:relative; display:inline-block;" id="userMenuWrap">
+                        <button onclick="toggleUserMenu()" style="border:1px solid #000; padding:6px 14px; background:#fff; cursor:pointer; font-size:12px; font-weight:600; font-family:inherit;">佐藤 健太 ▾</button>
+                        <div id="userMenu" style="display:none; position:absolute; right:0; top:100%; background:#fff; border:1px solid #000; z-index:200; min-width:160px; box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+                          <a href="AD24.html" style="display:block; padding:9px 16px; font-size:12px; text-decoration:none; color:#000; border-bottom:1px solid #eee;">プロフィール更新</a>
+                          <a href="AP0-01.html" style="display:block; padding:9px 16px; font-size:12px; text-decoration:none; color:#dc2626;">ログアウト</a>
+                        </div>
+                    </div>
                 </div>
             </header>
 
@@ -253,12 +278,6 @@
                     <div class="tab-item active">支払明細詳細</div>
                 </div>
 
-                <!-- Alert -->
-                <div class="alert-box">
-                    <strong>！ 承認待ちの案件があります (x 件)</strong><br>
-                    <span style="color: #666;">撮影完了後、管理者による承認が完了するまで報酬は確定されません。承認待ちの案件は表内でグレー表示されます。</span>
-                </div>
-
                 <!-- Filters -->
                 <div class="filter-bar">
                     <div class="filter-group">
@@ -266,30 +285,17 @@
                         <select class="select-box"><option>2025年02月度</option></select>
                     </div>
                     <div class="filter-group">
-                        <span class="filter-label">報酬種別</span>
-                        <select class="select-box"><option>すべて</option></select>
-                    </div>
-                    <div class="filter-group">
-                        <span class="filter-label">プラン</span>
-                        <select class="select-box"><option>すべて</option></select>
-                    </div>
-                    <div class="filter-group">
                         <span class="filter-label">支払ステータス</span>
                         <select class="select-box"><option>すべて</option></select>
                     </div>
-                    <div class="filter-group" style="flex: 1;">
-                        <span class="filter-label">検索</span>
-                        <input type="text" placeholder="案件ID / 物件名" class="input-text" style="flex: 1;">
-                    </div>
                     <button class="btn-black">絞り込む</button>
-                    <button class="btn-outline">リセット</button>
                 </div>
 
                 <!-- Summary Cards -->
                 <div class="summary-grid">
                     <div class="summary-card">
                         <div class="card-label">報酬合計 (税抜 / 承認済み分)</div>
-                        <div class="card-value">¥0</div>
+                        <div class="card-value">¥24,500</div>
                     </div>
                     <div class="summary-card">
                         <div class="card-label">支払済み額</div>
@@ -297,16 +303,13 @@
                     </div>
                     <div class="summary-card">
                         <div class="card-label">未払い額</div>
-                        <div class="card-value">¥0</div>
+                        <div class="card-value">¥24,500</div>
                     </div>
                 </div>
 
                 <!-- Detail Table -->
                 <div class="table-container">
-                    <div style="padding: 12px; display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid #000;">
-                        <span style="font-size: 13px; font-weight: 700;">支払明細一覧</span>
-                        <span style="font-size: 11px; color: #666;">全 xx 件</span>
-                    </div>
+                    <div style="padding: 12px; border-bottom: 1px solid #000; font-weight: 700;">支払明細一覧</div>
                     <table>
                         <thead>
                             <tr>
@@ -314,7 +317,6 @@
                                 <th>案件ID</th>
                                 <th>物件名</th>
                                 <th>Layout種別</th>
-                                <th>プラン</th>
                                 <th>報酬種別</th>
                                 <th>金額 (税抜)</th>
                                 <th>支払ステータス</th>
@@ -323,91 +325,93 @@
                         </thead>
                         <tbody>
                             <tr>
-                                <td>2025/02/xx</td>
-                                <td>---</td>
-                                <td><strong>---物件名---</strong><br><span style="color: #999;">xxx号室</span></td>
+                                <td>2025/02/10</td>
+                                <td>SHT-021</td>
+                                <td><strong>恵比寿レジデンス</strong><br><span style="color: #999;">101号室</span></td>
                                 <td><span class="badge">1LDK / 標準</span></td>
-                                <td><span class="badge">Plan A</span></td>
                                 <td><span class="badge">撮影報酬 (固定)</span></td>
                                 <td>¥5,000</td>
-                                <td><span class="badge" style="background: #eee;">支払済み</span></td>
-                                <td>---</td>
-                            </tr>
-                            <tr>
-                                <td>2025/02/xx</td>
-                                <td>---</td>
-                                <td><strong>---物件名---</strong><br><span style="color: #999;">xxx号室</span></td>
-                                <td><span class="badge">1LDK / 標準</span></td>
-                                <td><span class="badge">Plan A</span></td>
-                                <td><span class="badge">即時申込ボーナス</span></td>
-                                <td>¥3,000</td>
-                                <td><span class="badge" style="background: #eee;">支払済み</span></td>
-                                <td>内覧なし・直接申込</td>
-                            </tr>
-                            <tr>
-                                <td>2025/02/xx</td>
-                                <td>---</td>
-                                <td><strong>---物件名---</strong><br><span style="color: #999;">xxx号室</span></td>
-                                <td><span class="badge">2LDK / ハイグレード</span></td>
-                                <td><span class="badge">Plan B</span></td>
-                                <td><span class="badge">契約成立報酬 (賃料×2%)</span></td>
-                                <td>¥0</td>
-                                <td><span class="badge">支払予定</span></td>
-                                <td>支払予定日 : 2025/03/xx</td>
-                            </tr>
-                            <tr style="background: #fdfdfd;">
-                                <td>2025/02/xx</td>
-                                <td>---</td>
-                                <td><strong>---物件名---</strong><br><span style="color: #999;">xxx号室</span></td>
-                                <td><span class="badge">1K / スタンダード</span></td>
-                                <td><span class="badge">Plan A</span></td>
-                                <td><span class="badge">撮影報酬 (固定)</span></td>
-                                <td style="font-weight: 700;">¥5,000</td>
                                 <td><span class="badge">未払い</span></td>
                                 <td>---</td>
                             </tr>
-                            <tr style="color: #999;">
-                                <td>2025/02/xx</td>
+                            <tr>
+                                <td>2025/02/12</td>
+                                <td>SHT-023</td>
+                                <td><strong>代官山ヒルズ</strong><br><span style="color: #999;">203号室</span></td>
+                                <td><span class="badge">1K / 標準</span></td>
+                                <td><span class="badge">撮影報酬 (固定)</span></td>
+                                <td>¥5,000</td>
+                                <td><span class="badge">未払い</span></td>
                                 <td>---</td>
-                                <td><strong>---物件名---</strong><br><span style="color: #999;">xxx号室</span></td>
-                                <td><span class="badge">3LDK / ファミリー</span></td>
-                                <td><span class="badge">Plan B</span></td>
-                                <td><span class="badge">契約成立報酬 (賃料×2%)</span></td>
-                                <td>---</td>
-                                <td><span class="badge" style="border-color: #999;">承認待ち</span></td>
-                                <td>管理者承認後に確定します</td>
+                            </tr>
+                            <tr>
+                                <td>2025/02/15</td>
+                                <td>SHT-025</td>
+                                <td><strong>渋谷タワー</strong><br><span style="color: #999;">3005号室</span></td>
+                                <td><span class="badge">2LDK / ハイグレード</span></td>
+                                <td><span class="badge">撮影報酬 (固定)</span></td>
+                                <td>¥7,500</td>
+                                <td><span class="badge">未払い</span></td>
+                                <td>交通費補助 ¥2,500込</td>
                             </tr>
                             <tr style="color: #999;">
-                                <td>2025/02/xx</td>
-                                <td>---</td>
-                                <td><strong>---物件名---</strong><br><span style="color: #999;">xxx号室</span></td>
-                                <td><span class="badge">2K / スタンダード</span></td>
-                                <td><span class="badge">Plan A</span></td>
+                                <td>2025/02/18</td>
+                                <td>SHT-027</td>
+                                <td><strong>新宿スカイガーデン</strong><br><span style="color: #999;">502号室</span></td>
+                                <td><span class="badge">1DK / 標準</span></td>
                                 <td><span class="badge">撮影報酬 (固定)</span></td>
+                                <td>¥3,500</td>
+                                <td><span class="badge">承認待ち</span></td>
+                                <td>承認後に未払い分へ算入</td>
+                            </tr>
+                            <tr style="color: #999;">
+                                <td>2025/02/20</td>
+                                <td>SHT-029</td>
+                                <td><strong>中野マンション</strong><br><span style="color: #999;">102号室</span></td>
+                                <td><span class="badge">2K / 標準</span></td>
+                                <td><span class="badge">撮影報酬 (固定)</span></td>
+                                <td>¥3,500</td>
+                                <td><span class="badge">承認待ち</span></td>
                                 <td>---</td>
-                                <td><span class="badge" style="border-color: #999;">承認待ち</span></td>
-                                <td>管理者承認後に確定します</td>
                             </tr>
                         </tbody>
                     </table>
-                    <div class="pagination">
-                        <div class="page-btn">前</div>
-                        <div class="page-btn active">1</div>
-                        <div class="page-btn">2</div>
-                        <div class="page-btn">次</div>
-                    </div>
                 </div>
 
                 <!-- Footer Note -->
                 <div class="footer-note">
                     ・金額はすべて税抜表示です。承認済みの案件のみ報酬合計に算入されます。<br>
-                    ・Plan A：撮影報酬 ¥5,000 (固定) ／ 内覧なし直接申込の場合は即時申込ボーナス ¥3,000 を加算。<br>
-                    ・Plan B：固定報酬なし。賃貸契約成立時に 賃料 × 2% の報酬が発生します。<br>
-                    ・承認待ちの案件（グレー行）は管理者の承認後に報酬が確定し、支払処理へ進みます。<br>
-                    ・月次の集計は「報酬サマリー」タブで確認できます。
+                    ・標準報酬：単身者向け ¥3,500〜、ファミリー向け ¥5,000〜 です（物件により調整あり）。<br>
+                    ・承認待ちの案件（グレー行）は管理者の承認後に報酬が確定し、支払処理へ進みます。
                 </div>
             </div>
         </main>
     </div>
+    <script>
+      function toggleBell() {
+        var m = document.getElementById('bellMenu');
+        m.style.display = m.style.display === 'none' ? 'block' : 'none';
+        var u = document.getElementById('userMenu');
+        if (u) u.style.display = 'none';
+      }
+      function toggleUserMenu() {
+        var m = document.getElementById('userMenu');
+        m.style.display = m.style.display === 'none' ? 'block' : 'none';
+        var b = document.getElementById('bellMenu');
+        if (b) b.style.display = 'none';
+      }
+      document.addEventListener('click', function(e) {
+        var bellWrap = document.getElementById('bellWrap');
+        if (bellWrap && !bellWrap.contains(e.target)) {
+          var bm = document.getElementById('bellMenu');
+          if (bm) bm.style.display = 'none';
+        }
+        var wrap = document.getElementById('userMenuWrap');
+        if (wrap && !wrap.contains(e.target)) {
+          var um = document.getElementById('userMenu');
+          if (um) um.style.display = 'none';
+        }
+      });
+    </script>
 </body>
 </html>

@@ -8,14 +8,14 @@
 <script id="tailwind-config">
     tailwind.config = {
         theme: {
-            extend: {
-                colors: {
-                    "wireframe-bg": "#ffffff",
-                    "wireframe-border": "#333333",
-                    "wireframe-box": "#f3f4f6",
-                },
-                fontFamily: { "sans": ["Noto Sans JP", "sans-serif"] },
+          extend: {
+            colors: {
+              "wireframe-bg": "#ffffff",
+              "wireframe-border": "#333333",
+              "wireframe-box": "#f3f4f6",
             },
+            fontFamily: { "sans": ["Noto Sans JP", "sans-serif"] },
+          },
         },
     }
 </script>
@@ -69,19 +69,7 @@
         <input type="text" placeholder="検索..." style="border:1px solid #000; padding:6px 10px; font-size:12px; width:100%; outline:none; background:#fff; font-family:inherit;" />
       </div>
       <div style="display:flex; gap:16px; align-items:center;">
-        <!-- Bell -->
-        <div id="bellWrap" style="position:relative;">
-          <button onclick="toggleBell()" style="background:none; border:none; cursor:pointer; font-size:18px; padding:4px;">🔔</button>
-          <div id="bellDrop" style="display:none; position:absolute; right:0; top:36px; width:280px; background:#fff; border:1px solid #000; z-index:100; box-shadow:2px 2px 0 #000;">
-            <div style="padding:10px 14px; border-bottom:1px solid #000; font-size:12px; font-weight:700;">お知らせ</div>
-            <div style="padding:10px 14px; font-size:12px; border-bottom:1px solid #eee;">撮影案件SHT-033の予約が確定しました</div>
-            <div style="padding:10px 14px; font-size:12px; border-bottom:1px solid #eee;">SHT-021のアップロードが承認されました</div>
-            <div style="padding:10px 14px; font-size:12px;">新しい撮影依頼が届きました</div>
-          </div>
-        </div>
-        <!-- Help -->
-        <button style="background:none; border:none; cursor:pointer; font-size:16px; padding:4px;">❓</button>
-        <!-- User Menu -->
+        <a href="HC0-01.html" class="w-7 h-7 flex items-center justify-center border border-black bg-white text-black text-sm font-bold hover:bg-black hover:text-white transition-colors" title="ヘルプセンター">?</a>
         <div id="userMenuWrap" style="position:relative;">
           <button onclick="toggleUserMenu()" style="background:none; border:1px solid #000; cursor:pointer; font-size:12px; padding:6px 12px; font-family:inherit;">佐藤 健太 ▾</button>
           <div id="userMenuDrop" style="display:none; position:absolute; right:0; top:36px; width:180px; background:#fff; border:1px solid #000; z-index:100; box-shadow:2px 2px 0 #000;">
@@ -136,7 +124,7 @@
         <div class="grid grid-cols-4 gap-4">
           <div class="wireframe-box p-5 space-y-2">
             <div class="text-xs font-bold">今月の報酬合計</div>
-            <div class="text-3xl font-bold">¥0</div>
+            <div class="text-3xl font-bold">¥24,500</div>
             <div class="text-[10px] text-gray-400 border-t border-gray-200 pt-2">税抜 / 承認済み分のみ</div>
           </div>
           <div class="wireframe-box p-5 space-y-2">
@@ -146,15 +134,15 @@
           </div>
           <div class="wireframe-box p-5 space-y-2">
             <div class="text-xs font-bold">未払い額</div>
-            <div class="text-3xl font-bold">¥0</div>
+            <div class="text-3xl font-bold">¥24,500</div>
             <div class="space-y-0.5 border-t border-gray-200 pt-2">
-              <div class="flex justify-between text-[10px]"><span class="text-gray-500">未払い</span><span>¥0</span></div>
+              <div class="flex justify-between text-[10px]"><span class="text-gray-500">未払い</span><span>¥24,500</span></div>
               <div class="flex justify-between text-[10px]"><span class="text-gray-500">支払予定</span><span>¥0</span></div>
             </div>
           </div>
           <div class="wireframe-box p-5 space-y-2">
             <div class="text-xs font-bold">対応撮影案件数</div>
-            <div class="text-3xl font-bold">0</div>
+            <div class="text-3xl font-bold">5</div>
             <div class="text-[10px] text-gray-400 border-t border-gray-200 pt-2">当月承認済み分</div>
           </div>
         </div>
@@ -164,14 +152,14 @@
       <div class="wireframe-box">
         <div class="p-4 border-b border-wireframe-border">
           <h2 class="font-bold">月次報酬サマリー一覧</h2>
-          <p class="text-[10px] text-gray-500 mt-0.5">※ 承認済みの撮影案件の報酬のみ集計しています。行または「詳細」をクリックすると月次の明細を確認できます。</p>
+          <p class="text-[10px] text-gray-500 mt-0.5">※ 承認済みの撮影案件の報酬のみ集計しています。</p>
         </div>
         <div class="overflow-x-auto">
           <table>
             <thead>
               <tr>
                 <th>対象月</th>
-                <th class="text-right">対応撮影案件数</th>
+                <th class="text-right">対応案件数</th>
                 <th class="text-right">報酬合計（税抜）</th>
                 <th class="text-right">支払済み額</th>
                 <th class="text-right">未払い額</th>
@@ -180,72 +168,54 @@
               </tr>
             </thead>
             <tbody>
-              <!-- 支払済み -->
-              <tr class="hover:bg-gray-50 cursor-pointer" onclick="openDrawer('2025年02月度','支払済み')">
+              <tr class="hover:bg-gray-50 cursor-pointer" onclick="openDrawer('2025年02月度','未払い')">
                 <td class="font-bold text-xs">2025年02月度</td>
-                <td class="text-right text-gray-400">3</td>
-                <td class="text-right text-gray-400">¥0</td>
-                <td class="text-right text-gray-400">¥0</td>
-                <td class="text-right text-gray-400">¥0</td>
-                <td><span class="chip bold">支払済み</span></td>
-                <td><button class="text-xs underline" onclick="event.stopPropagation();openDrawer('2025年02月度','支払済み')">詳細</button></td>
-              </tr>
-              <!-- 未払い + 承認待ちあり -->
-              <tr class="hover:bg-gray-50 cursor-pointer" onclick="openDrawer('2025年01月度','未払い')">
-                <td class="font-bold text-xs">2025年01月度</td>
-                <td class="text-right text-gray-400">4</td>
-                <td class="text-right text-gray-400">¥0</td>
-                <td class="text-right text-gray-400">¥0</td>
-                <td class="text-right font-bold">¥0</td>
+                <td class="text-right">5</td>
+                <td class="text-right">¥24,500</td>
+                <td class="text-right">¥0</td>
+                <td class="text-right font-bold text-red-600">¥24,500</td>
                 <td><span class="chip">未払い</span></td>
-                <td><button class="text-xs underline" onclick="event.stopPropagation();openDrawer('2025年01月度','未払い',true)">詳細</button></td>
+                <td><button class="text-xs underline">詳細</button></td>
               </tr>
-              <!-- 支払予定 -->
+              <tr class="hover:bg-gray-50 cursor-pointer" onclick="openDrawer('2025年01月度','支払済み')">
+                <td class="font-bold text-xs">2025年01月度</td>
+                <td class="text-right">7</td>
+                <td class="text-right">¥32,000</td>
+                <td class="text-right">¥32,000</td>
+                <td class="text-right">¥0</td>
+                <td><span class="chip bold">支払済み</span></td>
+                <td><button class="text-xs underline">詳細</button></td>
+              </tr>
               <tr class="hover:bg-gray-50 cursor-pointer" onclick="openDrawer('2024年12月度','支払予定')">
                 <td class="font-bold text-xs">2024年12月度</td>
-                <td class="text-right text-gray-400">2</td>
-                <td class="text-right text-gray-400">¥0</td>
-                <td class="text-right text-gray-400">¥0</td>
-                <td class="text-right text-gray-400">¥0</td>
+                <td class="text-right">4</td>
+                <td class="text-right">¥18,500</td>
+                <td class="text-right">¥0</td>
+                <td class="text-right font-bold">¥18,500</td>
                 <td><span class="chip">支払予定</span></td>
-                <td><button class="text-xs underline" onclick="event.stopPropagation();openDrawer('2024年12月度','支払予定')">詳細</button></td>
+                <td><button class="text-xs underline">詳細</button></td>
               </tr>
-              <tr class="hover:bg-gray-50 cursor-pointer" onclick="openDrawer('2024年11月度','一部支払い')">
+              <tr class="hover:bg-gray-50 cursor-pointer" onclick="openDrawer('2024年11月度','支払済み')">
                 <td class="font-bold text-xs">2024年11月度</td>
-                <td class="text-right text-gray-400">5</td>
-                <td class="text-right text-gray-400">¥0</td>
-                <td class="text-right text-gray-400">¥0</td>
-                <td class="text-right text-gray-400">¥0</td>
-                <td><span class="chip">一部支払い</span></td>
-                <td><button class="text-xs underline" onclick="event.stopPropagation();openDrawer('2024年11月度','一部支払い')">詳細</button></td>
+                <td class="text-right">6</td>
+                <td class="text-right">¥28,000</td>
+                <td class="text-right">¥28,000</td>
+                <td class="text-right">¥0</td>
+                <td><span class="chip bold">支払済み</span></td>
+                <td><button class="text-xs underline">詳細</button></td>
               </tr>
               <tr class="hover:bg-gray-50 cursor-pointer" onclick="openDrawer('2024年10月度','支払済み')">
                 <td class="font-bold text-xs">2024年10月度</td>
-                <td class="text-right text-gray-400">3</td>
-                <td class="text-right text-gray-400">¥0</td>
-                <td class="text-right text-gray-400">¥0</td>
-                <td class="text-right text-gray-400">¥0</td>
+                <td class="text-right">3</td>
+                <td class="text-right">¥14,000</td>
+                <td class="text-right">¥14,000</td>
+                <td class="text-right">¥0</td>
                 <td><span class="chip bold">支払済み</span></td>
-                <td><button class="text-xs underline" onclick="event.stopPropagation();openDrawer('2024年10月度','支払済み')">詳細</button></td>
+                <td><button class="text-xs underline">詳細</button></td>
               </tr>
             </tbody>
           </table>
         </div>
-        <div class="p-4 border-t border-wireframe-border flex justify-between items-center">
-          <div class="text-xs text-gray-500">全 xx 件</div>
-          <div class="flex gap-1">
-            <button class="w-8 h-8 border border-wireframe-border flex items-center justify-center text-xs">前</button>
-            <button class="w-8 h-8 border border-wireframe-border flex items-center justify-center text-xs bg-wireframe-box font-bold">1</button>
-            <button class="w-8 h-8 border border-wireframe-border flex items-center justify-center text-xs">2</button>
-            <button class="w-8 h-8 border border-wireframe-border flex items-center justify-center text-xs">次</button>
-          </div>
-        </div>
-      </div>
-
-      <!-- Note -->
-      <div class="border border-dashed border-wireframe-border bg-wireframe-box px-4 py-3 text-xs text-gray-600 space-y-1">
-        <div>・ 承認済みの撮影案件の報酬のみを集計しています。承認待ちの案件は報酬合計に含まれません。</div>
-        <div>・ 案件ごとの明細は行の「詳細」または「支払明細詳細」タブから確認してください。</div>
       </div>
 
     </div>
@@ -257,15 +227,13 @@
   <!-- DETAIL DRAWER -->
   <div id="drawer" class="fixed top-0 right-0 h-full w-[420px] border-l border-wireframe-border bg-white z-30 flex flex-col">
     <div class="h-14 border-b border-wireframe-border flex items-center justify-between px-6 bg-wireframe-box flex-shrink-0">
-      <div class="font-bold text-sm" id="drawer-title">報酬明細詳細 — 2025年02月度</div>
+      <div class="font-bold text-sm" id="drawer-title">報酬明細詳細</div>
       <button onclick="closeDrawer()" class="wireframe-btn text-xs px-3 py-1.5">✕ 閉じる</button>
     </div>
-
     <div class="flex-1 overflow-y-auto p-6 space-y-6">
-
       <div class="flex items-center gap-3 flex-wrap">
         <span class="text-xs text-gray-500">支払ステータス</span>
-        <span id="drawer-status" class="chip bold">支払済み</span>
+        <span id="drawer-status" class="chip bold">未払い</span>
       </div>
 
       <!-- 報酬サマリーカード -->
@@ -273,11 +241,11 @@
         <div class="text-xs font-bold mb-2">報酬サマリー</div>
         <div class="border border-wireframe-border p-4 space-y-3">
           <div class="text-xs text-gray-500">報酬合計（税抜 / 承認済み分のみ）</div>
-          <div class="text-3xl font-bold">¥0</div>
+          <div class="text-3xl font-bold" id="drawer-total">¥24,500</div>
           <div class="border-t border-gray-200 pt-3 space-y-1.5">
-            <div class="flex justify-between text-xs"><span class="text-gray-500">支払済み額</span><span>¥0</span></div>
-            <div class="flex justify-between text-xs"><span class="text-gray-500">未払い額</span><span>¥0</span></div>
-            <div class="flex justify-between text-xs"><span class="text-gray-500">支払予定日</span><span class="text-gray-400">----/--/--</span></div>
+            <div class="flex justify-between text-xs"><span class="text-gray-500">支払済み額</span><span id="drawer-paid">¥0</span></div>
+            <div class="flex justify-between text-xs"><span class="text-gray-500">未払い額</span><span id="drawer-unpaid" class="font-bold text-red-600">¥24,500</span></div>
+            <div class="flex justify-between text-xs"><span class="text-gray-500">支払予定日</span><span class="text-gray-400">2025/03/15</span></div>
           </div>
         </div>
       </div>
@@ -288,15 +256,15 @@
         <div class="border border-wireframe-border">
           <div class="flex border-b border-wireframe-border">
             <div class="w-40 bg-wireframe-box px-3 py-2 text-xs font-bold flex-shrink-0">撮影報酬</div>
-            <div class="px-3 py-2 text-xs text-right flex-1 text-gray-400">¥0</div>
+            <div class="px-3 py-2 text-xs text-right flex-1">¥17,500</div>
           </div>
           <div class="flex border-b border-wireframe-border">
             <div class="w-40 bg-wireframe-box px-3 py-2 text-xs font-bold flex-shrink-0">交通費補助</div>
-            <div class="px-3 py-2 text-xs text-right flex-1 text-gray-400">¥0</div>
+            <div class="px-3 py-2 text-xs text-right flex-1">¥7,000</div>
           </div>
           <div class="flex">
             <div class="w-40 bg-wireframe-box px-3 py-2 text-xs font-bold flex-shrink-0">その他</div>
-            <div class="px-3 py-2 text-xs text-right flex-1 text-gray-400">¥0</div>
+            <div class="px-3 py-2 text-xs text-right flex-1">¥0</div>
           </div>
         </div>
       </div>
@@ -305,60 +273,61 @@
       <div>
         <div class="text-xs font-bold mb-2">対応撮影案件一覧</div>
         <table class="text-xs">
-          <thead>
+          <thead class="bg-wireframe-box">
             <tr>
-              <th class="text-xs">案件ID</th>
-              <th class="text-xs">物件・部屋番号</th>
-              <th class="text-xs text-right">報酬</th>
-              <th class="text-xs">ステータス</th>
+              <th class="p-2 border-b border-wireframe-border">案件ID</th>
+              <th class="p-2 border-b border-wireframe-border">物件名</th>
+              <th class="p-2 border-b border-wireframe-border text-right">報酬</th>
+              <th class="p-2 border-b border-wireframe-border text-center">状態</th>
             </tr>
           </thead>
           <tbody>
             <tr class="hover:bg-gray-50">
-              <td class="text-gray-400">---</td>
-              <td class="text-gray-400">--- / xxx号室</td>
-              <td class="text-right text-gray-400">¥0</td>
-              <td><span class="chip bold text-[10px]">承認済み</span></td>
+              <td class="p-2 border-b border-gray-100">SHT-021</td>
+              <td class="p-2 border-b border-gray-100"><div class="font-bold">恵比寿レジデンス</div><div class="text-[10px] text-gray-500">101号室</div></td>
+              <td class="p-2 border-b border-gray-100 text-right">¥5,000</td>
+              <td class="p-2 border-b border-gray-100 text-center"><span class="chip bold">承認済</span></td>
             </tr>
             <tr class="hover:bg-gray-50">
-              <td class="text-gray-400">---</td>
-              <td class="text-gray-400">--- / xxx号室</td>
-              <td class="text-right text-gray-400">¥0</td>
-              <td><span class="chip bold text-[10px]">承認済み</span></td>
+              <td class="p-2 border-b border-gray-100">SHT-023</td>
+              <td class="p-2 border-b border-gray-100"><div class="font-bold">代官山ヒルズ</div><div class="text-[10px] text-gray-500">203号室</div></td>
+              <td class="p-2 border-b border-gray-100 text-right">¥5,000</td>
+              <td class="p-2 border-b border-gray-100 text-center"><span class="chip bold">承認済</span></td>
+            </tr>
+            <tr class="hover:bg-gray-50">
+              <td class="p-2 border-b border-gray-100">SHT-025</td>
+              <td class="p-2 border-b border-gray-100"><div class="font-bold">渋谷タワー</div><div class="text-[10px] text-gray-500">3005号室</div></td>
+              <td class="p-2 border-b border-gray-100 text-right">¥7,500</td>
+              <td class="p-2 border-b border-gray-100 text-center"><span class="chip bold">承認済</span></td>
+            </tr>
+            <tr class="hover:bg-gray-50">
+              <td class="p-2 border-b border-gray-100">SHT-027</td>
+              <td class="p-2 border-b border-gray-100"><div class="font-bold">新宿スカイ</div><div class="text-[10px] text-gray-500">502号室</div></td>
+              <td class="p-2 border-b border-gray-100 text-right">¥3,500</td>
+              <td class="p-2 border-b border-gray-100 text-center"><span class="chip bold">承認済</span></td>
+            </tr>
+            <tr class="hover:bg-gray-50">
+              <td class="p-2 border-b border-gray-100">SHT-029</td>
+              <td class="p-2 border-b border-gray-100"><div class="font-bold">中野マン</div><div class="text-[10px] text-gray-500">102号室</div></td>
+              <td class="p-2 border-b border-gray-100 text-right">¥3,500</td>
+              <td class="p-2 border-b border-gray-100 text-center"><span class="chip bold">承認済</span></td>
             </tr>
           </tbody>
         </table>
       </div>
 
-    </div>
-
-    <div class="border-t border-wireframe-border p-4 flex-shrink-0 bg-wireframe-box">
-      <button class="wireframe-btn text-xs px-3 py-1.5 w-full" onclick="location.href='PC2-02.html'">支払明細詳細へ →</button>
+      <div class="mt-4">
+        <button class="wireframe-btn text-xs w-full" onclick="location.href='PC2-02.html'">支払明細詳細で確認 →</button>
+      </div>
     </div>
   </div>
 
 </div>
 <script>
-  function toggleBell(){
-    const d=document.getElementById('bellDrop');
-    const u=document.getElementById('userMenuDrop');
-    if(u) u.style.display='none';
-    d.style.display=d.style.display==='block'?'none':'block';
-  }
   function toggleUserMenu(){
     const d=document.getElementById('userMenuDrop');
-    const b=document.getElementById('bellDrop');
-    if(b) b.style.display='none';
     d.style.display=d.style.display==='block'?'none':'block';
   }
-  document.addEventListener('click',function(e){
-    const bw=document.getElementById('bellWrap');
-    const uw=document.getElementById('userMenuWrap');
-    if(bw && !bw.contains(e.target)) document.getElementById('bellDrop').style.display='none';
-    if(uw && !uw.contains(e.target)) document.getElementById('userMenuDrop').style.display='none';
-  });
-</script>
-<script>
   function openDrawer(month, status) {
     document.getElementById('drawer-title').textContent = '報酬明細詳細 — ' + month;
     document.getElementById('drawer-status').textContent = status;

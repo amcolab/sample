@@ -2225,53 +2225,37 @@
     function goDetail(id) { location.href = 'AD08.html'; }
     function goEdit(id) { showToast('success', '編集画面へ遷移: ' + id); }
 
+    function toggleBell() {
+      const bell = document.getElementById('bellDrop');
+      const user = document.getElementById('userMenuDrop');
+      const isOpen = bell.style.display === 'block';
+      if (user) user.style.display = 'none';
+      bell.style.display = isOpen ? 'none' : 'block';
+    }
+    function toggleUserMenu() {
+      const user = document.getElementById('userMenuDrop');
+      const bell = document.getElementById('bellDrop');
+      const isOpen = user.style.display === 'block';
+      if (bell) bell.style.display = 'none';
+      user.style.display = isOpen ? 'none' : 'block';
+    }
+
     function toggleNotiDropdown(event) {
-      event.stopPropagation();
-      const dropdown = document.getElementById('notification-dropdown');
-      const isVisible = dropdown.style.display === 'block';
-      dropdown.style.display = isVisible ? 'none' : 'block';
+      toggleBell();
     }
-
-    function toggleSubMenu(id) {
-      const menu = document.getElementById(id);
-      const icon = document.getElementById(id + '-icon');
-      const isVisible = menu.style.display === 'block';
-      menu.style.display = isVisible ? 'none' : 'block';
-      if (icon) {
-        icon.style.transform = isVisible ? 'rotate(-90deg)' : 'rotate(0deg)';
-      }
-    }
-
-    // Initialize sidebar states
-    document.addEventListener('DOMContentLoaded', () => {
-      const path = window.location.pathname;
-      if (path.includes('AF1-01') || path.includes('AF2-01')) {
-        const menu = document.getElementById('sales-menu');
-        const icon = document.getElementById('sales-menu-icon');
-        if (menu) menu.style.display = 'block';
-        if (icon) icon.style.transform = 'rotate(0deg)';
-      }
-    });
 
     function toggleAccountDropdown(event) {
-      event.stopPropagation();
-      const dropdown = document.getElementById('account-dropdown');
-      const isVisible = dropdown.style.display === 'block';
-      dropdown.style.display = isVisible ? 'none' : 'block';
-      document.getElementById('notification-dropdown').style.display = 'none';
+      toggleUserMenu();
     }
 
     document.addEventListener('click', (event) => {
-      const notiDropdown = document.getElementById('notification-dropdown');
-      const notiBtn = document.getElementById('noti-btn');
-      if (notiDropdown && !notiDropdown.contains(event.target) && !notiBtn.contains(event.target)) {
-        notiDropdown.style.display = 'none';
+      const bellWrap = document.getElementById('bellWrap');
+      if (bellWrap && !bellWrap.contains(event.target)) {
+        document.getElementById('bellDrop').style.display = 'none';
       }
-
-      const accDropdown = document.getElementById('account-dropdown');
-      const accBtn = document.getElementById('account-btn');
-      if (accDropdown && !accDropdown.contains(event.target) && !accBtn.contains(event.target)) {
-        accDropdown.style.display = 'none';
+      const userWrap = document.getElementById('userMenuWrap');
+      if (userWrap && !userWrap.contains(event.target)) {
+        document.getElementById('userMenuDrop').style.display = 'none';
       }
     });
 

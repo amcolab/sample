@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>AD24 パートナー詳細 - MooM Admin</title>
+<title>AD24 パートナー詳細 [Aプラン] - MooM Admin</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet"/>
 <script>
@@ -89,52 +89,35 @@
 <main class="flex-1 flex flex-col min-w-0 overflow-y-auto">
 
   <!-- Header -->
-  <header
-    style="height:52px; border-bottom:1px solid #000; display:flex; align-items:center; padding:0 24px; background:#fff; justify-content:space-between; position:sticky; top:0; z-index:100;">
-    <div style="flex:1; max-width:400px;">
-      <div style="position:relative;">
-        <i class="fas fa-search"
-          style="position:absolute; left:10px; top:50%; transform:translateY(-50%); color:#999; font-size:12px;"></i>
-        <input type="text" placeholder="グローバル検索..."
-          style="width:100%; border:1px solid #000; padding:4px 10px 4px 30px; font-size:12px; outline:none;">
-      </div>
+  <header style="height:52px; border-bottom:1px solid #000; display:flex; align-items:center; padding:0 24px; background:#fff; justify-content:space-between; position:sticky; top:0; z-index:100;">
+    <div style="flex:1;">
+      <input type="text" placeholder="検索..." style="border:1px solid #000; padding:6px 12px; width:200px; font-size:12px; background:#fff;">
     </div>
-    <div style="display:flex; gap:16px; align-items:center; position: relative;">
-      <button id="noti-btn" style="background:none; border:none; color:#aaa; cursor:pointer;"
-        onclick="toggleNotiDropdown(event)">
-        <i class="fas fa-bell"></i>
-      </button>
-
-      <!-- Notification Dropdown -->
-      <div id="notification-dropdown"
-        style="display: none; position: absolute; top: 40px; right: 0; width: 320px; background: #fff; border: 1px solid #000; box-shadow: 4px 4px 0px rgba(0,0,0,1); z-index: 1000;">
-        <div
-          style="padding: 12px; border-bottom: 1px solid #000; display: flex; align-items: center; justify-content: space-between; background: #f9f9f9;">
-          <div style="font-weight: 700; font-size: 12px;">通知・アラート</div>
-          <div style="display: flex; gap: 4px;">
-            <button class="text-[9px] font-bold px-2 py-0.5 border border-black bg-black text-white">すべて</button>
-            <button
-              class="text-[9px] font-bold px-2 py-0.5 border border-black bg-white text-black hover:bg-gray-100">未読</button>
-          </div>
-        </div>
-        <div style="max-height: 300px; overflow-y: auto;">
-          <div style="padding: 12px; border-bottom: 1px solid #eee; font-size: 11px; cursor: pointer;"
-            onclick="location.href='AD12.html'">
-            <div style="font-weight: 700; margin-bottom: 4px;">【新規】入居申込が入りました</div>
-            <div style="color: #666;">物件：代官山レジデンス 201号室</div>
-            <div style="color: #aaa; font-size: 10px; margin-top: 4px;">15分前</div>
-          </div>
+    <div style="display:flex; gap:20px; align-items:center;">
+      <div id="bellWrap" style="position:relative; display:inline-block;">
+        <button onclick="toggleBell()" style="position:relative; cursor:pointer; font-size:18px; background:none; border:none; color:inherit;">🔔
+          <span style="position:absolute; top:-8px; right:-8px; background:#f44336; color:#fff; border-radius:0px; width:20px; height:20px; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700;">2</span>
+        </button>
+        <div id="bellDrop" style="display:none; position:absolute; right:0; top:calc(100% + 8px); background:#fff; border:1px solid #000; z-index:300; width:300px; box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+          <div style="padding:10px 14px; border-bottom:1px solid #000; font-weight:700; font-size:12px; background:#f9f9f9;">お知らせ <span style="color:#f44336;">(2)</span></div>
+          <a href="#" style="display:block; padding:10px 14px; border-bottom:1px solid #eee; text-decoration:none; color:#000;">
+            <div style="font-size:12px; font-weight:600;">撮影マニュアルが更新されました</div>
+            <div style="font-size:11px; color:#888; margin-top:2px;">2023/11/10 · MooM運営</div>
+          </a>
+          <a href="#" style="display:block; padding:10px 14px; border-bottom:1px solid #eee; text-decoration:none; color:#000;">
+            <div style="font-size:12px; font-weight:600;">報酬振込スケジュールのご案内</div>
+            <div style="font-size:11px; color:#888; margin-top:2px;">2023/11/05 · MooM運営</div>
+          </a>
+          <div style="padding:8px 14px; text-align:center; font-size:11px; color:#999; cursor:pointer;">すべて見る</div>
         </div>
       </div>
-
-      <button style="background:none; border:none; color:#aaa; cursor:pointer;"><i
-          class="fas fa-question-circle"></i></button>
-      <div
-        style="display:flex; align-items:center; gap:8px; cursor:pointer; border:1px solid #000; padding:3px 12px; background:#fff;">
-        <div
-          style="width:24px; height:24px; background:#eee; border:1px solid #000; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700;">
-          AD</div>
-        <span style="font-size:11px; font-weight:500;">アカウント</span>
+      <a href="HC0-01.html" class="w-7 h-7 flex items-center justify-center border border-black bg-white text-black text-sm font-bold hover:bg-black hover:text-white transition-colors" title="ヘルプセンター">?</a>
+      <div id="userMenuWrap" style="position:relative; display:inline-block;">
+        <button onclick="toggleUserMenu()" style="border:1px solid #000; padding:6px 14px; background:#fff; cursor:pointer; font-size:12px; font-weight:600; font-family:inherit;">佐藤 健太 ▾</button>
+        <div id="userMenuDrop" style="display:none; position:absolute; right:0; top:100%; background:#fff; border:1px solid #000; z-index:200; min-width:160px; box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+          <a href="AD24.html" style="display:block; padding:9px 16px; font-size:12px; text-decoration:none; color:#000; border-bottom:1px solid #eee;">プロフィール更新</a>
+          <a href="AP0-01.html" style="display:block; padding:9px 16px; font-size:12px; text-decoration:none; color:#dc2626;">ログアウト</a>
+        </div>
       </div>
     </div>
   </header>
@@ -149,7 +132,7 @@
       <div class="w-16 h-16 bg-wbox border border-wb flex items-center justify-center text-2xl flex-shrink-0">👤</div>
       <div>
         <div class="flex items-center gap-3 flex-wrap mb-1">
-          <h1 class="text-2xl font-bold">佐藤 健太</h1>
+          <h1 class="text-2xl font-bold">佐藤 健太 <span class="text-sm font-normal text-gray-500 ml-2"> [現在：Aプラン]</span></h1>
           <span class="px-2 py-0.5 bg-wb text-white text-xs font-bold">RANK A</span>
           <span class="px-2 py-0.5 border border-wb text-xs font-bold bg-wbox">本人確認済み</span>
         </div>
@@ -325,7 +308,24 @@
               <button class="wbtn-sm" onclick="toast('リセットメールを送信しました')">リセットメールを送る</button>
             </div>
           </div>
+        </div>
 
+        <!-- 外部サービス連携 (LINE) -->
+        <div class="wcard">
+          <h3 class="sec-title">外部サービス連携</h3>
+          <div class="flex items-center justify-between p-4 border border-black bg-gray-50">
+            <div class="flex items-center gap-4">
+              <div class="w-12 h-12 bg-green-500 flex items-center justify-center text-white text-2xl font-bold">L</div>
+              <div>
+                <div class="text-sm font-bold">LINE 連携</div>
+                <div class="text-xs text-gray-500">連携するとLINEで業務通知を受け取れます</div>
+              </div>
+            </div>
+            <div class="flex flex-col items-end gap-2">
+              <span class="text-[10px] font-bold text-gray-400">未連携</span>
+              <button class="wbtn-sm bg-white" style="border-color: #06c755; color: #06c755;" onclick="toast('LINE連携を開始します...')">LINEで連携する</button>
+            </div>
+          </div>
         </div>
 
 
@@ -654,18 +654,28 @@ function toast(msg) {
   setTimeout(() => t.remove(), 2500);
 }
 
-function toggleNotiDropdown(event) {
-  event.stopPropagation();
-  const dropdown = document.getElementById('notification-dropdown');
-  const isVisible = dropdown.style.display === 'block';
-  dropdown.style.display = isVisible ? 'none' : 'block';
+function toggleBell() {
+  const bell = document.getElementById('bellDrop');
+  const user = document.getElementById('userMenuDrop');
+  const isOpen = bell.style.display === 'block';
+  if (user) user.style.display = 'none';
+  bell.style.display = isOpen ? 'none' : 'block';
 }
-
+function toggleUserMenu() {
+  const user = document.getElementById('userMenuDrop');
+  const bell = document.getElementById('bellDrop');
+  const isOpen = user.style.display === 'block';
+  if (bell) bell.style.display = 'none';
+  user.style.display = isOpen ? 'none' : 'block';
+}
 document.addEventListener('click', (event) => {
-  const dropdown = document.getElementById('notification-dropdown');
-  const btn = document.getElementById('noti-btn');
-  if (dropdown && !dropdown.contains(event.target) && !btn.contains(event.target)) {
-    dropdown.style.display = 'none';
+  const bellWrap = document.getElementById('bellWrap');
+  if (bellWrap && !bellWrap.contains(event.target)) {
+    document.getElementById('bellDrop').style.display = 'none';
+  }
+  const userWrap = document.getElementById('userMenuWrap');
+  if (userWrap && !userWrap.contains(event.target)) {
+    document.getElementById('userMenuDrop').style.display = 'none';
   }
 });
 </script>

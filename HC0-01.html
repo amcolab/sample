@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>カメラマンサポートセンター - MooM</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;700&display=swap" rel="stylesheet" />
+    <script id="tailwind-config">
+      tailwind.config = {
+        theme: {
+          extend: {
+            colors: {
+              "wireframe-bg": "#ffffff",
+              "wireframe-border": "#333333",
+              "wireframe-box": "#f3f4f6",
+            },
+            fontFamily: { "sans": ["Noto Sans JP", "sans-serif"] },
+          },
+        },
+      }
+    </script>
+    <style type="text/tailwindcss">
+      @layer base { body { @apply bg-wireframe-bg text-black font-sans; } }
+      .wireframe-box  { @apply border-2 border-black bg-white; }
+      .category-card  { @apply border border-black p-6 hover:bg-gray-50 transition-colors; }
+      .faq-item       { @apply border-b border-black py-4 last:border-0; }
+      .faq-q          { @apply flex justify-between items-center w-full text-left font-bold text-sm mb-2; }
+      .faq-a          { @apply text-xs text-gray-600 leading-relaxed pl-4 border-l-2 border-gray-200 mt-2; }
+      .wireframe-btn-dark { @apply border-2 border-black px-12 py-4 bg-black text-white text-sm font-bold hover:bg-gray-800 rounded-none transition-all uppercase; }
+    </style>
+</head>
+<body class="antialiased min-h-screen flex flex-col">
+
+    <!-- Header (Support Portal Style) -->
+    <header class="border-b-2 border-black p-4 flex justify-between items-center bg-white sticky top-0 z-50">
+        <div class="flex items-center gap-4">
+            <h1 class="text-xl font-bold tracking-tighter">MooM <span class="text-xs border border-black px-1 ml-1 font-mono uppercase">Photographer Support</span></h1>
+        </div>
+        <div class="flex items-center gap-6">
+            <button onclick="window.history.back()" class="text-xs font-bold border-b border-black uppercase">Back to System</button>
+            <div class="w-8 h-8 rounded-full border-2 border-black flex items-center justify-center font-bold">P</div>
+        </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="flex-1 w-full flex flex-col items-center">
+        
+        <!-- Hero Section -->
+        <div class="w-full bg-black text-white py-16 px-6 text-center">
+            <h2 class="text-4xl font-bold mb-4 uppercase tracking-tight">Photographer Support Center</h2>
+            <p class="text-sm border-t border-white/30 pt-4 max-w-xl mx-auto opacity-80">
+                カメラマン様専用のヘルプセンターです。撮影報酬、データのアップロード、機材要件に関するよくあるご質問をご確認いただけます。
+            </p>
+            <div class="mt-8 max-w-2xl mx-auto relative px-4">
+                <input type="text" placeholder="キーワードから探す (例: 報酬、アップロード、三脚)..." class="w-full p-4 border-2 border-white bg-transparent text-white placeholder-white/50 text-sm outline-none focus:bg-white/10" />
+                <span class="absolute right-8 top-1/2 -translate-y-1/2 text-xs font-bold font-mono opacity-50">SEARCH</span>
+            </div>
+        </div>
+
+        <!-- FAQ Content -->
+        <div class="w-full max-w-5xl p-12 space-y-16">
+            
+            <!-- Category Grid -->
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4">
+                <a href="#reward" class="category-card flex flex-col items-center text-center gap-2">
+                    <span class="text-2xl">¥</span>
+                    <span class="text-xs font-bold">撮影報酬・お支払い</span>
+                </a>
+                <a href="#upload" class="category-card flex flex-col items-center text-center gap-2">
+                    <span class="text-2xl">☁️</span>
+                    <span class="text-xs font-bold">データ入稿・アップロード</span>
+                </a>
+                <a href="#manual" class="category-card flex flex-col items-center text-center gap-2">
+                    <span class="text-2xl">📷</span>
+                    <span class="text-xs font-bold">撮影マニュアル・機材</span>
+                </a>
+                <a href="#system" class="category-card flex flex-col items-center text-center gap-2">
+                    <span class="text-2xl">⚙</span>
+                    <span class="text-xs font-bold">システムの操作</span>
+                </a>
+            </div>
+
+            <!-- FAQ Sections -->
+            <div class="space-y-20">
+                
+                <!-- Reward Section -->
+                <section id="reward" class="space-y-6">
+                    <h3 class="text-xl font-bold border-b-2 border-black pb-2 flex items-center gap-2">
+                        <span class="text-sm font-mono opacity-30">01</span> 撮影報酬・お支払いについて
+                    </h3>
+                    <div class="space-y-2">
+                        <div class="faq-item">
+                            <button class="faq-q">
+                                <span>1案件あたりの標準的な報酬はいくらですか？</span>
+                                <span class="text-[10px]">▼</span>
+                            </button>
+                            <div class="faq-a">
+                                物件の広さや部屋数によって異なりますが、標準的な単身者向け物件で3,500円〜、ファミリー向けで5,000円〜となっております。詳細は案件詳細画面をご確認ください。
+                            </div>
+                        </div>
+                        <div class="faq-item">
+                            <button class="faq-q">
+                                <span>交通費は支給されますか？</span>
+                                <span class="text-[10px]">▼</span>
+                            </button>
+                            <div class="faq-a">
+                                原則として報酬に含まれておりますが、遠方案件などで別途支給される場合は案件概要に記載いたします。
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Data Upload Section -->
+                <section id="upload" class="space-y-6">
+                    <h3 class="text-xl font-bold border-b-2 border-black pb-2 flex items-center gap-2">
+                        <span class="text-sm font-mono opacity-30">02</span> データ入稿・アップロードについて
+                    </h3>
+                    <div class="space-y-2">
+                        <div class="faq-item">
+                            <button class="faq-q">
+                                <span>納品期限はいつまでですか？</span>
+                                <span class="text-[10px]">▼</span>
+                            </button>
+                            <div class="faq-a">
+                                原則として撮影完了から24時間以内にアップロードをお願いしております。
+                            </div>
+                        </div>
+                        <div class="faq-item">
+                            <button class="faq-q">
+                                <span>写真はRAWデータで納品する必要がありますか？</span>
+                                <span class="text-[10px]">▼</span>
+                            </button>
+                            <div class="faq-a">
+                                いいえ、指定のピクセルサイズ（長辺2000px以上）のJPEG形式でお願いいたします。
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+                <!-- Camera/Manual Section -->
+                <section id="manual" class="space-y-6">
+                    <h3 class="text-xl font-bold border-b-2 border-black pb-2 flex items-center gap-2">
+                        <span class="text-sm font-mono opacity-30">03</span> 撮影マニュアル・機材について
+                    </h3>
+                    <div class="space-y-2">
+                        <div class="faq-item">
+                            <button class="faq-q">
+                                <span>必須の撮影機材を教えてください。</span>
+                                <span class="text-[10px]">▼</span>
+                            </button>
+                            <div class="faq-a">
+                                フルサイズ換算で16mm前後の広角レンズ、および三脚が必須となります。照明機材は原則不要ですが、暗い部屋では明るめの露出設定をお願いします。
+                            </div>
+                        </div>
+                    </div>
+                </section>
+
+            </div>
+
+            <!-- CTA Section -->
+            <div class="border-2 border-black p-12 bg-gray-50 text-center space-y-6">
+                <div class="space-y-2">
+                    <h3 class="text-2xl font-bold uppercase tracking-tight">Need More Help?</h3>
+                    <p class="text-xs text-gray-500 font-medium leading-relaxed">
+                        よくあるご質問で解決しない場合は、<br/>
+                        以下のボタンよりお問い合わせフォームにお進みください。
+                    </p>
+                </div>
+                <div>
+                    <button onclick="location.href='HC0-02.html'" class="wireframe-btn-dark">
+                        お問い合わせフォームへ
+                    </button>
+                </div>
+                <p class="text-[10px] text-gray-400">※ お問い合わせの際は「案件ID（SHT-XXXX）」をご用意いただくとスムーズです。</p>
+            </div>
+
+        </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="border-t-2 border-black p-8 text-center bg-white">
+        <p class="text-[10px] font-bold tracking-widest text-gray-400 uppercase">© MooM Photographer Support Portal - Wireframe Edition</p>
+    </footer>
+
+</body>
+</html>

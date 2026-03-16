@@ -230,54 +230,34 @@
 
       <!-- Header -->
       <header style="height:52px; border-bottom:1px solid #000; display:flex; align-items:center; justify-content:space-between; padding:0 24px; background:#fff; position:sticky; top:0; z-index:100;">
-        <div style="width:280px;">
-          <div class="wf px-3 py-1 flex items-center gap-2">
-            <i class="fas fa-search text-gray-400 text-xs"></i>
-            <input type="text" placeholder="検索..." style="border:none; padding:0; font-size:12px; width:100%; outline:none;" />
-          </div>
+        <div style="flex: 1; display: flex; align-items: center;">
+          <input type="text" placeholder="検索..." style="border: 1px solid #000; padding: 6px 12px; width: 200px; font-size: 12px; background: #fff;" />
         </div>
-        <div style="display:flex; gap:16px; align-items:center;">
+        <div style="display:flex; gap:20px; align-items:center;">
           <!-- Bell -->
-          <div id="bellWrap" style="position:relative;">
-            <button onclick="toggleBell()" style="background:none; border:none; cursor:pointer; position:relative; padding:4px;">
-              <i class="fas fa-bell" style="font-size:16px; color:#888;"></i>
-              <span style="position:absolute; top:0; right:0; background:#dc2626; color:#fff; font-size:8px; width:13px; height:13px; border-radius:50%; display:flex; align-items:center; justify-content:center; border:1px solid #fff;">3</span>
-            </button>
-            <div id="bellDrop">
-              <div style="padding:10px 14px; border-bottom:1px solid #000; font-weight:700; font-size:12px; background:#f9f9f9;">通知・アラート</div>
-              <div style="max-height:260px; overflow-y:auto;">
-                <div style="padding:12px 14px; border-bottom:1px solid #eee; font-size:11px; cursor:pointer;" onclick="location.href='CM07.html'">
-                  <div style="font-weight:700; margin-bottom:4px;">新しい撮影案件が割り当てられました</div>
-                  <div style="color:#666;">スカイタワー A / 101号室</div>
-                  <div style="color:#aaa; font-size:10px; margin-top:4px;">30分前</div>
-                </div>
-                <div style="padding:12px 14px; border-bottom:1px solid #eee; font-size:11px; cursor:pointer;" onclick="location.href='CM07.html'">
-                  <div style="font-weight:700; margin-bottom:4px;">撮影予約が確定しました</div>
-                  <div style="color:#666;">サンシャイン H / 501号室</div>
-                  <div style="color:#aaa; font-size:10px; margin-top:4px;">2時間前</div>
-                </div>
-                <div style="padding:12px 14px; font-size:11px; cursor:pointer;" onclick="location.href='CM07.html'">
-                  <div style="font-weight:700; margin-bottom:4px;">動画の差し戻しがあります</div>
-                  <div style="color:#666;">パークサイド B / 202号室</div>
-                  <div style="color:#aaa; font-size:10px; margin-top:4px;">昨日</div>
-                </div>
-              </div>
+          <div id="bellWrap" style="position:relative; display:inline-block;">
+            <div onclick="toggleBell()" style="position:relative; cursor:pointer; font-size:18px;">🔔
+              <span style="position:absolute; top:-8px; right:-8px; background:#f44336; color:#fff; border-radius:0px; width:20px; height:20px; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700;">2</span>
+            </div>
+            <div id="bellDrop" style="display:none; position:absolute; right:0; top:calc(100% + 8px); background:#fff; border:1px solid #000; z-index:300; width:300px; box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+              <div style="padding:10px 14px; border-bottom:1px solid #000; font-weight:700; font-size:12px; background:#f9f9f9;">お知らせ <span style="color:#f44336;">(2)</span></div>
+              <a href="#" style="display:block; padding:10px 14px; border-bottom:1px solid #eee; text-decoration:none; color:#000;">
+                <div style="font-size:12px; font-weight:600;">撮影マニュアルが更新されました</div>
+                <div style="font-size:11px; color:#888; margin-top:2px;">2023/11/10 · MooM運営</div>
+              </a>
+              <a href="#" style="display:block; padding:10px 14px; border-bottom:1px solid #eee; text-decoration:none; color:#000;">
+                <div style="font-size:12px; font-weight:600;">報酬振込スケジュールのご案内</div>
+                <div style="font-size:11px; color:#888; margin-top:2px;">2023/11/05 · MooM運営</div>
+              </a>
+              <div style="padding:8px 14px; text-align:center; font-size:11px; color:#999; cursor:pointer;">すべて見る</div>
             </div>
           </div>
-          <!-- Help -->
-          <button style="background:none; border:none; cursor:pointer; padding:4px;">
-            <i class="fas fa-question-circle" style="font-size:16px; color:#888;"></i>
-          </button>
-          <div style="width:1px; height:24px; background:#e5e7eb;"></div>
-          <!-- User -->
-          <div id="userMenuWrap" style="position:relative;">
-            <button onclick="toggleUserMenu()" style="background:#fff; border:1px solid #000; padding:5px 12px; font-size:12px; font-weight:700; cursor:pointer; display:flex; align-items:center; gap:6px;">
-              <i class="fas fa-user-circle" style="font-size:15px; color:#666;"></i>
-              佐藤 健太 ▾
-            </button>
-            <div id="userMenuDrop">
-              <a href="CM1-04.html" style="display:block; padding:10px 14px; font-size:12px; text-decoration:none; color:#333;" onmouseover="this.style.background='#f5f5f5'" onmouseout="this.style.background=''">プロフィール</a>
-              <a href="AP0-01.html" style="display:block; padding:10px 14px; font-size:12px; text-decoration:none; color:#dc2626; font-weight:700;" onmouseover="this.style.background='#fef2f2'" onmouseout="this.style.background=''">ログアウト</a>
+          <a href="HC0-01.html" class="w-7 h-7 flex items-center justify-center border border-black bg-white text-black text-sm font-bold hover:bg-black hover:text-white transition-colors" title="ヘルプセンター">?</a>
+          <div id="userMenuWrap" style="position:relative; display:inline-block;">
+            <button onclick="toggleUserMenu()" style="border:1px solid #000; padding:6px 14px; background:#fff; cursor:pointer; font-size:12px; font-weight:600; font-family:inherit;">佐藤 健太 ▾</button>
+            <div id="userMenuDrop" style="display:none; position:absolute; right:0; top:100%; background:#fff; border:1px solid #000; z-index:200; min-width:160px; box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+              <a href="AD24.html" style="display:block; padding:9px 16px; font-size:12px; text-decoration:none; color:#000; border-bottom:1px solid #eee;">プロフィール更新</a>
+              <a href="AP0-01.html" style="display:block; padding:9px 16px; font-size:12px; text-decoration:none; color:#dc2626;">ログアウト</a>
             </div>
           </div>
         </div>
@@ -617,6 +597,79 @@
                     </div>
                   </div>
                 </div>
+                <div class="room-row COLS" style="border-bottom:1px solid #f0f0f0;">
+                  <div></div>
+                  <div class="font-bold pl-4">401号室</div>
+                  <div>2LDK</div>
+                  <div><span class="s-badge s-live" style="background-color:#059669;color:white;border:none;">公開中</span></div>
+                  <div style="font-size:11px;color:#999;">2023/11/15</div>
+                  <div></div>
+                  <div style="grid-column:2 / 7; padding:8px 0 6px 0;">
+                    <div style="display:flex; flex-wrap:wrap; gap:0; border:1px solid #e5e7eb; width:fit-content; background:#fff;">
+                      <div style="padding:5px 12px; border-right:1px solid #e5e7eb; text-align:center; min-width:66px;">
+                        <div style="font-size:13px; font-weight:700;">978</div>
+                        <div style="font-size:10px; color:#999; margin-top:1px;">👁 視聴</div>
+                      </div>
+                      <div style="padding:5px 12px; border-right:1px solid #e5e7eb; text-align:center; min-width:58px;">
+                        <div style="font-size:13px; font-weight:700;">54</div>
+                        <div style="font-size:10px; color:#999; margin-top:1px;">♡ いいね</div>
+                      </div>
+                      <div style="padding:5px 12px; border-right:1px solid #e5e7eb; text-align:center; min-width:58px;">
+                        <div style="font-size:13px; font-weight:700;">31</div>
+                        <div style="font-size:10px; color:#999; margin-top:1px;">🔖 保存</div>
+                      </div>
+                      <div style="padding:5px 12px; border-right:1px solid #e5e7eb; text-align:center; min-width:58px;">
+                        <div style="font-size:13px; font-weight:700;">17</div>
+                        <div style="font-size:10px; color:#999; margin-top:1px;">内覧</div>
+                      </div>
+                      <div style="padding:5px 12px; border-right:1px solid #e5e7eb; text-align:center; min-width:58px;">
+                        <div style="font-size:13px; font-weight:700;">6</div>
+                        <div style="font-size:10px; color:#999; margin-top:1px;">申込</div>
+                      </div>
+                      <div style="padding:5px 12px; text-align:center; min-width:58px;">
+                        <div style="font-size:13px; font-weight:700;">2</div>
+                        <div style="font-size:10px; color:#999; margin-top:1px;">成約</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+                <div class="room-row COLS" style="border-bottom:none;">
+                  <div></div>
+                  <div class="font-bold pl-4">402号室</div>
+                  <div>1DK</div>
+                  <div><span class="s-badge s-live" style="background-color:#059669;color:white;border:none;">公開中</span></div>
+                  <div style="font-size:11px;color:#999;">2023/11/05</div>
+                  <div></div>
+                  <div style="grid-column:2 / 7; padding:8px 0 6px 0;">
+                    <div style="display:flex; flex-wrap:wrap; gap:0; border:1px solid #e5e7eb; width:fit-content; background:#fff;">
+                      <div style="padding:5px 12px; border-right:1px solid #e5e7eb; text-align:center; min-width:66px;">
+                        <div style="font-size:13px; font-weight:700;">1,105</div>
+                        <div style="font-size:10px; color:#999; margin-top:1px;">👁 視聴</div>
+                      </div>
+                      <div style="padding:5px 12px; border-right:1px solid #e5e7eb; text-align:center; min-width:58px;">
+                        <div style="font-size:13px; font-weight:700;">72</div>
+                        <div style="font-size:10px; color:#999; margin-top:1px;">♡ いいね</div>
+                      </div>
+                      <div style="padding:5px 12px; border-right:1px solid #e5e7eb; text-align:center; min-width:58px;">
+                        <div style="font-size:13px; font-weight:700;">27</div>
+                        <div style="font-size:10px; color:#999; margin-top:1px;">🔖 保存</div>
+                      </div>
+                      <div style="padding:5px 12px; border-right:1px solid #e5e7eb; text-align:center; min-width:58px;">
+                        <div style="font-size:13px; font-weight:700;">19</div>
+                        <div style="font-size:10px; color:#999; margin-top:1px;">内覧</div>
+                      </div>
+                      <div style="padding:5px 12px; border-right:1px solid #e5e7eb; text-align:center; min-width:58px;">
+                        <div style="font-size:13px; font-weight:700;">7</div>
+                        <div style="font-size:10px; color:#999; margin-top:1px;">申込</div>
+                      </div>
+                      <div style="padding:5px 12px; text-align:center; min-width:58px;">
+                        <div style="font-size:13px; font-weight:700;">1</div>
+                        <div style="font-size:10px; color:#999; margin-top:1px;">成約</div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
               </div>
             </div>
           </div>
@@ -942,9 +995,11 @@
       user.style.display = isOpen ? 'none' : 'block';
     }
     document.addEventListener('click', function(e) {
-      if (!document.getElementById('bellWrap').contains(e.target))
+      const bellWrap = document.getElementById('bellWrap');
+      if (bellWrap && !bellWrap.contains(e.target))
         document.getElementById('bellDrop').style.display = 'none';
-      if (!document.getElementById('userMenuWrap').contains(e.target))
+      const userWrap = document.getElementById('userMenuWrap');
+      if (userWrap && !userWrap.contains(e.target))
         document.getElementById('userMenuDrop').style.display = 'none';
     });
 

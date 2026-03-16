@@ -121,7 +121,7 @@
                     </div>
                 </div>
                 <div style="display:flex; gap:16px; align-items: center; position: relative;">
-                  <button id="noti-btn" class="relative text-gray-400 hover:text-black transition-colors" onclick="toggleNotiDropdown(event)">
+                  <button id="noti-btn" class="relative text-gray-400 hover:text-black transition-colors" onclick="toggleBell()">
                     <i class="fas fa-bell text-lg"></i>
                     <span class="absolute -top-1 -right-1 bg-red-600 text-white text-[8px] w-3 h-3 flex items-center justify-center rounded-full border border-white">3</span>
                   </button>
@@ -154,7 +154,7 @@
                   </button>
                   <div class="h-6 w-[1px] bg-gray-200 mx-1"></div>
                   <div class="relative">
-                    <button id="account-btn" onclick="toggleAccountDropdown(event)" class="flex items-center gap-2 text-xs font-bold hover:bg-gray-50 px-3 py-1.5 wireframe-border bg-white shadow-sm">
+                    <button id="account-btn" onclick="toggleUserMenu()" class="flex items-center gap-2 text-xs font-bold hover:bg-gray-50 px-3 py-1.5 wireframe-border bg-white shadow-sm">
                       <i class="fas fa-user-circle text-lg text-gray-700"></i>
                       Admin User
                     </button>
@@ -412,7 +412,7 @@
     </div>
 
     <script>
-        function toggleNotiDropdown(event) {
+        function toggleBell() {
             event.stopPropagation();
             const dropdown = document.getElementById('notification-dropdown');
             const isVisible = dropdown.style.display === 'block';
@@ -421,7 +421,7 @@
             document.getElementById('account-dropdown').style.display = 'none';
         }
 
-        function toggleAccountDropdown(event) {
+        function toggleUserMenu() {
             event.stopPropagation();
             const dropdown = document.getElementById('account-dropdown');
             const isVisible = dropdown.style.display === 'block';

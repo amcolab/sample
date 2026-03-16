@@ -3,7 +3,7 @@
 <head>
   <meta charset="utf-8"/>
   <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-  <title>物件詳細 - カメラマンポータル</title>
+  <title>申込詳細 - MooM 契約パートナー</title>
   <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet"/>
   <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet"/>
@@ -29,47 +29,55 @@
 
   <!-- SIDEBAR -->
   <aside style="width:200px; min-width:200px; border-right:1px solid #000; display:flex; flex-direction:column; min-height:100vh; background:#fff;">
-    <a href="CM0-01.html" style="padding:16px; border-bottom:1px solid #000; text-decoration:none; color:inherit; display:block;">
-      <div style="font-size:15px; font-weight:700;">MooM</div>
-      <div style="font-size:10px; color:#888; margin-top:2px;">カメラマンポータル</div>
-    </a>
-    <nav style="flex:1; padding:8px 0;">
-      <a href="CM0-01.html" class="nav-item">ダッシュボード</a>
-      <a href="CM2-01.html" class="nav-active">物件一覧</a>
-      <a href="CM07.html" class="nav-item">撮影案件</a>
-      <a href="CM4-01.html" class="nav-item">カレンダー</a>
-      <a href="PC2-01.html" class="nav-item">報酬管理</a>
-      <a href="AD24.html" class="nav-item">設定</a>
-    </nav>
-    <div style="padding:12px; border-top:1px solid #000;">
-      <div style="font-size:12px; color:#888; text-align:center;">佐藤 健太</div>
-    </div>
+      <a href="CM0-01.html" style="padding:16px; border-bottom:1px solid #000; text-decoration:none; color:inherit; display:block;">
+          <div style="font-size:15px; font-weight:700;">MooM</div>
+          <div style="font-size:10px; color:#888; margin-top:2px;">カメラマンポータル</div>
+      </a>
+      <nav style="flex:1; padding:8px 0;">
+          <a href="CM0-01.html" class="nav-item">ダッシュボード</a>
+          <a href="CM2-01.html" class="nav-active">物件一覧</a>
+          <a href="CM07.html" class="nav-item">撮影案件</a>
+          <a href="CM4-01.html" class="nav-item">カレンダー</a>
+          <a href="PC2-01.html" class="nav-item">報酬管理</a>
+          <a href="AD24.html" class="nav-item">設定</a>
+        </nav>
+      <div style="padding:12px; border-top:1px solid #000;">
+          <div style="border:1px solid #000; padding:8px 12px; text-align:center; cursor:pointer; font-size:12px;">佐藤 健太</div>
+      </div>
   </aside>
 
   <!-- MAIN -->
   <main style="flex:1; display:flex; flex-direction:column; min-width:0; overflow-y:auto;">
 
     <!-- Header -->
-    <header style="height:52px; border-bottom:1px solid #000; display:flex; align-items:center; justify-content:space-between; padding:0 24px; background:#fff; flex-shrink:0; position:sticky; top:0; z-index:100;">
-      <div style="width:240px;">
-        <input type="text" placeholder="検索..." style="border:1px solid #000; padding:6px 10px; font-size:12px; width:100%; outline:none; background:#fff; font-family:inherit;" />
+    <header style="height:52px; border-bottom:1px solid #000; display:flex; align-items:center; justify-content:space-between; padding:0 20px; background:#fff; flex-shrink:0; position:sticky; top:0; z-index:100;">
+      <div style="flex: 1; display: flex; align-items: center;">
+        <input type="text" placeholder="検索..." style="border: 1px solid #000; padding: 6px 12px; width: 200px; font-size: 12px; background: #fff;" />
       </div>
-      <div style="display:flex; gap:16px; align-items:center;">
-        <div id="bellWrap" style="position:relative;">
-          <button onclick="toggleBell()" style="background:none; border:none; cursor:pointer; font-size:18px; padding:4px;">🔔</button>
-          <div id="bellDrop" style="display:none; position:absolute; right:0; top:36px; width:280px; background:#fff; border:1px solid #000; z-index:200; box-shadow:2px 2px 0 #000;">
-            <div style="padding:10px 14px; border-bottom:1px solid #000; font-size:12px; font-weight:700;">お知らせ</div>
-            <div style="padding:10px 14px; font-size:12px; border-bottom:1px solid #eee;">撮影案件SHT-033の予約が確定しました</div>
-            <div style="padding:10px 14px; font-size:12px; border-bottom:1px solid #eee;">SHT-021のアップロードが承認されました</div>
-            <div style="padding:10px 14px; font-size:12px;">新しい撮影依頼が届きました</div>
+      <div style="display:flex; gap:20px; align-items:center;">
+        <div id="bellWrap" style="position:relative; display:inline-block;">
+          <button onclick="toggleBell()" style="position:relative; cursor:pointer; font-size:18px; background:none; border:none; color:inherit;">🔔
+            <span style="position:absolute; top:-8px; right:-8px; background:#f44336; color:#fff; border-radius:0px; width:20px; height:20px; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700;">2</span>
+          </button>
+          <div id="bellDrop" style="display:none; position:absolute; right:0; top:calc(100% + 8px); background:#fff; border:1px solid #000; z-index:300; width:300px; box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+            <div style="padding:10px 14px; border-bottom:1px solid #000; font-weight:700; font-size:12px; background:#f9f9f9;">お知らせ <span style="color:#f44336;">(2)</span></div>
+            <a href="#" style="display:block; padding:10px 14px; border-bottom:1px solid #eee; text-decoration:none; color:#000;">
+              <div style="font-size:12px; font-weight:600;">撮影マニュアルが更新されました</div>
+              <div style="font-size:11px; color:#888; margin-top:2px;">2023/11/10 · MooM運営</div>
+            </a>
+            <a href="#" style="display:block; padding:10px 14px; border-bottom:1px solid #eee; text-decoration:none; color:#000;">
+              <div style="font-size:12px; font-weight:600;">報酬振込スケジュールのご案内</div>
+              <div style="font-size:11px; color:#888; margin-top:2px;">2023/11/05 · MooM運営</div>
+            </a>
+            <div style="padding:8px 14px; text-align:center; font-size:11px; color:#999; cursor:pointer;">すべて見る</div>
           </div>
         </div>
-        <button style="background:none; border:none; cursor:pointer; font-size:16px; padding:4px;">❓</button>
-        <div id="userMenuWrap" style="position:relative;">
-          <button onclick="toggleUserMenu()" style="background:none; border:1px solid #000; cursor:pointer; font-size:12px; padding:6px 12px; font-family:inherit;">佐藤 健太 ▾</button>
-          <div id="userMenuDrop" style="display:none; position:absolute; right:0; top:36px; width:180px; background:#fff; border:1px solid #000; z-index:200; box-shadow:2px 2px 0 #000;">
-            <a href="AD24.html" style="display:block; padding:10px 14px; font-size:12px; text-decoration:none; color:#333; border-bottom:1px solid #eee;">プロフィール更新</a>
-            <a href="AP0-01.html" style="display:block; padding:10px 14px; font-size:12px; text-decoration:none; color:#333;">ログアウト</a>
+        <a href="HC0-01.html" class="w-7 h-7 flex items-center justify-center border border-black bg-white text-black text-sm font-bold hover:bg-black hover:text-white transition-colors" title="ヘルプセンター">?</a>
+        <div id="userMenuWrap" style="position:relative; display:inline-block;">
+          <button onclick="toggleUserMenu()" style="border:1px solid #000; padding:6px 14px; background:#fff; cursor:pointer; font-size:12px; font-weight:600; font-family:inherit;">佐藤 健太 ▾</button>
+          <div id="userMenuDrop" style="display:none; position:absolute; right:0; top:100%; background:#fff; border:1px solid #000; z-index:200; min-width:160px; box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+            <a href="AD24.html" style="display:block; padding:9px 16px; font-size:12px; text-decoration:none; color:#000; border-bottom:1px solid #eee;">プロフィール更新</a>
+            <a href="AP0-01.html" style="display:block; padding:9px 16px; font-size:12px; text-decoration:none; color:#dc2626;">ログアウト</a>
           </div>
         </div>
       </div>
@@ -77,21 +85,14 @@
 
     <div style="padding:32px;">
 
-      <!-- Breadcrumb -->
-      <div style="font-size:11px; color:#888; margin-bottom:16px;">
-        <a href="CM2-01.html" style="color:#2563eb; text-decoration:none;">物件一覧</a>
-        <span style="margin:0 6px;">›</span>
-        <span>物件詳細</span>
-      </div>
+      <!-- Breadcrumb removed -->
 
       <!-- Page Header -->
       <div style="display:flex; justify-content:space-between; align-items:flex-start; margin-bottom:24px; flex-wrap:wrap; gap:12px;">
         <div style="display:flex; align-items:center; gap:12px; flex-wrap:wrap;">
           <h2 style="font-size:22px; font-weight:700; margin:0;">サンシャイン・レジデンス A</h2>
-          <span class="badge-live">掲載中</span>
           <span style="font-size:11px; color:#666; border:1px solid #ccc; padding:2px 8px;">12部屋</span>
         </div>
-        <a href="CM2-01.html" style="border:1px solid #000; padding:7px 16px; font-size:12px; text-decoration:none; color:#000; background:#fff; white-space:nowrap;">← 物件一覧に戻る</a>
       </div>
 
       <!-- Two-column layout -->
@@ -136,15 +137,16 @@
             <div style="padding:20px; display:grid; grid-template-columns:1fr 1fr; gap:16px;">
               <!-- Room card template x2 -->
               <div class="wf" style="display:flex; flex-direction:column; background:#fff;">
-                <div style="position:relative; height:140px; background:#f2f2f2; border-bottom:1px solid #000; display:flex; align-items:center; justify-content:center;">
-                  <span style="font-size:11px; color:#aaa;">間取り図</span>
-                  <button style="position:absolute; left:4px; top:50%; transform:translateY(-50%); background:#fff; border:1px solid #000; width:22px; height:22px; cursor:pointer;">‹</button>
-                  <button style="position:absolute; right:4px; top:50%; transform:translateY(-50%); background:#fff; border:1px solid #000; width:22px; height:22px; cursor:pointer;">›</button>
+                <div style="position:relative; height:180px; background:#f2f2f2; border-bottom:1px solid #000; display:flex; align-items:center; justify-content:center; overflow:hidden;">
+                  <img src="/Users/quynt/.gemini/antigravity/brain/62e53c23-bd4a-40d1-b9ea-fd65865aeaed/inside1_png_1773669242234.png" style="width:100%; height:100%; object-fit:cover;">
+                  <button style="position:absolute; left:4px; top:50%; transform:translateY(-50%); background:rgba(255,255,255,0.7); border:1px solid #000; width:22px; height:22px; cursor:pointer; z-index:10;">‹</button>
+                  <button style="position:absolute; right:4px; top:50%; transform:translateY(-50%); background:rgba(255,255,255,0.7); border:1px solid #000; width:22px; height:22px; cursor:pointer; z-index:10;">›</button>
                 </div>
-                <div style="padding:8px; border-bottom:1px solid #000; display:grid; grid-template-columns:repeat(3,1fr); gap:4px; background:#f9f9f9;">
-                  <div style="aspect-ratio:1; background:#e5e7eb; border:1px solid #ccc;"></div>
-                  <div style="aspect-ratio:1; background:#e5e7eb; border:1px solid #ccc;"></div>
-                  <div style="aspect-ratio:1; background:#e5e7eb; border:1px solid #ccc;"></div>
+                <div style="padding:8px; border-bottom:1px solid #000; display:grid; grid-template-columns:repeat(4,1fr); gap:6px; background:#f9f9f9;">
+                  <div style="aspect-ratio:1; background:#000; border:1px solid #ccc; display:flex; align-items:center; justify-content:center;"><i class="fa-solid fa-play text-[10px] text-white"></i></div>
+                  <div style="aspect-ratio:1; background:#fff; border:1px solid #ccc; overflow:hidden;"><img src="/Users/quynt/.gemini/antigravity/brain/62e53c23-bd4a-40d1-b9ea-fd65865aeaed/inside1_png_1773669242234.png" style="width:100%; height:100%; object-fit:cover;"></div>
+                  <div style="aspect-ratio:1; background:#fff; border:1px solid #ccc; overflow:hidden;"><img src="/Users/quynt/.gemini/antigravity/brain/62e53c23-bd4a-40d1-b9ea-fd65865aeaed/inside2_png_1773669258956.png" style="width:100%; height:100%; object-fit:cover;"></div>
+                  <div style="aspect-ratio:1; background:#fff; border:1px solid #ccc; overflow:hidden;"><img src="/Users/quynt/.gemini/antigravity/brain/62e53c23-bd4a-40d1-b9ea-fd65865aeaed/inside3_png_1773669276291.png" style="width:100%; height:100%; object-fit:cover;"></div>
                 </div>
                 <div style="padding:10px 12px; display:flex; justify-content:space-between; align-items:center; background:#fff;">
                   <span style="font-weight:700; font-size:13px;">1K / 26.5㎡ / 8万円</span>
@@ -152,15 +154,16 @@
                 </div>
               </div>
               <div class="wf" style="display:flex; flex-direction:column; background:#fff;">
-                <div style="position:relative; height:140px; background:#f2f2f2; border-bottom:1px solid #000; display:flex; align-items:center; justify-content:center;">
-                  <span style="font-size:11px; color:#aaa;">間取り図</span>
-                  <button style="position:absolute; left:4px; top:50%; transform:translateY(-50%); background:#fff; border:1px solid #000; width:22px; height:22px; cursor:pointer;">‹</button>
-                  <button style="position:absolute; right:4px; top:50%; transform:translateY(-50%); background:#fff; border:1px solid #000; width:22px; height:22px; cursor:pointer;">›</button>
+                <div style="position:relative; height:180px; background:#f2f2f2; border-bottom:1px solid #000; display:flex; align-items:center; justify-content:center; overflow:hidden;">
+                  <img src="/Users/quynt/.gemini/antigravity/brain/62e53c23-bd4a-40d1-b9ea-fd65865aeaed/inside1_png_1773669242234.png" style="width:100%; height:100%; object-fit:cover;">
+                  <button style="position:absolute; left:4px; top:50%; transform:translateY(-50%); background:rgba(255,255,255,0.7); border:1px solid #000; width:22px; height:22px; cursor:pointer; z-index:10;">‹</button>
+                  <button style="position:absolute; right:4px; top:50%; transform:translateY(-50%); background:rgba(255,255,255,0.7); border:1px solid #000; width:22px; height:22px; cursor:pointer; z-index:10;">›</button>
                 </div>
-                <div style="padding:8px; border-bottom:1px solid #000; display:grid; grid-template-columns:repeat(3,1fr); gap:4px; background:#f9f9f9;">
-                  <div style="aspect-ratio:1; background:#e5e7eb; border:1px solid #ccc;"></div>
-                  <div style="aspect-ratio:1; background:#e5e7eb; border:1px solid #ccc;"></div>
-                  <div style="aspect-ratio:1; background:#e5e7eb; border:1px solid #ccc;"></div>
+                <div style="padding:8px; border-bottom:1px solid #000; display:grid; grid-template-columns:repeat(4,1fr); gap:6px; background:#f9f9f9;">
+                  <div style="aspect-ratio:1; background:#000; border:1px solid #ccc; display:flex; align-items:center; justify-content:center;"><i class="fa-solid fa-play text-[10px] text-white"></i></div>
+                  <div style="aspect-ratio:1; background:#fff; border:1px solid #ccc; overflow:hidden;"><img src="/Users/quynt/.gemini/antigravity/brain/62e53c23-bd4a-40d1-b9ea-fd65865aeaed/inside1_png_1773669242234.png" style="width:100%; height:100%; object-fit:cover;"></div>
+                  <div style="aspect-ratio:1; background:#fff; border:1px solid #ccc; overflow:hidden;"><img src="/Users/quynt/.gemini/antigravity/brain/62e53c23-bd4a-40d1-b9ea-fd65865aeaed/inside2_png_1773669258956.png" style="width:100%; height:100%; object-fit:cover;"></div>
+                  <div style="aspect-ratio:1; background:#fff; border:1px solid #ccc; overflow:hidden;"><img src="/Users/quynt/.gemini/antigravity/brain/62e53c23-bd4a-40d1-b9ea-fd65865aeaed/inside3_png_1773669276291.png" style="width:100%; height:100%; object-fit:cover;"></div>
                 </div>
                 <div style="padding:10px 12px; display:flex; justify-content:space-between; align-items:center; background:#fff;">
                   <span style="font-weight:700; font-size:13px;">2LDK / 58.0㎡ / 14万円</span>
@@ -179,16 +182,16 @@
           <section class="wf" style="background:#fff; overflow:hidden;">
             <div class="section-head">物件外観画像</div>
             <div style="padding:16px; display:flex; flex-direction:column; gap:10px;">
-              <div style="position:relative; width:100%; aspect-ratio:16/9; background:#e5e7eb; border:1px solid #ccc; display:flex; align-items:center; justify-content:center; font-size:11px; color:#aaa;">
-                MAIN IMAGE
-                <button style="position:absolute; left:4px; top:50%; transform:translateY(-50%); background:#fff; border:1px solid #000; width:22px; height:22px; cursor:pointer;">‹</button>
-                <button style="position:absolute; right:4px; top:50%; transform:translateY(-50%); background:#fff; border:1px solid #000; width:22px; height:22px; cursor:pointer;">›</button>
+              <div style="position:relative; width:100%; aspect-ratio:16/9; background:#e5e7eb; border:1px solid #ccc; display:flex; align-items:center; justify-content:center; overflow:hidden;">
+                <img src="/Users/quynt/.gemini/antigravity/brain/62e53c23-bd4a-40d1-b9ea-fd65865aeaed/building_main_png_1773669070922.png" alt="建物メイン" style="width:100%; height:100%; object-fit:cover;">
+                <button style="position:absolute; left:4px; top:50%; transform:translateY(-50%); background:rgba(255,255,255,0.8); border:1px solid #000; width:26px; height:26px; cursor:pointer;">‹</button>
+                <button style="position:absolute; right:4px; top:50%; transform:translateY(-50%); background:rgba(255,255,255,0.8); border:1px solid #000; width:26px; height:26px; cursor:pointer;">›</button>
               </div>
               <div style="display:grid; grid-template-columns:repeat(4,1fr); gap:6px;">
-                <div style="aspect-ratio:1; background:#e5e7eb; border:1px solid #ccc;"></div>
-                <div style="aspect-ratio:1; background:#e5e7eb; border:1px solid #ccc;"></div>
-                <div style="aspect-ratio:1; background:#e5e7eb; border:1px solid #ccc;"></div>
-                <div style="aspect-ratio:1; background:#f2f2f2; border:1px solid #ccc; display:flex; align-items:center; justify-content:center; font-size:9px; color:#aaa; font-style:italic;">NO IMG</div>
+                <div style="aspect-ratio:1; background:#e5e7eb; border:1px solid #ccc; overflow:hidden;"><img src="/Users/quynt/.gemini/antigravity/brain/62e53c23-bd4a-40d1-b9ea-fd65865aeaed/outside_building_png_1773669016568.png" style="width:100%; height:100%; object-fit:cover;"></div>
+                <div style="aspect-ratio:1; background:#e5e7eb; border:1px solid #ccc; overflow:hidden;"><img src="/Users/quynt/.gemini/antigravity/brain/62e53c23-bd4a-40d1-b9ea-fd65865aeaed/inside_room_png_1773669036290.png" style="width:100%; height:100%; object-fit:cover;"></div>
+                <div style="aspect-ratio:1; background:#e5e7eb; border:1px solid #ccc; overflow:hidden;"><img src="/Users/quynt/.gemini/antigravity/brain/62e53c23-bd4a-40d1-b9ea-fd65865aeaed/room_layout_png_1773669054974.png" style="width:100%; height:100%; object-fit:cover;"></div>
+                <div style="aspect-ratio:1; background:#f2f2f2; border:1px solid #ccc; display:flex; align-items:center; justify-content:center; font-size:9px; color:#aaa; font-style:italic;">+ ảnh khác</div>
               </div>
             </div>
           </section>
@@ -215,6 +218,10 @@
       <button onclick="hideRoomDetail()" style="background:none; border:1px solid #000; padding:4px 10px; cursor:pointer; font-size:12px;">✕ 閉じる</button>
     </div>
     <div style="flex:1; overflow-y:auto; padding:24px; display:flex; flex-direction:column; gap:20px;">
+      
+      <div style="width:100%; aspect-ratio:16/9; background:#f0f0f0; border:1px solid #000; overflow:hidden; margin-bottom:8px;">
+        <img src="/Users/quynt/.gemini/antigravity/brain/62e53c23-bd4a-40d1-b9ea-fd65865aeaed/inside_room_png_1773669036290.png" alt="室内" style="width:100%; height:100%; object-fit:cover;">
+      </div>
 
       <div class="wf" style="overflow:hidden;">
         <div style="background:#f2f2f2; padding:8px 14px; border-bottom:1px solid #000; font-size:10px; font-weight:700; text-transform:uppercase; letter-spacing:.06em; color:#555;">賃料・契約金</div>
@@ -292,9 +299,12 @@
   }
   document.addEventListener('click',function(e){
     const bw=document.getElementById('bellWrap');
-    const uw=document.getElementById('userMenuWrap');
     if(bw && !bw.contains(e.target)) document.getElementById('bellDrop').style.display='none';
-    if(uw && !uw.contains(e.target)) document.getElementById('userMenuDrop').style.display='none';
+    const wrap = document.getElementById('userMenuWrap');
+    if (wrap && !wrap.contains(e.target)) {
+      var um = document.getElementById('userMenuDrop');
+      if (um) um.style.display = 'none';
+    }
   });
   function showRoomDetail(){
     const m=document.getElementById('roomDetailModal');

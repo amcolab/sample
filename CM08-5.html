@@ -138,16 +138,16 @@
   <!-- Main Content -->
   <main style="flex:1; display:flex; flex-direction:column;">
     <!-- Top Header -->
-    <header style="height:52px; border-bottom:1px solid #000; display:flex; align-items:center; justify-content:space-between; padding:0 24px; background:#fff; flex-shrink:0;">
-      <div style="width:240px;">
-        <input type="text" placeholder="検索..." style="border:1px solid #000; padding:6px 10px; font-size:12px; width:100%; outline:none; background:#fff;" />
+    <header style="height:52px; border-bottom:1px solid #000; display:flex; align-items:center; justify-content:space-between; padding:0 20px; background:#fff; flex-shrink:0;">
+      <div style="flex: 1; display: flex; align-items: center;">
+        <input type="text" placeholder="検索..." style="border: 1px solid #000; padding: 6px 12px; width: 200px; font-size: 12px; background: #fff;" />
       </div>
-      <div style="display:flex; gap:16px; align-items:center;">
-        <div style="position:relative; display:inline-block;" id="bellWrap">
-          <div onclick="toggleBell()" style="position:relative; cursor:pointer; font-size:18px;">🔔
-            <span style="position:absolute; top:-8px; right:-8px; background:#f44336; color:#fff; width:18px; height:18px; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700;">2</span>
-          </div>
-          <div id="bellMenu" style="display:none; position:absolute; right:0; top:calc(100% + 8px); background:#fff; border:1px solid #000; z-index:300; width:300px;">
+      <div style="display:flex; gap:20px; align-items:center;">
+        <div id="bellWrap" style="position:relative; display:inline-block;">
+          <button onclick="toggleBell()" style="position:relative; cursor:pointer; font-size:18px; background:none; border:none; color:inherit;">🔔
+            <span style="position:absolute; top:-8px; right:-8px; background:#f44336; color:#fff; border-radius:0px; width:20px; height:20px; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700;">2</span>
+          </button>
+          <div id="bellMenu" style="display:none; position:absolute; right:0; top:calc(100% + 8px); background:#fff; border:1px solid #000; z-index:300; width:300px; box-shadow:0 2px 8px rgba(0,0,0,0.08);">
             <div style="padding:10px 14px; border-bottom:1px solid #000; font-weight:700; font-size:12px; background:#f9f9f9;">お知らせ <span style="color:#f44336;">(2)</span></div>
             <a href="#" style="display:block; padding:10px 14px; border-bottom:1px solid #eee; text-decoration:none; color:#000;">
               <div style="font-size:12px; font-weight:600;">撮影マニュアルが更新されました</div>
@@ -160,10 +160,9 @@
             <div style="padding:8px 14px; text-align:center; font-size:11px; color:#999; cursor:pointer;">すべて見る</div>
           </div>
         </div>
-        <div style="cursor:pointer; font-size:18px;">❓</div>
-        <div style="position:relative; display:inline-block;" id="userMenuWrap">
-          <button onclick="toggleUserMenu()" style="border:1px solid #000; padding:6px 14px; background:#fff; cursor:pointer; font-size:12px; font-weight:600; font-family:inherit;">佐藤 健太 ▾</button>
-          <div id="userMenu" style="display:none; position:absolute; right:0; top:100%; background:#fff; border:1px solid #000; z-index:200; min-width:160px;">
+        <a href="HC0-01.html" class="w-7 h-7 flex items-center justify-center border border-black bg-white text-black text-sm font-bold hover:bg-black hover:text-white transition-colors" title="ヘルプセンター">?</a>
+        <div id="userMenuWrap" style="position:relative; display:inline-block;">          <button onclick="toggleUserMenu()" style="border:1px solid #000; padding:6px 14px; background:#fff; cursor:pointer; font-size:12px; font-weight:600; font-family:inherit;">佐藤 健太 ▾</button>
+          <div id="userMenu" style="display:none; position:absolute; right:0; top:100%; background:#fff; border:1px solid #000; z-index:200; min-width:160px; box-shadow:0 2px 8px rgba(0,0,0,0.08);">
             <a href="AD24.html" style="display:block; padding:9px 16px; font-size:12px; text-decoration:none; color:#000; border-bottom:1px solid #eee;">プロフィール更新</a>
             <a href="AP0-01.html" style="display:block; padding:9px 16px; font-size:12px; text-decoration:none; color:#dc2626;">ログアウト</a>
           </div>
