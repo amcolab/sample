@@ -1,0 +1,891 @@
+<!DOCTYPE html>
+<html class="light" lang="ja">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>AD10 内覧案件一覧 - MooM Admin</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Public+Sans:wght@400;500;700&display=swap"
+        rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet" />
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: { "primary": "#000", "background-light": "#ffffff", "background-dark": "#121212" },
+                    fontFamily: { "display": ["Noto Sans JP", "Public Sans", "sans-serif"] },
+                    borderRadius: { "DEFAULT": "0px", "lg": "0px", "xl": "0px", "full": "0px" },
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            background: #fafafa;
+            color: #000;
+            font-size: 13px;
+            margin: 0;
+        }
+
+        .wf {
+            border: 1px solid #000;
+        }
+
+        .wireframe-border {
+            border: 1px solid #000;
+        }
+
+        .wireframe-bg-gray {
+            background-color: #f2f2f2;
+        }
+
+        /* Account Dropdown */
+        #account-dropdown {
+            display: none;
+            position: absolute;
+            top: 40px;
+            right: 0;
+            width: 140px;
+            background: #fff;
+            border: 1px solid #000;
+            box-shadow: 4px 4px 0px rgba(0, 0, 0, 1);
+            z-index: 1000;
+            animation: slideDown 0.3s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .account-item:hover {
+            background: #f5f5f5;
+        }
+
+        @keyframes slideDown {
+            from {
+                opacity: 0;
+                transform: translateY(-10px) scale(0.98);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0) scale(1);
+            }
+        }
+
+        .wf2 {
+            border: 1px solid #ccc;
+        }
+
+        .nav-item {
+            display: block;
+            padding: 8px;
+            font-size: 14px;
+            color: #000;
+            text-decoration: none;
+        }
+
+        .nav-item:hover {
+            background-color: #f3f4f6;
+        }
+
+        .nav-active {
+            display: block;
+            padding: 8px;
+            font-size: 14px;
+            font-weight: 700;
+            color: #000;
+            background-color: #f3f4f6;
+            border: 1px solid #000;
+            text-decoration: none;
+        }
+
+        .btn {
+            border: 1px solid #000;
+            padding: 6px 14px;
+            background: #fff;
+            font-size: 12px;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .btn:hover {
+            background: #f2f2f2;
+        }
+
+        .btn-black {
+            background: #000;
+            color: #fff;
+            border: 1px solid #000;
+            padding: 7px 18px;
+            font-size: 13px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 600;
+        }
+
+        .btn-black:hover {
+            background: #333;
+        }
+
+        .badge {
+            display: inline-block;
+            border: 1px solid #000;
+            padding: 2px 8px;
+            font-size: 10px;
+            font-weight: bold;
+            white-space: nowrap;
+        }
+
+        .sync-banner {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            padding: 7px 14px;
+            font-size: 12px;
+            border: 1px solid #16a34a;
+            background: #f0fdf4;
+            color: #166534;
+        }
+
+        .tab-count {
+            display: inline-block;
+            background: #eee;
+            color: #666;
+            font-size: 10px;
+            padding: 1px 6px;
+            margin-left: 4px;
+            font-weight: bold;
+        }
+
+        .bg-black .tab-count {
+            background: rgba(255, 255, 255, 0.2);
+            color: #fff;
+        }
+
+        /* Modal */
+        .modal-bg {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.45);
+            z-index: 500;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .modal-bg.open {
+            display: flex;
+        }
+
+        .modal {
+            background: #fff;
+            border: 1px solid #000;
+            padding: 24px;
+        }
+
+        .modal-content {
+            background: #fff;
+            border: 1px solid #000;
+            padding: 32px;
+            width: 100%;
+            max-width: 500px;
+            position: relative;
+            box-shadow: 8px 8px 0px rgba(0, 0, 0, 1);
+        }
+    </style>
+</head>
+
+<body>
+    <div style="display:flex; min-height:100vh;">
+        <!-- SIDEBAR -->
+        <aside style="width:256px; min-width:256px; border-right:1px solid #000; display:flex; flex-direction:column; background:#fff;">
+            <a href="VP0-01.html" style="padding:16px; border-bottom:1px solid #000; text-decoration:none; color:inherit; display:block;">
+                <div style="font-size:15px; font-weight:700;">MooM</div>
+                <div style="font-size:11px; color:#666; margin-top:2px;">内覧パートナーポータル</div>
+            </a>
+            <nav style="flex:1; padding:16px; display:flex; flex-direction:column; gap:8px;">
+                <a href="VP0-01.html" class="nav-item">ダッシュボード</a>
+                <a href="AD10.html" class="nav-active">内覧管理</a>
+                <a href="CM4-01.html" class="nav-item">カレンダー</a>
+                <a href="COM-04-1.html" class="nav-item">メッセージ</a>
+                <a href="PV2-01.html" class="nav-item">報酬管理</a>
+                <a href="AD24.html" class="nav-item">設定</a>
+            </nav>
+            <div style="padding:12px; border-top:1px solid #000;">
+                <div class="wf" style="padding:8px 12px; text-align:center; font-size:12px; font-weight:700; background:#fff;">佐藤 健太</div>
+            </div>
+        </aside>
+
+        <!-- MAIN -->
+        <main style="flex:1; display:flex; flex-direction:column; overflow-x:hidden;">
+            <!-- Header -->
+            <header style="height:52px; border-bottom:1px solid #000; display:flex; align-items:center; padding:0 24px; background:#fff; justify-content:space-between; position:sticky; top:0; z-index:100;">
+                <div style="flex:1;">
+                    <input type="text" placeholder="検索..." style="border:1px solid #000; padding:6px 12px; width:200px; font-size:12px; background:#fff;">
+                </div>
+                <div style="display:flex; gap:20px; align-items:center;">
+                    <div id="bellWrap" style="position:relative; display:inline-block;">
+                        <button onclick="toggleBell()" style="position:relative; cursor:pointer; font-size:18px; background:none; border:none; color:inherit;">🔔
+                            <span style="position:absolute; top:-8px; right:-8px; background:#f44336; color:#fff; border-radius:0px; width:20px; height:20px; display:flex; align-items:center; justify-content:center; font-size:10px; font-weight:700;">2</span>
+                        </button>
+                        <div id="bellDrop" style="display:none; position:absolute; right:0; top:calc(100% + 8px); background:#fff; border:1px solid #000; z-index:300; width:300px; box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+                            <div style="padding:10px 14px; border-bottom:1px solid #000; font-weight:700; font-size:12px; background:#f9f9f9;">お知らせ <span style="color:#f44336;">(2)</span></div>
+                            <a href="#" style="display:block; padding:10px 14px; border-bottom:1px solid #eee; text-decoration:none; color:#000;">
+                                <div style="font-size:12px; font-weight:600;">内覧マニュアルが更新されました</div>
+                                <div style="font-size:11px; color:#888; margin-top:2px;">2023/11/10 · MooM運営</div>
+                            </a>
+                            <a href="#" style="display:block; padding:10px 14px; border-bottom:1px solid #eee; text-decoration:none; color:#000;">
+                                <div style="font-size:12px; font-weight:600;">今月の報酬精算について</div>
+                                <div style="font-size:11px; color:#888; margin-top:2px;">2023/11/05 · MooM運営</div>
+                            </a>
+                            <div style="padding:8px 14px; text-align:center; font-size:11px; color:#999; cursor:pointer;">すべて見る</div>
+                        </div>
+                    </div>
+                    <a href="HC0-01.html" class="w-7 h-7 flex items-center justify-center border border-black bg-white text-black text-sm font-bold hover:bg-black hover:text-white transition-colors" title="ヘルプセンター">?</a>
+                    <div id="userMenuWrap" style="position:relative; display:inline-block;">
+                        <button onclick="toggleUserMenu()" style="border:1px solid #000; padding:6px 14px; background:#fff; cursor:pointer; font-size:12px; font-weight:600; font-family:inherit;">佐藤 健太 ▾</button>
+                        <div id="userMenuDrop" style="display:none; position:absolute; right:0; top:100%; background:#fff; border:1px solid #000; z-index:200; min-width:160px; box-shadow:0 2px 8px rgba(0,0,0,0.08);">
+                          <a href="AD24.html" style="display:block; padding:9px 16px; font-size:12px; text-decoration:none; color:#000; border-bottom:1px solid #eee;">プロフィール更新</a>
+                          <a href="AP0-01.html" style="display:block; padding:9px 16px; font-size:12px; text-decoration:none; color:#dc2626;">ログアウト</a>
+                        </div>
+                    </div>
+                </div>
+            </header>
+
+            <div class="p-8 space-y-6">
+                <!-- Page Title -->
+                <div class="flex justify-between items-end">
+                    <div>
+                        <div class="text-xs text-gray-500 mb-1">内覧管理 &gt; 内覧案件一覧</div>
+                        <h2 class="text-2xl font-bold">内覧案件一覧</h2>
+                    </div>
+                    <div class="flex gap-3">
+                        <div class="sync-banner">
+                            <i class="fas fa-check-circle"></i>
+                            <span>管理会社連携: 最終同期 <strong>3分前</strong></span>
+                            <button class="ml-4 underline text-[11px] font-bold" onclick="simulateSync()">手動同期</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tabs -->
+                <div class="flex">
+                    <button id="tab-ongoing" class="wf px-8 py-2 text-sm font-bold bg-black text-white"
+                        onclick="switchTab('ongoing')">進行中 <span
+                            class="tab-count !bg-red-600 !text-white">4</span></button>
+                    <button id="tab-done"
+                        class="wf border-l-0 px-8 py-2 text-sm bg-white hover:bg-gray-50 text-gray-600"
+                        onclick="switchTab('done')">内覧完了 <span class="tab-count">1</span></button>
+                    <button id="tab-cancel"
+                        class="wf border-l-0 px-8 py-2 text-sm bg-white hover:bg-gray-50 text-gray-600"
+                        onclick="switchTab('cancel')">キャンセル <span class="tab-count">4</span></button>
+                </div>
+
+                <!-- Filter Form -->
+                <div class="wf p-6 space-y-4 bg-white mt-[-24px]" style="margin-top:24px;">
+                    <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:12px;">
+                        <div>
+                            <label class="text-[10px] uppercase font-bold text-gray-400 block mb-1">キーワード
+                                (建物名/住所)</label>
+                            <input type="text" placeholder="キーワードを入力" class="wf w-full text-xs px-3 py-1.5 bg-white" />
+                        </div>
+                        <div>
+                            <label class="text-[10px] uppercase font-bold text-gray-400 block mb-1">申込者名</label>
+                            <input type="text" placeholder="名前を入力" class="wf w-full text-xs px-3 py-1.5 bg-white" />
+                        </div>
+                        <div>
+                            <label class="text-[10px] uppercase font-bold text-gray-400 block mb-1">エリア</label>
+                            <div class="flex gap-2">
+                                <select class="wf w-1/2 text-xs px-3 py-1.5 bg-white">
+                                    <option value="">都道府県</option>
+                                </select>
+                                <select class="wf w-1/2 text-xs px-3 py-1.5 bg-white">
+                                    <option value="">市区町村</option>
+                                </select>
+                            </div>
+                        </div>
+                    </div>
+                    <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:12px;">
+                        <div>
+                            <label class="text-[10px] uppercase font-bold text-gray-400 block mb-1">内覧予定日</label>
+                            <div class="flex items-center gap-2">
+                                <input type="date" class="wf w-full text-xs px-2 py-1 bg-white" />
+                                <span class="text-gray-400">～</span>
+                                <input type="date" class="wf w-full text-xs px-2 py-1 bg-white" />
+                            </div>
+                        </div>
+                        <div>
+                            <label class="text-[10px] uppercase font-bold text-gray-400 block mb-1">ステータス</label>
+                            <select class="wf w-full text-xs px-3 py-1.5 bg-white">
+                                <option value="">すべて</option>
+                                <option value="来場未確定">来場未確定</option>
+                                <option value="来場確定済">来場確定済</option>
+                                <option value="日程再提案中">日程再提案中</option>
+                                <option value="パートナー辞退">パートナー辞退</option>
+                            </select>
+                        </div>
+                    </div>
+                    <div class="flex justify-end gap-2 pt-2">
+                        <button type="button" class="btn min-w-[100px]">クリア</button>
+                        <button type="button" class="btn-black min-w-[100px]">検索する</button>
+                    </div>
+                </div>
+
+                <!-- Table Section -->
+                <div class="wf bg-white">
+                    <div class="overflow-x-auto">
+                        <table class="w-full text-left text-sm min-w-[1200px]">
+                            <thead class="bg-gray-100 border-b border-black">
+                                <tr>
+                                    <th class="p-3 text-xs font-bold text-gray-700">建物名/号室</th>
+                                    <th class="p-3 text-xs font-bold text-gray-700 cursor-pointer hover:bg-gray-200 transition-colors"
+                                        onclick="alert('日付でソートします')">
+                                        <div class="flex items-center gap-1">
+                                            内覧予定日 <i class="fas fa-sort text-gray-400"></i>
+                                        </div>
+                                    </th>
+                                    <th class="p-3 text-xs font-bold text-gray-700">申込者</th>
+                                    <th class="p-3 text-xs font-bold text-gray-700">ステータス</th>
+                                    <th class="p-3 text-xs font-bold text-gray-700">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="table-body" class="divide-y divide-gray-300">
+                                <!-- Data will be rendered here -->
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Pagination -->
+                <div class="flex justify-center items-center gap-1 mt-6">
+                    <button class="wf px-3 py-1 bg-white hover:bg-gray-50 text-xs">前へ</button>
+                    <button class="wf px-3 py-1 bg-black text-white text-xs font-bold">1</button>
+                    <button class="wf px-3 py-1 bg-white hover:bg-gray-50 text-xs">2</button>
+                    <button class="wf px-3 py-1 bg-white hover:bg-gray-50 text-xs">3</button>
+                    <button class="wf px-3 py-1 bg-white hover:bg-gray-50 text-xs text-gray-400">...</button>
+                    <button class="wf px-3 py-1 bg-white hover:bg-gray-50 text-xs">12</button>
+                    <button class="wf px-3 py-1 bg-white hover:bg-gray-50 text-xs">次へ</button>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- ========== COMPLETION REPORT MODAL ========== -->
+    <div class="modal-bg" id="completionModal">
+        <div class="modal" style="width:450px; padding:32px;">
+            <h3 class="text-lg font-bold mb-4">内覧完了報告</h3>
+            <div class="space-y-4">
+                <div>
+                    <label class="text-[10px] font-bold text-gray-400 block mb-1">内覧完了日</label>
+                    <input type="date" id="compDate" class="wf w-full p-2 text-xs">
+                </div>
+                <div>
+                    <label class="text-[10px] font-bold text-gray-400 block mb-1">当日のメモ・特記事項</label>
+                    <textarea id="compNote" class="wf w-full p-2 text-xs h-24" placeholder="内覧時の様子や顧客の反応など"></textarea>
+                </div>
+                <div class="bg-blue-50 border border-blue-200 p-4">
+                    <div class="flex items-start gap-3">
+                        <input type="checkbox" id="proxyApply" class="mt-1" onchange="toggleProxyForm(this.checked)">
+                        <label for="proxyApply" class="text-xs text-blue-800 cursor-pointer">
+                            <strong>代理申込を行う</strong><br>
+                            <span class="text-[10px]">※顧客に代わって入居申込を登録します。代理申込を行うと、パートナー報酬にインセンティブ・ボーナスが加算されます。</span>
+                        </label>
+                    </div>
+                </div>
+
+                <!-- Proxy Form Fields (Hidden by default) -->
+                <div id="proxyFormFields" class="hidden border-l-4 border-blue-500 pl-4 space-y-3 pt-2">
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="text-[10px] font-bold text-gray-400 block mb-1">メールアドレス</label>
+                            <input type="email" placeholder="example@mail.com" class="wf w-full p-2 text-xs">
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-bold text-gray-400 block mb-1">電話番号</label>
+                            <input type="tel" placeholder="090-0000-0000" class="wf w-full p-2 text-xs">
+                        </div>
+                    </div>
+                    <div class="grid grid-cols-2 gap-3">
+                        <div>
+                            <label class="text-[10px] font-bold text-gray-400 block mb-1">入居希望日</label>
+                            <input type="date" class="wf w-full p-2 text-xs">
+                        </div>
+                        <div>
+                            <label class="text-[10px] font-bold text-gray-400 block mb-1">入居人数</label>
+                            <input type="number" value="1" min="1" class="wf w-full p-2 text-xs">
+                        </div>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-bold text-gray-400 block mb-1">区分</label>
+                        <div class="flex gap-4 mt-1">
+                            <label class="flex items-center gap-1 text-xs cursor-pointer"><input type="radio"
+                                    name="applyType" value="individual" checked> 個人</label>
+                            <label class="flex items-center gap-1 text-xs cursor-pointer"><input type="radio"
+                                    name="applyType" value="corporate"> 法人</label>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="flex gap-3 mt-8">
+                <button class="flex-1 btn py-3" onclick="closeModal('completionModal')">キャンセル</button>
+                <button class="flex-1 btn-black py-3" onclick="execCompletion()">報告を送信する</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Reschedule Modal -->
+    <div id="rescheduleModal" class="modal-bg" onclick="closeModal('rescheduleModal')">
+        <div class="modal-content !max-w-[700px] !p-0" onclick="event.stopPropagation()">
+            <div class="bg-black text-white p-4 flex justify-between items-center">
+                <h3 class="text-sm font-bold">日程変更 (管理会社空き枠取得)</h3>
+                <button onclick="closeModal('rescheduleModal')" class="hover:opacity-70"><i
+                        class="fas fa-times"></i></button>
+            </div>
+
+            <!-- Loading State -->
+            <div id="rescheduleLoading" class="p-12 text-center">
+                <div class="mb-6">
+                    <i class="fas fa-circle-notch fa-spin text-4xl text-black"></i>
+                </div>
+                <h4 class="text-base font-bold mb-2">管理会社へ空き枠を確認中です...</h4>
+                <p class="text-xs text-gray-500 mb-6 font-bold">管理会社 của bạn sẽ lấy dữ liệu chính xác trong khoảng 5
+                    giây.<br>完了 đến 5 giây, vui lòng chờ trong giây lát.</p>
+                <div class="w-64 h-1.5 bg-gray-100 mx-auto rounded-full overflow-hidden">
+                    <div id="loadingProgress" class="h-full bg-black transition-all duration-300" style="width: 0%">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content State -->
+            <div id="rescheduleContent" class="hidden">
+                <div class="p-6">
+                    <div class="bg-blue-50 border border-blue-200 p-4 mb-6">
+                        <div class="flex items-start gap-3">
+                            <i class="fas fa-comment-dots text-blue-600 mt-1"></i>
+                            <div class="text-xs text-blue-800 leading-relaxed font-bold">
+                                【重要：内覧パートナーへの指示】<br>
+                                チャットを通じてユーザーに日程変更の意思を確認し、候補となる<span
+                                    class="text-red-600 underline">「3つのスロット」</span>を確定させてください。<br>
+                                確定後, 管理会社への正式な予約変更を行うために以下の空き枠から選択してください。
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4 flex justify-between items-end">
+                        <div>
+                            <p class="text-[11px] font-bold text-gray-500 uppercase">管理会社空き枠 (今後1週間 / 1時間スロット)</p>
+                            <p id="slotCountMsg" class="text-[11px] text-red-600 font-bold mt-1">※ あと 3 つのスロットを選択してください
+                            </p>
+                        </div>
+                        <span class="text-[10px] text-green-600 font-bold"><i
+                                class="fas fa-sync-alt mr-1"></i>最新の空枠を取得済み</span>
+                    </div>
+
+                    <div class="border border-black overflow-hidden bg-gray-50">
+<table class="w-full text-[11px] text-center border-collapse">
+    <thead class="sticky top-0 bg-white border-b border-black shadow-sm">
+        <tr>
+            <th class="p-2 border-r border-gray-200 text-left" style="min-width:110px;">時間枠</th>
+            <th class="p-2 border-r border-gray-200">3/15<br><span class="font-normal text-gray-500">(日)</span></th>
+<th class="p-2 border-r border-gray-200">3/16<br><span class="font-normal text-gray-500">(月)</span></th>
+<th class="p-2 border-r border-gray-200">3/17<br><span class="font-normal text-gray-500">(火)</span></th>
+<th class="p-2 border-r border-gray-200">3/18<br><span class="font-normal text-gray-500">(水)</span></th>
+<th class="p-2 border-r border-gray-200">3/19<br><span class="font-normal text-gray-500">(木)</span></th>
+<th class="p-2 border-r border-gray-200">3/20<br><span class="font-normal text-gray-500">(金)</span></th>
+<th class="p-2">3/21<br><span class="font-normal text-gray-500">(土)</span></th>
+
+        </tr>
+    </thead>
+    <tbody class="bg-white">
+        <tr class="border-b border-gray-100">
+<td class="p-3 border-r border-gray-200 bg-gray-50 font-bold text-left text-[10px] leading-snug whitespace-nowrap">午前<br><span class="font-normal text-gray-400">09:00〜12:00</span></td>
+<td class="slot-cell p-3 border-r border-gray-100 cursor-pointer hover:bg-blue-50 transition-colors" onclick="selectSlot(this)" data-avail="○"><span class="text-blue-600 font-bold text-sm">○</span></td>
+<td class="slot-cell p-3 border-r border-gray-100 cursor-pointer hover:bg-blue-50 transition-colors" onclick="selectSlot(this)" data-avail="○"><span class="text-blue-600 font-bold text-sm">○</span></td>
+<td class="slot-cell p-3 border-r border-gray-100 cursor-pointer hover:bg-amber-50 transition-colors" onclick="selectSlot(this)" data-avail="△"><span class="text-amber-500 font-bold text-sm">△</span></td>
+<td class="slot-cell p-3 border-r border-gray-100" data-avail="×"><span class="text-gray-300 text-sm">×</span></td>
+<td class="slot-cell p-3 border-r border-gray-100 cursor-pointer hover:bg-blue-50 transition-colors" onclick="selectSlot(this)" data-avail="○"><span class="text-blue-600 font-bold text-sm">○</span></td>
+<td class="slot-cell p-3 border-r border-gray-100 cursor-pointer hover:bg-blue-50 transition-colors" onclick="selectSlot(this)" data-avail="○"><span class="text-blue-600 font-bold text-sm">○</span></td>
+<td class="slot-cell p-3 cursor-pointer hover:bg-blue-50 transition-colors" onclick="selectSlot(this)" data-avail="○"><span class="text-blue-600 font-bold text-sm">○</span></td>
+</tr>
+<tr class="border-b border-gray-100">
+<td class="p-3 border-r border-gray-200 bg-gray-50 font-bold text-left text-[10px] leading-snug whitespace-nowrap">お昼<br><span class="font-normal text-gray-400">12:00〜14:00</span></td>
+<td class="slot-cell p-3 border-r border-gray-100 cursor-pointer hover:bg-blue-50 transition-colors" onclick="selectSlot(this)" data-avail="○"><span class="text-blue-600 font-bold text-sm">○</span></td>
+<td class="slot-cell p-3 border-r border-gray-100 cursor-pointer hover:bg-blue-50 transition-colors" onclick="selectSlot(this)" data-avail="○"><span class="text-blue-600 font-bold text-sm">○</span></td>
+<td class="slot-cell p-3 border-r border-gray-100 cursor-pointer hover:bg-blue-50 transition-colors" onclick="selectSlot(this)" data-avail="○"><span class="text-blue-600 font-bold text-sm">○</span></td>
+<td class="slot-cell p-3 border-r border-gray-100 cursor-pointer hover:bg-blue-50 transition-colors" onclick="selectSlot(this)" data-avail="○"><span class="text-blue-600 font-bold text-sm">○</span></td>
+<td class="slot-cell p-3 border-r border-gray-100 cursor-pointer hover:bg-amber-50 transition-colors" onclick="selectSlot(this)" data-avail="△"><span class="text-amber-500 font-bold text-sm">△</span></td>
+<td class="slot-cell p-3 border-r border-gray-100" data-avail="×"><span class="text-gray-300 text-sm">×</span></td>
+<td class="slot-cell p-3 cursor-pointer hover:bg-blue-50 transition-colors" onclick="selectSlot(this)" data-avail="○"><span class="text-blue-600 font-bold text-sm">○</span></td>
+</tr>
+<tr class="border-b border-gray-100">
+<td class="p-3 border-r border-gray-200 bg-gray-50 font-bold text-left text-[10px] leading-snug whitespace-nowrap">午後<br><span class="font-normal text-gray-400">14:00〜17:00</span></td>
+<td class="slot-cell p-3 border-r border-gray-100" data-avail="×"><span class="text-gray-300 text-sm">×</span></td>
+<td class="slot-cell p-3 border-r border-gray-100 cursor-pointer hover:bg-blue-50 transition-colors" onclick="selectSlot(this)" data-avail="○"><span class="text-blue-600 font-bold text-sm">○</span></td>
+<td class="slot-cell p-3 border-r border-gray-100 cursor-pointer hover:bg-blue-50 transition-colors" onclick="selectSlot(this)" data-avail="○"><span class="text-blue-600 font-bold text-sm">○</span></td>
+<td class="slot-cell p-3 border-r border-gray-100 cursor-pointer hover:bg-blue-50 transition-colors" onclick="selectSlot(this)" data-avail="○"><span class="text-blue-600 font-bold text-sm">○</span></td>
+<td class="slot-cell p-3 border-r border-gray-100 cursor-pointer hover:bg-blue-50 transition-colors" onclick="selectSlot(this)" data-avail="○"><span class="text-blue-600 font-bold text-sm">○</span></td>
+<td class="slot-cell p-3 border-r border-gray-100 cursor-pointer hover:bg-blue-50 transition-colors" onclick="selectSlot(this)" data-avail="○"><span class="text-blue-600 font-bold text-sm">○</span></td>
+<td class="slot-cell p-3 cursor-pointer hover:bg-amber-50 transition-colors" onclick="selectSlot(this)" data-avail="△"><span class="text-amber-500 font-bold text-sm">△</span></td>
+</tr>
+<tr class="border-b border-gray-100">
+<td class="p-3 border-r border-gray-200 bg-gray-50 font-bold text-left text-[10px] leading-snug whitespace-nowrap">夕方<br><span class="font-normal text-gray-400">17:00〜20:00</span></td>
+<td class="slot-cell p-3 border-r border-gray-100 cursor-pointer hover:bg-blue-50 transition-colors" onclick="selectSlot(this)" data-avail="○"><span class="text-blue-600 font-bold text-sm">○</span></td>
+<td class="slot-cell p-3 border-r border-gray-100 cursor-pointer hover:bg-amber-50 transition-colors" onclick="selectSlot(this)" data-avail="△"><span class="text-amber-500 font-bold text-sm">△</span></td>
+<td class="slot-cell p-3 border-r border-gray-100" data-avail="×"><span class="text-gray-300 text-sm">×</span></td>
+<td class="slot-cell p-3 border-r border-gray-100 cursor-pointer hover:bg-blue-50 transition-colors" onclick="selectSlot(this)" data-avail="○"><span class="text-blue-600 font-bold text-sm">○</span></td>
+<td class="slot-cell p-3 border-r border-gray-100 cursor-pointer hover:bg-blue-50 transition-colors" onclick="selectSlot(this)" data-avail="○"><span class="text-blue-600 font-bold text-sm">○</span></td>
+<td class="slot-cell p-3 border-r border-gray-100 cursor-pointer hover:bg-blue-50 transition-colors" onclick="selectSlot(this)" data-avail="○"><span class="text-blue-600 font-bold text-sm">○</span></td>
+<td class="slot-cell p-3 cursor-pointer hover:bg-blue-50 transition-colors" onclick="selectSlot(this)" data-avail="○"><span class="text-blue-600 font-bold text-sm">○</span></td>
+</tr>
+
+    </tbody>
+</table>
+</div>
+</div>
+
+                <div class="bg-gray-50 p-4 border-t border-black flex justify-end gap-3">
+                    <button onclick="closeModal('rescheduleModal')"
+                        class="px-6 py-2 border border-black text-xs font-bold hover:bg-gray-100 transition-colors">キャンセル</button>
+                    <button id="submitRescheduleBtn" disabled onclick="executeReschedule()"
+                        class="px-6 py-2 bg-gray-300 text-white text-xs font-bold cursor-not-allowed shadow-md transition-all">3つ選択して変更する</button>
+                </div>
+            </div>
+
+            <!-- Success State -->
+            <div id="rescheduleSuccess" class="hidden p-12 text-center">
+                <div class="mb-6">
+                    <i class="fas fa-check-circle text-4xl text-green-600"></i>
+                </div>
+                <h4 class="text-base font-bold mb-2 text-green-600">候補日の送信が完了しました！</h4>
+                <p class="text-xs text-gray-500 leading-relaxed uppercase font-bold text-gray-500">
+                    管理会社への日程調整リクエストを送信しました。<br>
+                    確定次第, ユーザーにメールおよびLINEで通知されます。<br><br>
+                    <span class="text-black font-bold">ユーザーは届いた通知から「確定ボタン」を押す必要があります。</span><br>
+                    名刺チャット等でも, 通知の確認を促すようにしてください。
+                </p>
+                <div class="mt-8">
+                    <button onclick="closeModal('rescheduleResuccess')"
+                        class="px-8 py-2 bg-black text-white text-xs font-bold hover:bg-gray-800 transition-all">閉じる</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        function openModal(id) { document.getElementById(id).classList.add('open'); }
+        function closeModal(id) {
+            // Special case for the reschedule success close
+            if (id === 'rescheduleResuccess') {
+                document.getElementById('rescheduleModal').classList.remove('open');
+                document.body.style.overflow = '';
+                return;
+            }
+            const modal = document.getElementById(id);
+            if (modal) modal.classList.remove('open');
+            document.body.style.overflow = '';
+            if (loadingTimer) clearInterval(loadingTimer);
+        }
+
+        // Reschedule Logic
+        let selectedSlots = [];
+        let loadingTimer = null;
+
+        function startRescheduleLoading() {
+            openModal('rescheduleModal');
+            const loading = document.getElementById('rescheduleLoading');
+            const content = document.getElementById('rescheduleContent');
+            const success = document.getElementById('rescheduleSuccess');
+            const progress = document.getElementById('loadingProgress');
+            const title = loading.querySelector('h4');
+            const desc = loading.querySelector('p');
+
+            loading.style.display = 'block';
+            content.classList.add('hidden');
+            success.classList.add('hidden');
+            progress.style.width = '0%';
+
+            title.innerText = "管理会社へ空き枠を確認中です...";
+            desc.innerHTML = "管理会社の最新状況と照合しています。<br>完了まで5秒ほどかかりますので、そのままお待ちください。";
+
+            selectedSlots = [];
+            resetSlotSelection();
+
+            let startTime = Date.now();
+            const duration = 5000; // 5 seconds simulation
+
+            if (loadingTimer) clearInterval(loadingTimer);
+
+            loadingTimer = setInterval(() => {
+                let elapsed = Date.now() - startTime;
+                let percent = Math.min((elapsed / duration) * 100, 100);
+                progress.style.width = percent + '%';
+
+                if (elapsed >= duration) {
+                    clearInterval(loadingTimer);
+                    loading.style.display = 'none';
+                    content.classList.remove('hidden');
+                }
+            }, 50);
+        }
+
+        function selectSlot(td) {
+            if (td.dataset.avail === '×') return;
+
+            const isSelected = td.classList.contains('bg-blue-600') || td.classList.contains('bg-amber-500');
+
+            if (isSelected) {
+                td.classList.remove('bg-blue-600', 'bg-amber-500', 'text-white');
+                selectedSlots = selectedSlots.filter(s => s !== td);
+            } else {
+                if (selectedSlots.length >= 3) {
+                    alert('スロットは最大3つまでしか選択できません。');
+                    return;
+                }
+                if (td.dataset.avail === '△') {
+                    td.classList.add('bg-amber-500', 'text-white');
+                } else {
+                    td.classList.add('bg-blue-600', 'text-white');
+                }
+                selectedSlots.push(td);
+            }
+            updateSlotUI();
+        }
+
+        function updateSlotUI() {
+            const btn = document.getElementById('submitRescheduleBtn');
+            const msg = document.getElementById('slotCountMsg');
+            if (!msg || !btn) return;
+
+            const remaining = 3 - selectedSlots.length;
+
+            if (remaining > 0) {
+                msg.innerText = `※ あと ${remaining} つのスロットを選択してください`;
+                msg.className = 'text-[11px] text-red-600 font-bold mt-1';
+                btn.disabled = true;
+                btn.className = 'px-6 py-2 bg-gray-300 text-white text-xs font-bold cursor-not-allowed shadow-md transition-all';
+                btn.innerText = `${selectedSlots.length}/3 選択中`;
+            } else {
+                msg.innerText = '✓ 3つのスロットを選択しました';
+                msg.className = 'text-[11px] text-green-600 font-bold mt-1';
+                btn.disabled = false;
+                btn.className = 'px-6 py-2 bg-black text-white text-xs font-bold hover:bg-gray-800 transition-colors shadow-md font-bold';
+                btn.innerText = 'この3件でリクエストを送る';
+            }
+        }
+
+        function resetSlotSelection() {
+            document.querySelectorAll('#rescheduleContent .slot-cell').forEach(el => {
+                el.classList.remove('bg-blue-600', 'bg-amber-500', 'text-white');
+            });
+            selectedSlots = [];
+            updateSlotUI();
+        }
+
+        function executeReschedule() {
+            const loading = document.getElementById('rescheduleLoading');
+            const content = document.getElementById('rescheduleContent');
+            const success = document.getElementById('rescheduleSuccess');
+            const progress = document.getElementById('loadingProgress');
+            const title = loading.querySelector('h4');
+            const desc = loading.querySelector('p');
+
+            content.classList.add('hidden');
+            loading.style.display = 'block';
+            progress.style.width = '0%';
+
+            title.innerText = "管理会社へ予約リクエストを送信中です...";
+            desc.innerHTML = "選択された3つの候補日に基づき、Botが自動で手続きを行っています。<br>そのまま少々お待ちください。";
+
+            let startTime = Date.now();
+            const duration = 5000; // 5 seconds for secondary loading
+
+            if (loadingTimer) clearInterval(loadingTimer);
+
+            loadingTimer = setInterval(() => {
+                let elapsed = Date.now() - startTime;
+                let percent = Math.min((elapsed / duration) * 100, 100);
+                progress.style.width = percent + '%';
+
+                if (elapsed >= duration) {
+                    clearInterval(loadingTimer);
+                    loading.style.display = 'none';
+                    success.classList.remove('hidden');
+                }
+            }, 50);
+        }
+
+        function openCompletionModal(id, building) {
+            const today = new Date().toISOString().split('T')[0];
+            document.getElementById('compDate').value = today;
+            document.getElementById('proxyApply').checked = false;
+            document.getElementById('proxyFormFields').classList.add('hidden');
+            openModal('completionModal');
+        }
+
+        function toggleProxyForm(show) {
+            const fields = document.getElementById('proxyFormFields');
+            if (show) {
+                fields.classList.remove('hidden');
+            } else {
+                fields.classList.add('hidden');
+            }
+        }
+
+        function execCompletion() {
+            const isProxy = document.getElementById('proxyApply').checked;
+            closeModal('completionModal');
+            let msg = '';
+            if (isProxy) {
+                msg = '【代理申込ボーナス適用】\n代理申込として登録を受け付けました。パートナー報酬にインセンティブが加算されます。\n\n';
+            }
+            msg += '内覧完了報告を送信しました。';
+            alert(msg);
+        }
+
+        const mockData = [
+            { id: "V-001", date: "2024/03/18 10:00", building: "リバーサイド隅田 101", address: "東京都墨田区向島1-2-3", user: "高橋 健二", partner: "鈴木 一郎", type: "個人", status: "来場未確定" },
+            { id: "V-004", date: "2024/03/14 13:00", building: "吉祥寺ハイツ 202", address: "東京都武蔵野市吉祥寺本町1-2-3", user: "木村 拓哉", partner: "藤原 紀香", type: "個人", status: "来場確定済" },
+            { id: "V-006", date: "2024/03/16 10:00", building: "スカイタワー新宿 305", address: "東京都新宿区西新宿1-1-1", user: "佐藤 理恵", partner: "田中 義男", type: "個人", status: "パートナー辞退(要対応)" },
+            { id: "V-100", date: "-", building: "青山レジデンス 101", address: "東京都港区青山1-1-1", user: "山田 太郎", partner: "佐藤 次郎", type: "個人", status: "日程再提案中" },
+            { id: "V-004-D", date: "2024/03/12 13:00", building: "板橋ハイツ 101", address: "東京都板橋区板橋1-1-1", user: "菅田 将暉", partner: "小松 菜奈", type: "個人", status: "内覧完了" },
+            { id: "V-005", date: "2024/03/13 15:00", building: "六本木ヒルズ A棟", address: "東京都港区六本木6-10-1", user: "J. Smith", partner: "佐藤 明美", type: "法人", status: "キャンセル", reason: "ユーザー都合（スケジュール）" },
+            { id: "V-007", date: "2024/03/20 11:00", building: "代官山テラス 401", address: "東京都渋谷区代官山町1-1", user: "田中 太郎", partner: "渡辺 謙", type: "個人", status: "キャンセル", reason: "他決（他社で成約済）" },
+            { id: "V-010", date: "2024/03/22 15:30", building: "恵比寿ガーデン 205", address: "東京都渋谷区恵比寿1-1", user: "佐藤 花子", partner: "広末 涼子", type: "個人", status: "キャンセル", reason: "パートナー不在（割当不能）" },
+            { id: "V-012", date: "2024/03/25 10:00", building: "麻布レジデンス 501", address: "東京都港区元麻布1-1", user: "鈴木 健一", partner: "伊藤 博", type: "個人", status: "キャンセル", reason: "無断キャンセル（No Show）" },
+            { id: "V-999", date: "2026/03/15 14:00", building: "新宿パークタワー 1502", address: "東京都新宿区西新宿3-1", user: "山田 花子", partner: "佐藤 健太", type: "個人", status: "来場確定済" }
+        ];
+
+        function switchTab(tabKey) {
+            const tabs = ['ongoing', 'done', 'cancel'];
+            tabs.forEach(t => {
+                const el = document.getElementById('tab-' + t);
+                el.className = 'wf border-l-0 px-8 py-2 text-sm bg-white hover:bg-gray-50 text-gray-600';
+            });
+            const activeEl = document.getElementById('tab-' + tabKey);
+            activeEl.className = 'wf px-8 py-2 text-sm font-bold bg-black text-white';
+            if (tabKey !== 'ongoing') activeEl.classList.add('border-l-0');
+
+            renderTable(tabKey);
+        }
+
+        function renderTable(tabKey) {
+            const body = document.getElementById('table-body');
+            let filtered = [];
+
+            if (tabKey === 'ongoing') {
+                filtered = mockData.filter(d => ['日程再提案中', '来場確定済', '来場未確定', 'パートナー辞退(要対応)'].includes(d.status));
+            } else if (tabKey === 'done') {
+                filtered = mockData.filter(d => d.status === '内覧完了');
+            } else if (tabKey === 'cancel') {
+                filtered = mockData.filter(d => d.status === 'キャンセル');
+            }
+
+            body.innerHTML = filtered.map(row => {
+                let statusBadge = row.status;
+                let statusClass = '';
+                if (row.status === '来場未確定') { statusClass = 'border-red-500 text-red-600 bg-red-50'; }
+                if (row.status === '来場確定済') { statusClass = 'border-black text-white bg-black'; }
+                if (row.status === '日程再提案中') { statusClass = 'border-blue-500 text-blue-600 bg-blue-50'; }
+                if (row.status === '内覧完了') { statusBadge = '内覧完了'; statusClass = 'border-green-600 text-green-600 bg-green-50'; }
+                if (row.status === 'キャンセル') { statusClass = 'border-gray-400 text-gray-400 bg-gray-50'; }
+                if (row.status === 'パートナー辞退(要対応)') { statusClass = 'border-orange-500 text-orange-600 bg-orange-50'; }
+
+                const detailUrl = row.status === 'キャンセル' ? 'AD11-5.html' : (row.status === 'パートナー辞退(要対応)' ? 'AD11-4.html' : (row.status === '日程再提案中' ? 'AD11-1.html' : (row.status === '来場未確定' ? 'AD11-2.html' : (row.status === '来場確定済' ? 'AD11-3.html' : 'AD11.html'))));
+
+                const isLate = row.id === 'V-999';
+                const lateAlert = isLate ? `<div class="mt-2 bg-red-50 border border-red-500 text-red-600 px-2 py-1 text-[10px] font-bold"><i class="fas fa-exclamation-triangle mr-1"></i>完了報告が遅れています</div>` : '';
+
+                return `
+                    <tr class="hover:bg-gray-50 transition-colors ${isLate ? 'bg-red-50/50' : ''}">
+                        <td class="p-3">
+                            <div class="font-bold text-sm text-blue-600 underline cursor-pointer hover:text-blue-800" onclick="location.href='AD04.html'">${row.building}</div>
+                            <div class="text-[10px] text-gray-500 mt-1"><i class="fas fa-map-marker-alt mr-1"></i>${row.address}</div>
+                        </td>
+                        <td class="p-3">
+                            <div class="text-sm font-bold">${row.date}</div>
+                            <div class="text-[10px] text-gray-400 mt-0.5">ID: ${row.id}</div>
+                            ${lateAlert}
+                        </td>
+                        <td class="p-3">
+                            <div class="text-sm font-bold">${row.user}</div>
+                        </td>
+                        <td class="p-3">
+                            <span class="badge ${statusClass}">${statusBadge}</span>
+                            ${row.reason ? `<div class="text-[10px] text-red-500 mt-1 font-bold">${row.reason}</div>` : ''}
+                        </td>
+                        <td class="p-3">
+                            <div class="flex items-center gap-3">
+                                ${row.status === '来場確定済' ? `<button class="bg-black text-white text-[10px] font-bold px-2 py-1 hover:bg-gray-800 transition-colors" onclick="openCompletionModal('${row.id}', '${row.building}')">完了報告</button>` : ''}
+                                ${row.status === '来場未確定' ? `<button class="bg-black text-white text-[10px] font-bold px-2 py-1 hover:bg-gray-800 transition-colors" onclick="startRescheduleLoading()">日程変更</button>` : ''}
+                                <button class="text-blue-600 underline text-xs hover:text-blue-800" onclick="location.href='${detailUrl}'">詳細</button>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            }).join('');
+        }
+
+        function simulateSync() {
+            alert('管理会社との手動同期を開始します...');
+        }
+
+        function toggleNotiDropdown(event) {
+            event.stopPropagation();
+            const dropdown = document.getElementById('notification-dropdown');
+            const isVisible = dropdown.style.display === 'block';
+            dropdown.style.display = isVisible ? 'none' : 'block';
+            // Close account dropdown if open
+            document.getElementById('account-dropdown').style.display = 'none';
+        }
+
+        function toggleAccountDropdown(event) {
+            event.stopPropagation();
+            const dropdown = document.getElementById('account-dropdown');
+            const isVisible = dropdown.style.display === 'block';
+            dropdown.style.display = isVisible ? 'none' : 'block';
+            // Close notification dropdown if open
+            document.getElementById('notification-dropdown').style.display = 'none';
+        }
+
+        function toggleSubMenu(id) {
+            const menu = document.getElementById(id);
+            const icon = document.getElementById(id + '-icon');
+            const isVisible = menu.style.display === 'block';
+            menu.style.display = isVisible ? 'none' : 'block';
+            if (icon) {
+                icon.style.transform = isVisible ? 'rotate(-90deg)' : 'rotate(0deg)';
+            }
+        }
+
+        // Initialize sidebar states
+        document.addEventListener('DOMContentLoaded', () => {
+            const path = window.location.pathname;
+            if (path.includes('AF1-01') || path.includes('AF2-01')) {
+                const menu = document.getElementById('sales-menu');
+                const icon = document.getElementById('sales-menu-icon');
+                if (menu) menu.style.display = 'block';
+                if (icon) icon.style.transform = 'rotate(0deg)';
+            }
+        });
+
+        document.addEventListener('click', (event) => {
+            const notiDropdown = document.getElementById('notification-dropdown');
+            const notiBtn = document.getElementById('noti-btn');
+            if (notiDropdown && !notiDropdown.contains(event.target) && !notiBtn.contains(event.target)) {
+                notiDropdown.style.display = 'none';
+            }
+
+            const accDropdown = document.getElementById('account-dropdown');
+            const accBtn = document.getElementById('account-btn');
+            if (accDropdown && !accDropdown.contains(event.target) && !accBtn.contains(event.target)) {
+                accDropdown.style.display = 'none';
+            }
+        });
+
+        // Init
+        switchTab('ongoing');
+    </script>
+</body>
+
+</html>

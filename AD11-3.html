@@ -1,0 +1,1118 @@
+<!DOCTYPE html>
+<html class="light" lang="ja">
+
+<head>
+    <meta charset="utf-8" />
+    <meta content="width=device-width, initial-scale=1.0" name="viewport" />
+    <title>AD11-3 内覧詳細 (来場確定済) - MooM</title>
+    <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
+    <link
+        href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&family=Public+Sans:wght@400;500;700&display=swap"
+        rel="stylesheet" />
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css" rel="stylesheet" />
+    <script>
+        tailwind.config = {
+            darkMode: "class",
+            theme: {
+                extend: {
+                    colors: { "primary": "#000" },
+                    fontFamily: { "display": ["Noto Sans JP", "Public Sans", "sans-serif"] },
+                    borderRadius: { "DEFAULT": "0px", "lg": "0px", "xl": "0px", "full": "0px" },
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            font-family: 'Noto Sans JP', sans-serif;
+            background: #fafafa;
+            color: #000;
+            font-size: 13px;
+            margin: 0;
+        }
+
+        .wf {
+            border: 1px solid #000;
+        }
+
+        .wireframe-border {
+            border: 1px solid #000;
+        }
+
+        .wireframe-bg-gray {
+            background-color: #f2f2f2;
+        }
+
+        .wf2 {
+            border: 1px solid #ccc;
+        }
+
+        .nav-item {
+            display: block;
+            padding: 8px;
+            cursor: pointer;
+            color: #000;
+            font-size: 14px;
+            text-decoration: none;
+            transition: all 0.2s;
+        }
+
+        .nav-item:hover {
+            background: #f3f4f6;
+        }
+
+        .nav-active {
+            display: block;
+            padding: 8px;
+            font-weight: 700;
+            background: #f3f4f6;
+            border: 1px solid #000;
+            color: #000;
+            text-decoration: none;
+            font-size: 14px;
+        }
+
+        .btn {
+            border: 1px solid #000;
+            padding: 6px 14px;
+            background: #fff;
+            font-size: 12px;
+            cursor: pointer;
+            font-family: inherit;
+        }
+
+        .btn:hover {
+            background: #f2f2f2;
+        }
+
+        .btn-black {
+            background: #000;
+            color: #fff;
+            border: 1px solid #000;
+            padding: 7px 18px;
+            font-size: 13px;
+            cursor: pointer;
+            font-family: inherit;
+            font-weight: 600;
+        }
+
+        .btn-black:hover {
+            background: #333;
+        }
+
+        .card {
+            background: #fff;
+            border: 1px solid #000;
+            padding: 18px 20px;
+        }
+
+        .card-title {
+            font-size: 13px;
+            font-weight: 700;
+            margin-bottom: 14px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+        }
+
+        .info-label {
+            font-size: 11px;
+            color: #999;
+            margin-bottom: 2px;
+        }
+
+        .info-value {
+            font-size: 13px;
+            color: #000;
+            font-weight: 500;
+        }
+
+        .modal-bg {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0, 0, 0, 0.4);
+            z-index: 1000;
+            align-items: center;
+            justify-content: center;
+            backdrop-filter: blur(2px);
+        }
+
+        .modal-bg.open {
+            display: flex;
+        }
+
+        .modal-content {
+            background: #fff;
+            border: 1px solid #000;
+            width: 90%;
+            max-width: 800px;
+            padding: 32px;
+            position: relative;
+        }
+
+        /* Booking Row Style from CM4-01 */
+        .row-item {
+            display: flex;
+            border-left: 4px solid #000;
+            background: #fff;
+            margin-bottom: 8px;
+            border-top: 1px solid #f0f0f0;
+            border-right: 1px solid #f0f0f0;
+            border-bottom: 1px solid #f0f0f0;
+        }
+
+        .row-label {
+            width: 200px;
+            background: #f7f7f7;
+            padding: 12px 16px;
+            font-size: 12px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .row-value {
+            flex: 1;
+            padding: 12px 16px;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+        }
+
+
+        .status-option {
+            border: 1px solid #eee;
+            padding: 10px 12px;
+            margin-bottom: 8px;
+            cursor: pointer;
+            transition: all 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+
+        .status-option:hover {
+            border-color: #000;
+            background: #fafafa;
+        }
+
+        .status-option.active {
+            border-color: #000;
+            background: #f0f0f0;
+            font-weight: bold;
+        }
+
+        .image-placeholder {
+            border: 1px solid #ddd;
+            background: #f9f9f9;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 12px;
+            font-weight: bold;
+            color: #888;
+            text-align: center;
+        }
+    </style>
+</head>
+
+<body>
+    <div style="display:flex; min-height:100vh;">
+        <!-- SIDEBAR -->
+        <aside style="width:256px; min-width:256px; border-right:1px solid #000; display:flex; flex-direction:column; background:#fff;">
+            <a href="VP0-01.html" style="padding:16px; border-bottom:1px solid #000; text-decoration:none; color:inherit; display:block;">
+                <div style="font-size:15px; font-weight:700;">MooM</div>
+                <div style="font-size:11px; color:#666; margin-top:2px;">内覧パートナーポータル</div>
+            </a>
+            <nav style="flex:1; padding:16px; display:flex; flex-direction:column; gap:8px;">
+                <a href="VP0-01.html" class="nav-item">ダッシュボード</a>
+                <a href="AD10.html" class="nav-active">内覧管理</a>
+                <a href="CM4-01.html" class="nav-item">カレンダー</a>
+                <a href="COM-04-1.html" class="nav-item">メッセージ</a>
+                <a href="PV2-01.html" class="nav-item">報酬管理</a>
+                <a href="AD24.html" class="nav-item">設定</a>
+            </nav>
+            <div style="padding:12px; border-top:1px solid #000;">
+                <div class="wf" style="padding:8px 12px; text-align:center; font-size:12px; font-weight:700; background:#fff;">佐藤 健太</div>
+            </div>
+        </aside>
+
+        <!-- MAIN CONTENT -->
+        <main class="flex-grow overflow-y-auto p-10 bg-[#fafafa]">
+            <div class="text-[11px] text-gray-400 mb-4">内覧管理 > 内覧一覧 > 内覧詳細</div>
+
+            <!-- Page Header -->
+            <div class="flex items-start justify-between mb-6">
+                <div class="flex items-center gap-4">
+                    <h1 class="text-2xl font-bold m-0">内覧詳細</h1>
+                    <div class="border border-black px-2 py-0.5 text-xs font-bold">内覧ID : PRP-10042</div>
+                    <div class="bg-black text-white px-3 py-1 text-xs font-bold">ステータス : 来場確定済</div>
+                </div>
+                <div class="flex gap-2 items-center">
+                    <button class="bg-white border border-red-500 text-red-600 px-4 py-1.5 text-xs font-bold hover:bg-red-50 transition-colors"
+                        onclick="openModal('withdrawChoiceModal')">辞退</button>
+                    <button
+                        class="bg-black text-white px-4 py-1.5 text-xs font-bold hover:bg-gray-800 transition-colors"
+                        onclick="startRescheduleLoading()">日程変更</button>
+                    <div class="w-[1px] h-4 bg-gray-300 mx-2"></div>
+                </div>
+            </div>
+
+            <!-- Confirmed Notice Banner -->
+            <div class="bg-green-50 border border-green-600 p-4 mb-6 relative">
+                <div class="flex items-start gap-3">
+                    <i class="fas fa-check-circle text-green-600 mt-0.5"></i>
+                    <div>
+                        <div class="text-xs font-bold text-green-700 mb-1">来場予定が確定しています</div>
+                        <p class="text-[11px] text-gray-700 leading-relaxed">
+                            管理会社での予約およびユーザーの最終確認が完了しました。<br>
+                            当日は指定の日時に現地へ向かってください。<br>
+                            内覧予定日時: <span class="font-bold">2023/12/12 10:00</span><br>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-12 gap-6">
+                <!-- Left Column -->
+                <div class="col-span-8 space-y-6">
+                    <!-- 内見予約の概要 -->
+                    <div class="card bg-blue-50/50 border-blue-200">
+                        <div class="flex justify-between items-center mb-4">
+                            <div class="flex items-center gap-2 text-blue-800 font-bold text-sm">
+                                <i class="fas fa-info-circle"></i>
+                                <span>内覧予約情報</span>
+                            </div>
+                            <span class="text-[10px] bg-green-600 text-white px-2 py-0.5 font-bold italic">来場確定済</span>
+                        </div>
+                        <div class="space-y-4">
+                            <div class="grid grid-cols-3 gap-4">
+                                <div>
+                                    <div class="info-label text-blue-600/70">予約日時</div>
+                                    <div class="info-value">3月14日 14時00分 ー 3月14日 15時00分</div>
+                                </div>
+                                <div>
+                                    <div class="info-label text-blue-600/70">取引態様</div>
+                                    <div class="info-value">貸主</div>
+                                </div>
+                                <div>
+                                    <div class="info-label text-blue-600/70">獲得予定報酬</div>
+                                    <div class="info-value font-bold text-red-600 text-base">¥5,000 <span class="text-[9px] font-normal text-gray-500 ml-1">(含ボーナス)</span></div>
+                                </div>
+                            </div>
+                            <div>
+                                <div class="info-label text-blue-600/70">内見方法（鍵取・現地 等）</div>
+                                <div class="info-value font-bold text-red-600">【鍵取】案内鍵は現地設置しております。管理会社システムにて内見予約をお取りください。</div>
+                            </div>
+                            <div>
+                                <div class="info-label text-blue-600/70">内見方法詳細（鍵情報等）</div>
+                                <div class="info-value">スマートキーBOX設置物件です。スマートロック解除方法を必ずご確認の上、現地対応ください。</div>
+                            </div>
+                            <div>
+                                <div class="info-label text-blue-600/70">内見時注意事項</div>
+                                <div class="info-value text-red-600 font-bold">※ブレーカー操作厳禁※本物件はＳＮＳへの無断掲載・転載・共有を禁止しております※</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 物件概要 -->
+                    <div class="card !p-0 overflow-hidden">
+                        <div class="bg-gray-50 border-b border-black p-3 text-sm font-bold flex justify-between items-center cursor-pointer hover:bg-gray-100 transition-colors"
+                            onclick="toggleSection('property-summary')">
+                            <div class="flex items-center gap-2">
+                                <span>物件概要</span>
+                                <span class="text-xs font-normal text-gray-400 italic">管理会社データ取得済</span>
+                            </div>
+                            <i id="property-summary-icon" class="fas fa-chevron-down text-[10px] transition-transform"
+                                style="transform: rotate(180deg);"></i>
+                        </div>
+                        <div id="property-summary" class="p-6">
+                            <h3 class="text-lg font-bold mb-6">青山レジデンス 101</h3>
+                            <div class="grid grid-cols-2 gap-y-6 gap-x-8">
+                                <div class="space-y-1">
+                                    <p class="text-[10px] text-gray-400 font-bold uppercase">住所</p>
+                                    <p class="text-sm border-b border-gray-100 pb-1">東京都港区青山1-1-1</p>
+                                </div>
+                                <div class="space-y-1 border-l border-gray-100 pl-8">
+                                    <p class="text-[10px] text-gray-400 font-bold uppercase">管理会社</p>
+                                    <p class="text-sm border-b border-gray-100 pb-1">港不動産管理株式会社</p>
+                                </div>
+                                <div class="space-y-1">
+                                    <p class="text-[10px] text-gray-400 font-bold uppercase">電話番号</p>
+                                    <p class="text-sm border-b border-gray-100 pb-1">03-9999-8888</p>
+                                </div>
+                                <div class="space-y-1 border-l border-gray-100 pl-8">
+                                    <p class="text-[10px] text-gray-400 font-bold uppercase">最寄り駅</p>
+                                    <p class="text-sm border-b border-gray-100 pb-1">青山一丁目駅 徒歩3分</p>
+                                </div>
+                            </div>
+
+                            <!-- 位置情報 Map -->
+                            <div class="mt-8">
+                                <p class="text-[10px] text-gray-400 font-bold uppercase mb-2">位置情報</p>
+                                <div
+                                    class="bg-gray-100 border border-gray-200 h-48 flex items-center justify-center text-gray-400 relative overflow-hidden group">
+                                    <img src="https://maps.googleapis.com/maps/api/staticmap?center=35.6728,139.7258&zoom=16&size=800x400&key=YOUR_API_KEY"
+                                        alt="Map Placeholder"
+                                        class="w-full h-full object-cover grayscale group-hover:grayscale-0 transition-all">
+                                    <div class="absolute inset-0 flex items-center justify-center bg-black/5">
+                                        <i class="fas fa-map-marker-alt text-red-500 text-3xl"></i>
+                                    </div>
+                                    <div
+                                        class="absolute bottom-2 right-2 bg-white/80 px-2 py-1 text-[9px] border border-black">
+                                        Google Mapsで見る ↗</div>
+                                </div>
+                            </div>
+
+                            <!-- 周辺施設 (Google API連携) -->
+                            <div class="mt-8 pt-6 border-t border-gray-100">
+                                <div class="flex items-center justify-between mb-4">
+                                    <p class="text-[10px] text-gray-400 font-bold uppercase">周辺施設 (Google Maps API連携済)
+                                    </p>
+                                    <span
+                                        class="text-[9px] text-blue-600 bg-blue-50 px-2 py-0.5 rounded-full">自動取得中</span>
+                                </div>
+                                <div class="grid grid-cols-3 gap-4 text-[11px]">
+                                    <div class="bg-gray-50 border border-gray-100 p-3 flex items-start gap-2">
+                                        <i class="fas fa-store text-gray-400 mt-0.5"></i>
+                                        <div>
+                                            <div class="font-bold">セブンイレブン 青山1丁目店</div>
+                                            <div class="text-gray-500">徒歩 2分 (140m)</div>
+                                        </div>
+                                    </div>
+                                    <div class="bg-gray-50 border border-gray-100 p-3 flex items-start gap-2">
+                                        <i class="fas fa-shopping-basket text-gray-400 mt-0.5"></i>
+                                        <div>
+                                            <div class="font-bold">成城石井 本社ビル店</div>
+                                            <div class="text-gray-500">徒歩 4分 (320m)</div>
+                                        </div>
+                                    </div>
+                                    <div class="bg-gray-50 border border-gray-100 p-3 flex items-start gap-2">
+                                        <i class="fas fa-coffee text-gray-400 mt-0.5"></i>
+                                        <div>
+                                            <div class="font-bold">スターバックス 青山ビル店</div>
+                                            <div class="text-gray-500">徒歩 3分 (210m)</div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 申込者 & パートナー -->
+                    <div class="grid grid-cols-2 gap-6">
+                        <div class="card">
+                            <div class="card-title">申込者</div>
+                            <div class="grid grid-cols-2">
+                                <div>
+                                    <div class="info-label">氏名</div>
+                                    <div class="info-value mb-4">山田 太郎</div>
+                                    <div class="info-label">メールアドレス</div>
+                                    <div class="info-value mb-4">y.taro@example.com</div>
+                                    <div class="info-label">過去の内覧件数</div>
+                                    <div class="info-value">1 件</div>
+                                </div>
+                                <div>
+                                    <div class="info-label">性別</div>
+                                    <div class="info-value mb-4">男性</div>
+                                    <div class="info-label">対応言語</div>
+                                    <div class="info-value mb-4 whitespace-nowrap">日本語</div>
+                                    <div class="info-label">予定の内覧件数</div>
+                                    <div class="info-value font-bold text-blue-600">1 件</div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card">
+                            <div class="card-title flex justify-between items-center">
+                                <span>内覧パートナー情報</span>
+                                <span class="text-blue-600 text-xs underline cursor-pointer font-normal"
+                                    onclick="alert('名刺を表示')">名刺表示</span>
+                            </div>
+                            <div class="info-label">パートナー名</div>
+                            <div class="info-value mb-4">鈴木 一郎</div>
+                            <div class="info-label">内覧予定日時</div>
+                            <div class="info-value text-green-600 font-bold">2023/12/12 10:00 (来場確定)</div>
+                            <p class="text-[10px] text-gray-400 mt-2">※当初希望: 2023/12/10 14:00</p>
+                        </div>
+                    </div>
+
+                    <!-- 部屋情報 -->
+                    <div class="card !p-0 overflow-hidden">
+                        <div
+                            class="bg-gray-50 border-b border-black p-3 text-sm font-bold flex justify-between items-center">
+                            <span>部屋情報 (1K - 101号室)</span>
+                            <span class="text-[10px] underline cursor-pointer font-normal">部屋の詳細を見る</span>
+                        </div>
+                        <div class="flex flex-col">
+                            <div
+                                class="relative h-64 bg-white flex flex-col items-center justify-center p-4 border-b border-black overflow-hidden">
+                                <img src="roomtype.png" alt="Floorplan" class="w-full h-full object-contain">
+                                <button
+                                    class="absolute left-2 top-1/2 -translate-y-1/2 bg-white/80 border border-black w-8 h-8 flex items-center justify-center hover:bg-black hover:text-white transition-colors">
+                                    <i class="fas fa-chevron-left text-sm"></i>
+                                </button>
+                                <button
+                                    class="absolute right-2 top-1/2 -translate-y-1/2 bg-white/80 border border-black w-8 h-8 flex items-center justify-center hover:bg-black hover:text-white transition-colors">
+                                    <i class="fas fa-chevron-right text-sm"></i>
+                                </button>
+                            </div>
+                            <div class="p-3 bg-gray-50 grid grid-cols-4 gap-2 border-b border-black">
+                                <div
+                                    class="aspect-[1.5/1] border border-black bg-white overflow-hidden relative group cursor-pointer shadow-sm">
+                                    <img src="main.jpg" class="w-full h-full object-cover">
+                                    <div
+                                        class="absolute inset-0 bg-black/30 flex items-center justify-center text-white opacity-100 grayscale-0 group-hover:grayscale transition-all">
+                                        <i class="fas fa-play-circle text-2xl"></i>
+                                    </div>
+                                    <span
+                                        class="absolute bottom-1 right-1 bg-black text-white text-[8px] px-1">00:45</span>
+                                </div>
+                                <div
+                                    class="aspect-[1.5/1] border border-black bg-white overflow-hidden cursor-pointer hover:opacity-80 transition-opacity">
+                                    <img src="inside1.jpg" class="w-full h-full object-cover">
+                                </div>
+                                <div
+                                    class="aspect-[1.5/1] border border-black bg-white overflow-hidden cursor-pointer hover:opacity-80 transition-opacity">
+                                    <img src="inside2.jpg" class="w-full h-full object-cover">
+                                </div>
+                                <div
+                                    class="aspect-[1.5/1] border border-black bg-white overflow-hidden cursor-pointer hover:opacity-80 transition-opacity">
+                                    <img src="inside3.jpg" class="w-full h-full object-cover">
+                                </div>
+                            </div>
+                            <div class="p-3 bg-white flex justify-between items-center italic text-xs text-gray-400">
+                                <span>※ 画像をクリックすると拡大表示します</span>
+                                <span>1K / 25.50㎡</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- アクティビティログ -->
+                    <div class="card !p-0 overflow-hidden">
+                        <div class="bg-gray-50 border-b border-black p-3 text-sm font-bold">アクティビティログ</div>
+                        <div class="p-0">
+                            <table class="w-full text-left text-xs">
+                                <tbody class="divide-y divide-gray-100">
+                                    <tr class="hover:bg-gray-50">
+                                        <td class="p-3 text-gray-500 w-40">2023/12/11 09:15:00</td>
+                                        <td class="p-3 font-bold w-40">自分 (システム連携)</td>
+                                        <td class="p-3 text-gray-700">管理会社の空き枠を確認し、仮予約を行いました。</td>
+                                    </tr>
+                                    <tr class="hover:bg-gray-50 bg-green-50">
+                                        <td class="p-3 text-gray-500 w-40">2023/12/11 15:30:00</td>
+                                        <td class="p-3 font-bold w-40 text-green-600">来場確定</td>
+                                        <td class="p-3 text-gray-700 font-medium">ユーザーが確認メールを承諾し、内覧予定が確定しました。</td>
+                                    </tr>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Right Column -->
+                <div class="col-span-4 space-y-6">
+                    <!-- 建物外観画像 (Collapsible) -->
+                    <div class="card !p-0 overflow-hidden">
+                        <button onclick="toggleSection('exterior-images')"
+                            class="w-full bg-gray-50 border-b border-black p-3 flex justify-between items-center hover:bg-gray-100 transition-colors">
+                            <span class="text-xs font-bold uppercase tracking-wider">建物外観画像</span>
+                            <i id="exterior-images-icon"
+                                class="fas fa-chevron-down text-[10px] transition-transform"></i>
+                        </button>
+                        <div id="exterior-images" class="hidden">
+                            <div class="p-4 space-y-3">
+                                <div
+                                    class="relative w-full aspect-video border border-black overflow-hidden bg-white shadow-sm">
+                                    <img src="main.jpg" alt="Main" class="w-full h-full object-cover">
+                                </div>
+                                <div class="grid grid-cols-4 gap-2">
+                                    <div
+                                        class="aspect-square border border-black overflow-hidden cursor-pointer hover:opacity-80 transition-opacity">
+                                        <img src="outside.jpg" class="w-full h-full object-cover">
+                                    </div>
+                                    <div
+                                        class="aspect-square border border-black overflow-hidden cursor-pointer hover:opacity-80 transition-opacity">
+                                        <img src="outside2.jpg" class="w-full h-full object-cover">
+                                    </div>
+                                    <div
+                                        class="aspect-square border border-black overflow-hidden cursor-pointer hover:opacity-80 transition-opacity">
+                                        <img src="outsite3.png" class="w-full h-full object-cover">
+                                    </div>
+                                    <div
+                                        class="aspect-square bg-gray-50 border border-black flex items-center justify-center text-[8px] text-gray-400 italic">
+                                        NO IMAGE</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 申込者チャット (Preview Only) -->
+                    <div class="card !p-0 overflow-hidden">
+                        <div class="bg-gray-50 border-b border-black p-3 flex justify-between items-center">
+                            <span class="text-xs font-bold uppercase tracking-wider">申込者チャット</span>
+                            <span class="text-[10px] text-blue-600 underline cursor-pointer"
+                                onclick="location.href='COM-04-1.html'">すべて表示</span>
+                        </div>
+                        <div class="p-4">
+                            <div class="bg-gray-50 border border-black p-3">
+                                <div class="flex justify-between items-center mb-1">
+                                    <span class="font-bold text-[10px] text-gray-500">山田 太郎</span>
+                                    <span class="text-[9px] text-gray-400">12/11</span>
+                                </div>
+                                <p class="text-xs text-gray-700 truncate">12/12 10:00で確定しました。宜しくお願いします。</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- メモ (Bottom) -->
+                    <div class="card !p-0 overflow-hidden">
+                        <div class="bg-gray-50 border-b border-black p-3 flex justify-between items-center">
+                            <span class="text-xs font-bold uppercase tracking-wider">メモ</span>
+                            <button class="text-[10px] bg-white border border-black px-2 py-0.5 hover:bg-gray-100">+
+                                追加</button>
+                        </div>
+                        <div class="p-4 space-y-3">
+                            <div class="bg-gray-50 border border-black p-2 text-xs">
+                                <div class="font-bold flex justify-between items-center mb-1">
+                                    <span>2023/12/11 システム</span>
+                                </div>
+                                <div class="text-gray-600 font-bold text-green-600 text-[10px]">内覧予約が確定しました。管理会社予約ID:
+                                    ITD-X9922</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- MODALS -->
+    <!-- withdrawChoiceModal -->
+    <div id="withdrawChoiceModal" class="modal-bg" onclick="closeModal('withdrawChoiceModal')">
+        <div class="modal-content !max-w-[480px]" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-center mb-5 pb-3 border-b border-gray-200">
+                <h3 class="text-sm font-bold flex items-center gap-2">
+                    <i class="fas fa-exclamation-triangle text-red-500"></i>
+                    案件の辞退
+                </h3>
+                <button onclick="closeModal('withdrawChoiceModal')" class="text-gray-400 hover:text-black"><i class="fas fa-times"></i></button>
+            </div>
+
+            <!-- Near-schedule warning banner -->
+            <div class="bg-red-50 border border-red-400 px-4 py-3 mb-5">
+                <div class="flex items-start gap-2">
+                    <i class="fas fa-clock text-red-500 mt-0.5 text-sm"></i>
+                    <div>
+                        <p class="text-xs font-bold text-red-600 mb-1">内覧日程が近いためご注意ください</p>
+                        <p class="text-[11px] text-red-500 leading-relaxed">
+                            キャンセルが内覧日程に近接しているため、<span class="font-bold">ユーザーへキャンセルの通知が自動送信</span>されます。
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Info block -->
+            <div class="bg-gray-50 border border-gray-200 px-4 py-4 mb-6 space-y-3">
+                <div class="flex items-start gap-2">
+                    <i class="fas fa-bell text-gray-500 mt-0.5 text-xs"></i>
+                    <div>
+                        <p class="text-xs font-bold text-gray-700 mb-0.5">ユーザーへの通知</p>
+                        <p class="text-[11px] text-gray-500 leading-relaxed">辞退確定後、ユーザーにメール・LINEでキャンセルの旨が通知されます。</p>
+                    </div>
+                </div>
+                <div class="border-t border-gray-200 pt-3 flex items-start gap-2">
+                    <i class="fas fa-calendar-plus text-gray-500 mt-0.5 text-xs"></i>
+                    <div>
+                        <p class="text-xs font-bold text-gray-700 mb-0.5">日程の再調整をお願いします</p>
+                        <p class="text-[11px] text-gray-500 leading-relaxed">都合がつき次第、ユーザーと改めて内覧日程を調整してください。</p>
+                    </div>
+                </div>
+            </div>
+
+            <p class="text-xs text-gray-600 mb-6">この案件を辞退しますか？辞退すると元に戻すことはできません。</p>
+
+            <div class="flex gap-3 justify-end">
+                <button onclick="closeModal('withdrawChoiceModal')"
+                    class="px-6 py-2 border border-black text-xs font-bold hover:bg-gray-100 transition-colors">戻る</button>
+                <button onclick="processFullCancel()"
+                    class="px-6 py-2 bg-red-600 text-white text-xs font-bold hover:bg-red-700 transition-colors">
+                    <i class="fas fa-sign-out-alt mr-1"></i>辞退する
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Withdraw toast -->
+    <div id="withdraw-toast" class="fixed bottom-6 left-1/2 -translate-x-1/2 bg-gray-800 text-white text-xs font-bold px-5 py-3 flex items-center gap-2 shadow-lg z-[9999] transition-all duration-300 opacity-0 pointer-events-none">
+        <i class="fas fa-check-circle text-green-400"></i>
+        <span>辞退しました。ユーザーへキャンセル通知を送信しました。</span>
+    </div>
+
+    <script>
+        function processFullCancel() {
+            closeModal('withdrawChoiceModal');
+            // Show toast notification
+            const toast = document.getElementById('withdraw-toast');
+            toast.classList.remove('opacity-0', 'pointer-events-none');
+            toast.classList.add('opacity-100');
+            setTimeout(() => {
+                toast.classList.remove('opacity-100');
+                toast.classList.add('opacity-0', 'pointer-events-none');
+                setTimeout(() => { location.href = 'AD10.html'; }, 400);
+            }, 3000);
+        }
+    </script>
+
+
+    <!-- Reschedule Modal -->
+    <div id="rescheduleModal" class="modal-bg" onclick="closeModal('rescheduleModal')">
+        <div class="modal-content !max-w-[700px] !p-0" onclick="event.stopPropagation()">
+            <div class="bg-black text-white p-4 flex justify-between items-center">
+                <h3 class="text-sm font-bold">日程変更 (管理会社空き枠取得)</h3>
+                <button onclick="closeModal('rescheduleModal')" class="hover:opacity-70"><i
+                        class="fas fa-times"></i></button>
+            </div>
+
+            <!-- Loading State -->
+            <div id="rescheduleLoading" class="p-12 text-center">
+                <div class="mb-6">
+                    <i class="fas fa-circle-notch fa-spin text-4xl text-black"></i>
+                </div>
+                <h4 class="text-base font-bold mb-2">管理会社へ空き枠を確認中です...</h4>
+                <p class="text-xs text-gray-500 mb-6 font-bold text-gray-500">
+                    管理会社の最新状況と照合しています。<br>完了まで10秒〜20秒ほどかかりますので、そのままお待ちください。</p>
+                <div class="w-64 h-1.5 bg-gray-100 mx-auto rounded-full overflow-hidden">
+                    <div id="loadingProgress" class="h-full bg-black transition-all duration-300" style="width: 0%">
+                    </div>
+                </div>
+            </div>
+
+            <!-- Content State -->
+            <div id="rescheduleContent" class="hidden">
+                <div class="p-6">
+                    <div class="bg-blue-50 border border-blue-200 p-4 mb-6">
+                        <div class="flex items-start gap-3">
+                            <i class="fas fa-comment-dots text-blue-600 mt-1"></i>
+                            <div class="text-xs text-blue-800 leading-relaxed font-bold">
+                                【重要：内覧パートナーへの指示】<br>
+                                チャットを通じてユーザーに日程変更の意思を確認し、候補となる<span
+                                    class="text-red-600 underline">「3つのスロット」</span>を確定させてください。<br>
+                                確定後、管理会社への正式な予約変更を行うために以下の空き枠から選択してください。
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mb-4 flex justify-between items-end">
+                        <div>
+                            <p class="text-[11px] font-bold text-gray-500 uppercase">管理会社空き枠 (今後1週間 / 1時間スロット)</p>
+                            <p id="slotCountMsg" class="text-[11px] text-red-600 font-bold mt-1">※ あと 3 つのスロットを選択してください
+                            </p>
+                        </div>
+                        <span class="text-[10px] text-green-600 font-bold"><i
+                                class="fas fa-sync-alt mr-1"></i>最新の空枠を取得済み</span>
+                    </div>
+
+                    <div class="border border-black overflow-hidden bg-gray-50">
+<table class="w-full text-[11px] text-center border-collapse">
+    <thead class="sticky top-0 bg-white border-b border-black shadow-sm">
+        <tr>
+            <th class="p-2 border-r border-gray-200 text-left" style="min-width:110px;">時間枠</th>
+            <th class="p-2 border-r border-gray-200">3/15<br><span class="font-normal text-gray-500">(日)</span></th>
+<th class="p-2 border-r border-gray-200">3/16<br><span class="font-normal text-gray-500">(月)</span></th>
+<th class="p-2 border-r border-gray-200">3/17<br><span class="font-normal text-gray-500">(火)</span></th>
+<th class="p-2 border-r border-gray-200">3/18<br><span class="font-normal text-gray-500">(水)</span></th>
+<th class="p-2 border-r border-gray-200">3/19<br><span class="font-normal text-gray-500">(木)</span></th>
+<th class="p-2 border-r border-gray-200">3/20<br><span class="font-normal text-gray-500">(金)</span></th>
+<th class="p-2">3/21<br><span class="font-normal text-gray-500">(土)</span></th>
+
+        </tr>
+    </thead>
+    <tbody class="bg-white">
+        <tr class="border-b border-gray-100">
+<td class="p-3 border-r border-gray-200 bg-gray-50 font-bold text-left text-[10px] leading-snug whitespace-nowrap">午前<br><span class="font-normal text-gray-400">09:00〜12:00</span></td>
+<td class="slot-cell p-3 border-r border-gray-100 cursor-pointer hover:bg-blue-50 transition-colors" onclick="selectSlot(this)" data-avail="○"><span class="text-blue-600 font-bold text-sm">○</span></td>
+<td class="slot-cell p-3 border-r border-gray-100 cursor-pointer hover:bg-blue-50 transition-colors" onclick="selectSlot(this)" data-avail="○"><span class="text-blue-600 font-bold text-sm">○</span></td>
+<td class="slot-cell p-3 border-r border-gray-100 cursor-pointer hover:bg-amber-50 transition-colors" onclick="selectSlot(this)" data-avail="△"><span class="text-amber-500 font-bold text-sm">△</span></td>
+<td class="slot-cell p-3 border-r border-gray-100" data-avail="×"><span class="text-gray-300 text-sm">×</span></td>
+<td class="slot-cell p-3 border-r border-gray-100 cursor-pointer hover:bg-blue-50 transition-colors" onclick="selectSlot(this)" data-avail="○"><span class="text-blue-600 font-bold text-sm">○</span></td>
+<td class="slot-cell p-3 border-r border-gray-100 cursor-pointer hover:bg-blue-50 transition-colors" onclick="selectSlot(this)" data-avail="○"><span class="text-blue-600 font-bold text-sm">○</span></td>
+<td class="slot-cell p-3 cursor-pointer hover:bg-blue-50 transition-colors" onclick="selectSlot(this)" data-avail="○"><span class="text-blue-600 font-bold text-sm">○</span></td>
+</tr>
+<tr class="border-b border-gray-100">
+<td class="p-3 border-r border-gray-200 bg-gray-50 font-bold text-left text-[10px] leading-snug whitespace-nowrap">お昼<br><span class="font-normal text-gray-400">12:00〜14:00</span></td>
+<td class="slot-cell p-3 border-r border-gray-100 cursor-pointer hover:bg-blue-50 transition-colors" onclick="selectSlot(this)" data-avail="○"><span class="text-blue-600 font-bold text-sm">○</span></td>
+<td class="slot-cell p-3 border-r border-gray-100 cursor-pointer hover:bg-blue-50 transition-colors" onclick="selectSlot(this)" data-avail="○"><span class="text-blue-600 font-bold text-sm">○</span></td>
+<td class="slot-cell p-3 border-r border-gray-100 cursor-pointer hover:bg-blue-50 transition-colors" onclick="selectSlot(this)" data-avail="○"><span class="text-blue-600 font-bold text-sm">○</span></td>
+<td class="slot-cell p-3 border-r border-gray-100 cursor-pointer hover:bg-blue-50 transition-colors" onclick="selectSlot(this)" data-avail="○"><span class="text-blue-600 font-bold text-sm">○</span></td>
+<td class="slot-cell p-3 border-r border-gray-100 cursor-pointer hover:bg-amber-50 transition-colors" onclick="selectSlot(this)" data-avail="△"><span class="text-amber-500 font-bold text-sm">△</span></td>
+<td class="slot-cell p-3 border-r border-gray-100" data-avail="×"><span class="text-gray-300 text-sm">×</span></td>
+<td class="slot-cell p-3 cursor-pointer hover:bg-blue-50 transition-colors" onclick="selectSlot(this)" data-avail="○"><span class="text-blue-600 font-bold text-sm">○</span></td>
+</tr>
+<tr class="border-b border-gray-100">
+<td class="p-3 border-r border-gray-200 bg-gray-50 font-bold text-left text-[10px] leading-snug whitespace-nowrap">午後<br><span class="font-normal text-gray-400">14:00〜17:00</span></td>
+<td class="slot-cell p-3 border-r border-gray-100" data-avail="×"><span class="text-gray-300 text-sm">×</span></td>
+<td class="slot-cell p-3 border-r border-gray-100 cursor-pointer hover:bg-blue-50 transition-colors" onclick="selectSlot(this)" data-avail="○"><span class="text-blue-600 font-bold text-sm">○</span></td>
+<td class="slot-cell p-3 border-r border-gray-100 cursor-pointer hover:bg-blue-50 transition-colors" onclick="selectSlot(this)" data-avail="○"><span class="text-blue-600 font-bold text-sm">○</span></td>
+<td class="slot-cell p-3 border-r border-gray-100 cursor-pointer hover:bg-blue-50 transition-colors" onclick="selectSlot(this)" data-avail="○"><span class="text-blue-600 font-bold text-sm">○</span></td>
+<td class="slot-cell p-3 border-r border-gray-100 cursor-pointer hover:bg-blue-50 transition-colors" onclick="selectSlot(this)" data-avail="○"><span class="text-blue-600 font-bold text-sm">○</span></td>
+<td class="slot-cell p-3 border-r border-gray-100 cursor-pointer hover:bg-blue-50 transition-colors" onclick="selectSlot(this)" data-avail="○"><span class="text-blue-600 font-bold text-sm">○</span></td>
+<td class="slot-cell p-3 cursor-pointer hover:bg-amber-50 transition-colors" onclick="selectSlot(this)" data-avail="△"><span class="text-amber-500 font-bold text-sm">△</span></td>
+</tr>
+<tr class="border-b border-gray-100">
+<td class="p-3 border-r border-gray-200 bg-gray-50 font-bold text-left text-[10px] leading-snug whitespace-nowrap">夕方<br><span class="font-normal text-gray-400">17:00〜20:00</span></td>
+<td class="slot-cell p-3 border-r border-gray-100 cursor-pointer hover:bg-blue-50 transition-colors" onclick="selectSlot(this)" data-avail="○"><span class="text-blue-600 font-bold text-sm">○</span></td>
+<td class="slot-cell p-3 border-r border-gray-100 cursor-pointer hover:bg-amber-50 transition-colors" onclick="selectSlot(this)" data-avail="△"><span class="text-amber-500 font-bold text-sm">△</span></td>
+<td class="slot-cell p-3 border-r border-gray-100" data-avail="×"><span class="text-gray-300 text-sm">×</span></td>
+<td class="slot-cell p-3 border-r border-gray-100 cursor-pointer hover:bg-blue-50 transition-colors" onclick="selectSlot(this)" data-avail="○"><span class="text-blue-600 font-bold text-sm">○</span></td>
+<td class="slot-cell p-3 border-r border-gray-100 cursor-pointer hover:bg-blue-50 transition-colors" onclick="selectSlot(this)" data-avail="○"><span class="text-blue-600 font-bold text-sm">○</span></td>
+<td class="slot-cell p-3 border-r border-gray-100 cursor-pointer hover:bg-blue-50 transition-colors" onclick="selectSlot(this)" data-avail="○"><span class="text-blue-600 font-bold text-sm">○</span></td>
+<td class="slot-cell p-3 cursor-pointer hover:bg-blue-50 transition-colors" onclick="selectSlot(this)" data-avail="○"><span class="text-blue-600 font-bold text-sm">○</span></td>
+</tr>
+
+    </tbody>
+</table>
+</div>
+</div>
+
+                <div class="bg-gray-50 p-4 border-t border-black flex justify-end gap-3">
+                    <button onclick="closeModal('rescheduleModal')"
+                        class="px-6 py-2 border border-black text-xs font-bold hover:bg-gray-100 transition-colors">キャンセル</button>
+                    <button id="submitRescheduleBtn" disabled onclick="executeReschedule()"
+                        class="px-6 py-2 bg-gray-300 text-white text-xs font-bold cursor-not-allowed shadow-md transition-all">3つ選択して変更する</button>
+                </div>
+            </div>
+
+            <!-- Success State -->
+            <div id="rescheduleSuccess" class="hidden p-12 text-center">
+                <div class="mb-6">
+                    <i class="fas fa-check-circle text-4xl text-green-600"></i>
+                </div>
+                <h4 class="text-base font-bold mb-2 text-green-600">候補日の送信が完了しました！</h4>
+                <p class="text-xs text-gray-500 leading-relaxed uppercase font-bold text-gray-500">
+                    管理会社への日程調整リクエストを送信しました。<br>
+                    確定次第、ユーザーにメールおよびLINEで通知されます。<br><br>
+                    <span class="text-black font-bold">ユーザーは届いた通知から「確定ボタン」を押す必要があります。</span><br>
+                    名刺チャット等でも、通知の確認を促すようにしてください。
+                </p>
+                <div class="mt-8">
+                    <button onclick="closeModal('rescheduleResuccess'); location.reload();"
+                        class="px-8 py-2 bg-black text-white text-xs font-bold hover:bg-gray-800 transition-all font-bold">閉じる</button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+
+    <script>
+        function toggleSection(id) {
+            const el = document.getElementById(id);
+            const icon = document.getElementById(id + '-icon');
+            if (!el) return;
+
+            if (el.classList.contains('hidden')) {
+                el.classList.remove('hidden');
+                if (icon) icon.style.transform = 'rotate(180deg)';
+            } else {
+                el.classList.add('hidden');
+                if (icon) icon.style.transform = 'rotate(0deg)';
+            }
+        }
+
+        function openModal(id) {
+            document.getElementById(id).classList.add('open');
+            document.body.style.overflow = 'hidden';
+        }
+
+        function closeModal(id) {
+            document.getElementById(id).classList.remove('open');
+            document.body.style.overflow = '';
+            if (loadingTimer) clearInterval(loadingTimer);
+        }
+
+        // Reschedule Logic
+        let selectedSlots = [];
+        let loadingTimer = null;
+
+        function startRescheduleLoading() {
+            openModal('rescheduleModal');
+            const loading = document.getElementById('rescheduleLoading');
+            const content = document.getElementById('rescheduleContent');
+            const success = document.getElementById('rescheduleSuccess');
+            const progress = document.getElementById('loadingProgress');
+            const title = loading.querySelector('h4');
+            const desc = loading.querySelector('p');
+
+            loading.style.display = 'block';
+            content.classList.add('hidden');
+            success.classList.add('hidden');
+            progress.style.width = '0%';
+
+            title.innerText = "管理会社へ空き枠を確認中です...";
+            desc.innerHTML = "管理会社の最新状況と照合しています。<br>完了まで5秒ほどかかりますので、そのままお待ちください。";
+
+            selectedSlots = [];
+            resetSlotSelection();
+
+            let startTime = Date.now();
+            const duration = 5000; // 5 seconds simulation
+
+            if (loadingTimer) clearInterval(loadingTimer);
+
+            loadingTimer = setInterval(() => {
+                let elapsed = Date.now() - startTime;
+                let percent = Math.min((elapsed / duration) * 100, 100);
+                progress.style.width = percent + '%';
+
+                if (elapsed >= duration) {
+                    clearInterval(loadingTimer);
+                    loading.style.display = 'none';
+                    content.classList.remove('hidden');
+                }
+            }, 50);
+        }
+
+        function selectSlot(td) {
+            if (td.dataset.avail === '×') return;
+
+            const isSelected = td.classList.contains('bg-blue-600') || td.classList.contains('bg-amber-500');
+
+            if (isSelected) {
+                td.classList.remove('bg-blue-600', 'bg-amber-500', 'text-white');
+                selectedSlots = selectedSlots.filter(s => s !== td);
+            } else {
+                if (selectedSlots.length >= 3) {
+                    alert('スロットは最大3つまでしか選択できません。');
+                    return;
+                }
+                if (td.dataset.avail === '△') {
+                    td.classList.add('bg-amber-500', 'text-white');
+                } else {
+                    td.classList.add('bg-blue-600', 'text-white');
+                }
+                selectedSlots.push(td);
+            }
+            updateSlotUI();
+        }
+
+        function updateSlotUI() {
+            const btn = document.getElementById('submitRescheduleBtn');
+            const msg = document.getElementById('slotCountMsg');
+            if (!msg || !btn) return;
+
+            const remaining = 3 - selectedSlots.length;
+
+            if (remaining > 0) {
+                msg.innerText = `※ あと ${remaining} つのスロットを選択してください`;
+                msg.className = 'text-[11px] text-red-600 font-bold mt-1';
+                btn.disabled = true;
+                btn.className = 'px-6 py-2 bg-gray-300 text-white text-xs font-bold cursor-not-allowed shadow-md transition-all';
+                btn.innerText = `${selectedSlots.length}/3 選択中`;
+            } else {
+                msg.innerText = '✓ 3つのスロットを選択しました';
+                msg.className = 'text-[11px] text-green-600 font-bold mt-1';
+                btn.disabled = false;
+                btn.className = 'px-6 py-2 bg-black text-white text-xs font-bold hover:bg-gray-800 transition-colors shadow-md font-bold';
+                btn.innerText = 'この3件でリクエストを送る';
+            }
+        }
+
+        function resetSlotSelection() {
+            document.querySelectorAll('#rescheduleContent .slot-cell').forEach(el => {
+                el.classList.remove('bg-blue-600', 'bg-amber-500', 'text-white');
+            });
+            selectedSlots = [];
+            updateSlotUI();
+        }
+
+        function executeReschedule() {
+            const loading = document.getElementById('rescheduleLoading');
+            const content = document.getElementById('rescheduleContent');
+            const success = document.getElementById('rescheduleSuccess');
+            const progress = document.getElementById('loadingProgress');
+            const title = loading.querySelector('h4');
+            const desc = loading.querySelector('p');
+
+            content.classList.add('hidden');
+            loading.style.display = 'block';
+            progress.style.width = '0%';
+
+            title.innerText = "管理会社へ予約リクエストを送信中です...";
+            desc.innerHTML = "選択された3つの候補日に基づき、Botが自動で手続きを行っています。<br>そのまま少々お待ちください。";
+
+            let startTime = Date.now();
+            const duration = 5000; // 5 seconds for secondary loading
+
+            if (loadingTimer) clearInterval(loadingTimer);
+
+            loadingTimer = setInterval(() => {
+                let elapsed = Date.now() - startTime;
+                let percent = Math.min((elapsed / duration) * 100, 100);
+                progress.style.width = percent + '%';
+
+                if (elapsed >= duration) {
+                    clearInterval(loadingTimer);
+                    loading.style.display = 'none';
+                    success.classList.remove('hidden');
+                }
+            }, 50);
+
+            // Activity log update
+            const tableBody = document.querySelector('table tbody');
+            if (tableBody) {
+                const row = document.createElement('tr');
+                row.className = 'hover:bg-gray-50 bg-blue-50';
+                row.innerHTML = `
+                    <td class="p-3 text-gray-500 w-40">たった今</td>
+                    <td class="p-3 font-bold w-40 text-blue-600">日程変更依頼</td>
+                    <td class="p-3 text-gray-700 font-medium">管理会社へ新しい候補日（3件）を送信しました。管理会社への確認中です。</td>
+                `;
+                tableBody.insertBefore(row, tableBody.firstChild);
+            }
+        }
+
+        function closeModal(id) {
+            // Special case for the reschedule success close
+            if (id === 'rescheduleResuccess') {
+                document.getElementById('rescheduleModal').classList.remove('open');
+                document.body.style.overflow = '';
+                return;
+            }
+            const modal = document.getElementById(id);
+            if (modal) modal.classList.remove('open');
+            document.body.style.overflow = '';
+            if (loadingTimer) clearInterval(loadingTimer);
+        }
+
+        function confirmCancel管理会社() {
+            openModal('cancel管理会社Modal');
+        }
+
+        function executeCancel管理会社() {
+            closeModal('cancel管理会社Modal');
+            alert('システムが管理会社で自動キャンセル処理を開始します。しばらくお待ちください。');
+            setTimeout(() => {
+                alert('管理会社上の予約が正常にキャンセルされました。');
+                location.href = 'AD10.html';
+            }, 1000);
+        }
+
+        function toggleSubMenu(id) {
+            const menu = document.getElementById(id);
+            const icon = document.getElementById(id + '-icon');
+            const isVisible = menu.style.display === 'block';
+            menu.style.display = isVisible ? 'none' : 'block';
+            if (icon) {
+                icon.style.transform = isVisible ? 'rotate(-90deg)' : 'rotate(0deg)';
+            }
+        }
+    </script>
+    <!-- bookingSummaryModal -->
+    <div id="bookingSummaryModal" class="modal-bg" onclick="closeModal('bookingSummaryModal')">
+        <div class="modal-content" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-center mb-6 pb-2 border-b border-gray-100">
+                <h3 class="text-sm font-bold">内見予約の概要</h3>
+                <button onclick="closeModal('bookingSummaryModal')" class="text-gray-400 hover:text-black"><i
+                        class="fas fa-times"></i></button>
+            </div>
+            <div class="space-y-4">
+                <!-- Status & ID -->
+                <div class="flex justify-between items-center bg-gray-50 p-4 border border-black mb-4">
+                    <div class="flex items-center gap-3">
+                        <span class="w-3 h-3 bg-green-500 rounded-full"></span>
+                        <span class="text-xs font-bold uppercase tracking-wider">予約状況: 来場確定済 (管理会社連携完了)</span>
+                    </div>
+                    <div class="text-[11px] font-bold">
+                        <span class="text-gray-400 mr-2 uppercase">Booking ID:</span>PRP-10042
+                    </div>
+                </div>
+
+                <!-- Rows -->
+                <div class="space-y-1">
+                    <div class="row-item">
+                        <div class="row-label"><span>📅</span> 予約日時</div>
+                        <div class="row-value font-bold text-blue-600">2023/12/12 10:00 〜</div>
+                    </div>
+                    <div class="row-item">
+                        <div class="row-label"><span>🏢</span> 物件名</div>
+                        <div class="row-value font-bold">パークタワー 2205</div>
+                    </div>
+                    <div class="row-item">
+                        <div class="row-label"><span>👤</span> 申込者</div>
+                        <div class="row-value">佐藤 様</div>
+                    </div>
+                    <div class="row-item">
+                        <div class="row-label"><span>🔗</span> 予約経路</div>
+                        <div class="row-value">管理会社 BB (API連携済)</div>
+                    </div>
+                    <div class="row-item">
+                        <div class="row-label"><span>🔑</span> 鍵の情報</div>
+                        <div class="row-value text-red-600 font-bold">スマートロック (Qrio)</div>
+                    </div>
+                    <div class="row-item">
+                        <div class="row-label"><span>🏢</span> 入館方法</div>
+                        <div class="row-value font-bold">オートロック 呼出: 2205</div>
+                    </div>
+                    <div class="row-item">
+                        <div class="row-label"><span>⚠️</span> 注意事項</div>
+                        <div class="row-value text-xs text-gray-600 italic">予約は確定済みです。当日は名刺を持参の上、現地に向かってください。</div>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-8 flex justify-end">
+                <button onclick="closeModal('bookingSummaryModal')"
+                    class="px-8 py-2 bg-black text-white hover:bg-gray-800 font-bold text-xs">閉じる</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- responsiblePersonModal -->
+    <div id="responsiblePersonModal" class="modal-bg" onclick="closeModal('responsiblePersonModal')">
+        <div class="modal-content !max-w-[450px]" onclick="event.stopPropagation()">
+            <div class="flex justify-between items-center mb-6 pb-2 border-b border-gray-100">
+                <h3 class="text-sm font-bold">担当者変更</h3>
+                <button onclick="closeModal('responsiblePersonModal')" class="text-gray-400 hover:text-black"><i
+                        class="fas fa-times"></i></button>
+            </div>
+            <div class="space-y-3">
+                <p class="text-xs text-gray-500 mb-4">この案件の担当者を変更します。変更後は新しい担当者に通知が送信されます。</p>
+                <div class="relative mb-4">
+                    <input type="text" placeholder="スタッフ名を検索..."
+                        class="w-full px-3 py-2 text-xs border border-black outline-none focus:ring-1 focus:ring-black">
+                    <i class="fas fa-search absolute right-3 top-1/2 -translate-y-1/2 text-gray-400"></i>
+                </div>
+                <div class="max-h-48 overflow-y-auto space-y-2 border border-black p-2 bg-gray-50">
+                    <div
+                        class="flex items-center justify-between p-3 bg-white border border-gray-200 hover:border-black cursor-pointer group">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="w-8 h-8 rounded-full bg-gray-200 flex items-center justify-center text-[10px] font-bold">
+                                鈴木</div>
+                            <div>
+                                <div class="text-[11px] font-bold">鈴木 一郎 (現在)</div>
+                            </div>
+                        </div>
+                        <div class="text-blue-600 text-[10px] font-bold">選択中</div>
+                    </div>
+                    <div class="flex items-center justify-between p-3 bg-white border border-gray-200 hover:border-black cursor-pointer group"
+                        onclick="alert('担当者を変更しました'); closeModal('responsiblePersonModal')">
+                        <div class="flex items-center gap-3">
+                            <div
+                                class="w-8 h-8 rounded-full bg-blue-100 text-blue-600 flex items-center justify-center text-[10px] font-bold">
+                                佐藤</div>
+                            <div>
+                                <div class="text-[11px] font-bold">佐藤 明美</div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            <div class="mt-8 flex justify-end gap-2 text-xs">
+                <button onclick="closeModal('responsiblePersonModal')"
+                    class="px-4 py-2 border border-black hover:bg-gray-50 transition-colors">キャンセル</button>
+            </div>
+        </div>
+    </div>
+</body>
+
+</html>
