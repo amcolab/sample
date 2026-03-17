@@ -111,7 +111,7 @@
           <div style="display:flex; gap:8px; align-items:center; flex-wrap:wrap;">
             <span class="badge" style="font-weight:700;">SHT-015</span>
             <a href="#" style="color:#0066cc; text-decoration:none; font-weight:500;">代官山ヒルズ ↗</a>
-            <span class="badge badge-warn">審査中（管理者確認待ち）</span>
+            <span class="badge badge-rejected">差し戻し（一部再提出が必要）</span>
             <span class="badge">Plan B（最大 5,000円）</span>
           </div>
         </div>
@@ -119,15 +119,16 @@
     </header>
 
     <!-- Alert Banner -->
-    <div class="alert-banner" style="margin:24px 24px 0 24px;">
-      <div style="font-weight:700; color:#d97706;">⏳</div>
+    <div class="alert-banner" style="margin:24px 24px 0 24px; border-color:#dc2626; background:#fef2f2;">
+      <div style="font-weight:700; color:#dc2626;"><i class="fas fa-exclamation-circle"></i></div>
       <div class="alert-banner-text">
-        <div style="color:#92400e;">管理者が撮影データを確認中です。承認結果をお待ちください。</div>
+        <div style="color:#b91c1c; font-weight:700;">一部の撮影データに不備があり、差し戻されました。</div>
+        <div style="color:#dc2626; font-size:12px;">内容を確認し、不足しているデータの再提出をお願いします。</div>
       </div>
     </div>
 
     <!-- Content Area -->
-    <div style="flex:1; padding:24px; display:grid; grid-template-columns:1fr 280px; gap:24px; overflow-auto;">
+    <div style="flex:1; padding:24px; display:grid; grid-template-columns:1fr 280px; gap:24px; overflow: auto;">
       <!-- Left Column -->
       <div>
         <!-- 物件概要 Card -->
@@ -261,6 +262,61 @@
 
               <div style="font-size:11px; color:#d97706; font-weight:600; background:#fffbeb; padding:8px 12px; border-radius:2px;">
                 このデータは管理者が確認中です
+              </div>
+            </div>
+          </div>
+
+          <!-- Room 3 (Rejected) -->
+          <div class="room-card" style="border-color:#dc2626;">
+            <div class="room-header" style="background:#fef2f2;">
+              <div style="font-weight:700;">2LDK - 202号室</div>
+              <span class="badge badge-rejected">差し戻し</span>
+            </div>
+            <div class="room-body">
+              <div style="background:#fff1f0; border:1px solid #ffa39e; padding:10px; margin-bottom:12px; font-size:12px; color:#cf1322;">
+                <strong><i class="fas fa-exclamation-triangle mr-1"></i>差し戻し理由:</strong> 写真の枚数が不足しています。キッチン周りの詳細写真を2枚追加してください。
+              </div>
+              <!-- Video Preview -->
+              <div style="margin-bottom:16px;">
+                <div class="info-label" style="margin-bottom:8px;">動画</div>
+                <div class="media-preview">
+                  <i class="fas fa-play" style="opacity:0;"></i>
+                  <img src="main.jpg" alt="video thumbnail" style="width:100%; height:100%; object-fit:cover; position:absolute; opacity:0.6;">
+                  <div class="media-play-btn">
+                    <i class="fas fa-play"></i>
+                  </div>
+                </div>
+              </div>
+
+              <!-- Floorplan + Photos Grid -->
+              <div style="margin-bottom:12px;">
+                <div class="info-label" style="margin-bottom:8px;">平面図</div>
+                <div class="media-grid-thumb">
+                  <img src="roomtype.png" alt="floorplan" style="width:100%; height:100%; object-fit:cover; opacity:0.6;">
+                </div>
+              </div>
+
+              <div style="margin-bottom:12px;">
+                <div class="info-label" style="margin-bottom:8px;">室内写真</div>
+                <div class="media-grid">
+                  <div class="media-grid-thumb">
+                    <img src="inside1.jpg" alt="photo 1" style="width:100%; height:100%; object-fit:cover; opacity:0.6;">
+                  </div>
+                  <div class="media-grid-thumb">
+                    <img src="inside2.jpg" alt="photo 2" style="width:100%; height:100%; object-fit:cover; opacity:0.6;">
+                  </div>
+                  <div style="background:#fff; border:1px dashed #dc2626; height:100px; display:flex; flex-direction:column; align-items:center; justify-content:center; color:#dc2626; font-size:10px; cursor:pointer;">
+                    <i class="fas fa-plus mb-1"></i>
+                    追加する
+                  </div>
+                </div>
+              </div>
+
+              <div style="font-size:11px; color:#dc2626; font-weight:600; background:#fef2f2; padding:8px 12px; border-radius:2px; display:flex; align-items:center; gap:8px;">
+                <i class="fas fa-info-circle"></i> 不足している写真をアップロードして再提出してください
+              </div>
+              <div style="margin-top:12px;">
+                <button class="btn-black" style="width:100%; background:#dc2626; border-color:#dc2626;">再提出する</button>
               </div>
             </div>
           </div>

@@ -385,8 +385,8 @@
           <!-- Column header -->
           <div class="tbl-head COLS">
             <div>画像</div>
-            <div>建物名/号室</div>
-            <div>間取り</div>
+            <div>建物名 / Layout ID</div>
+            <div>号室・間取り</div>
             <div>撮影プラン/状態</div>
             <div id="sort-date-col" onclick="toggleDateSort()" style="cursor:pointer; user-select:none; display:flex; align-items:center; gap:4px;">
               受注/更新日
@@ -413,13 +413,13 @@
               <div class="bg-white">
                 <div class="room-row COLS">
                   <div></div>
-                  <div class="font-bold pl-4">101号室</div>
-                  <div>1K</div>
+                  <div class="font-bold pl-4 text-emerald-600">L-4001</div>
+                  <div>101, 102号室 / 1K</div>
                   <div><span class="s-badge s-waiting">撮影予約待ち</span><span class="dl-tag-soon ml-1">3日後</span></div>
                   <div style="font-size:11px;color:#999;">2023/10/25</div>
                   <div style="text-align:right;">
                     <button class="bg-black text-white text-[11px] font-bold px-3 py-1 hover:bg-gray-800 transition-colors"
-                      onclick="openBookingModal('スカイタワー A', '101号室')">予約する</button>
+                      onclick="openBookingModal('スカイタワー A', '101, 102号室')">予約する</button>
                   </div>
                 </div>
               </div>
@@ -440,13 +440,13 @@
               <div class="bg-white">
                 <div class="room-row COLS">
                   <div></div>
-                  <div class="font-bold pl-4">501号室</div>
-                  <div>1LDK</div>
+                  <div class="font-bold pl-4 text-emerald-600">L-5011</div>
+                  <div>501, 502, 503号室 / 1LDK</div>
                   <div><span class="s-badge s-confirmed">撮影予約確定</span><span class="dl-tag-ok ml-1">明日 10:00</span></div>
                   <div style="font-size:11px;color:#999;">2023/11/13 (確定日)</div>
                   <div style="text-align:right;">
                     <button class="bg-gray-100 text-black text-[11px] font-bold px-3 py-1 border border-black hover:bg-gray-200 transition-colors"
-                      onclick="openRescheduleModal('サンシャイン H', '501号室')">変更する</button>
+                      onclick="openRescheduleModal('サンシャイン H', '501, 502, 503号室')">変更する</button>
                   </div>
                 </div>
               </div>
@@ -477,32 +477,32 @@
               <div class="bg-white">
                 <div class="room-row COLS">
                   <div></div>
-                  <div class="font-bold pl-4">201号室</div>
-                  <div>2LDK</div>
+                  <div class="font-bold pl-4 text-emerald-600">L-2011</div>
+                  <div>201, 202, 203号室 / 2LDK</div>
                   <div><span class="s-badge s-live">承認済み</span></div>
                   <div style="font-size:11px;color:#999;">2023/11/01</div>
                   <div></div>
                 </div>
                 <div class="room-row COLS">
                   <div></div>
-                  <div class="font-bold pl-4">202号室</div>
-                  <div>2LDK</div>
+                  <div class="font-bold pl-4 text-emerald-600">L-2021</div>
+                  <div>204, 205号室 / 2LDK</div>
                   <div><span class="s-badge s-rejected">差し戻し</span></div>
                   <div style="font-size:11px;color:#dc2626;">2023/11/10 (要再撮影)</div>
                   <div style="text-align:right;">
                     <button class="text-green-600 underline text-xs font-bold"
-                      onclick="openUploadModal('パークサイド B', '202号室', true)">動画アップロード</button>
+                      onclick="openUploadModal('パークサイド B', '204, 205号室', true)">動画アップロード</button>
                   </div>
                 </div>
                 <div class="room-row COLS">
                   <div></div>
-                  <div class="font-bold pl-4">203号室</div>
-                  <div>1LDK</div>
+                  <div class="font-bold pl-4 text-emerald-600">L-2031</div>
+                  <div>206号室 / 1LDK</div>
                   <div><span class="s-badge s-shooting">撮影対応中</span></div>
                   <div style="font-size:11px;color:#999;">未着手</div>
                   <div style="text-align:right;">
                     <button class="text-green-600 underline text-xs font-bold"
-                      onclick="openUploadModal('パークサイド B', '203号室')">動画アップロード</button>
+                      onclick="openUploadModal('パークサイド B', '206号室')">動画アップロード</button>
                   </div>
                 </div>
               </div>
@@ -527,8 +527,8 @@
               <div class="bg-white">
                 <div class="room-row COLS bg-red-50/20">
                   <div></div>
-                  <div class="font-bold pl-4">301号室</div>
-                  <div>3LDK</div>
+                  <div class="font-bold pl-4 text-emerald-600">L-3011</div>
+                  <div>301号室 / 3LDK</div>
                   <div><span class="s-badge s-review">承認待ち</span><span class="dl-tag-over ml-1">期限超過</span></div>
                   <div style="font-size:11px;color:#dc2626;">2023/10/24</div>
                   <div></div>
@@ -555,16 +555,16 @@
               <div class="bg-white">
                 <div class="room-row COLS">
                   <div></div>
-                  <div class="font-bold pl-4">太子堂レジデンス 202</div>
-                  <div>2DK</div>
+                  <div class="font-bold pl-4 text-emerald-600">L-8001</div>
+                  <div>201, 202号室 / 2DK</div>
                   <div><span class="s-badge s-live">承認済み</span></div>
                   <div style="font-size:11px;color:#999;">2023/10/12</div>
                   <div></div>
                 </div>
                 <div class="room-row COLS" style="border-bottom:1px solid #f0f0f0;">
                   <div></div>
-                  <div class="font-bold pl-4">301号室</div>
-                  <div>1LDK</div>
+                  <div class="font-bold pl-4 text-emerald-600">L-8002</div>
+                  <div>301号室 / 1LDK</div>
                   <div><span class="s-badge s-live" style="background-color:#059669;color:white;border:none;">公開中</span></div>
                   <div style="font-size:11px;color:#999;">2023/11/22</div>
                   <div></div>
@@ -599,8 +599,8 @@
                 </div>
                 <div class="room-row COLS" style="border-bottom:1px solid #f0f0f0;">
                   <div></div>
-                  <div class="font-bold pl-4">401号室</div>
-                  <div>2LDK</div>
+                  <div class="font-bold pl-4 text-emerald-600">L-8003</div>
+                  <div>401号室 / 2LDK</div>
                   <div><span class="s-badge s-live" style="background-color:#059669;color:white;border:none;">公開中</span></div>
                   <div style="font-size:11px;color:#999;">2023/11/15</div>
                   <div></div>
@@ -635,8 +635,8 @@
                 </div>
                 <div class="room-row COLS" style="border-bottom:none;">
                   <div></div>
-                  <div class="font-bold pl-4">402号室</div>
-                  <div>1DK</div>
+                  <div class="font-bold pl-4 text-emerald-600">L-8004</div>
+                  <div>402号室 / 1DK</div>
                   <div><span class="s-badge s-live" style="background-color:#059669;color:white;border:none;">公開中</span></div>
                   <div style="font-size:11px;color:#999;">2023/11/05</div>
                   <div></div>
@@ -692,8 +692,8 @@
               <div class="bg-white">
                 <div class="room-row COLS">
                   <div></div>
-                  <div class="font-bold pl-4">105号室</div>
-                  <div>1R</div>
+                  <div class="font-bold pl-4 text-emerald-600">L-9001</div>
+                  <div>105号室 / 1R</div>
                   <div><span class="s-badge s-cancelled">キャンセル</span></div>
                   <div style="font-size:11px;color:#999;">2023/10/06 (キャンセル日)</div>
                   <div></div>

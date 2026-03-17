@@ -469,6 +469,7 @@
       </div>
       <div style="display:flex; gap:8px;">
         <button class="btn" onclick="backToPlan()">← 戻る</button>
+        <button class="btn" onclick="skipBooking()">スキップして後で予約する</button>
         <button class="btn" onclick="closeAll()">キャンセル</button>
         <button class="btn-black" id="confirmBookingBtn" disabled style="opacity:0.4; cursor:not-allowed; padding:6px 24px;" onclick="confirmBooking()">候補を確定して受注する</button>
       </div>
@@ -940,10 +941,32 @@
   function confirmBooking() {
     if(selectedSlotKeys.length<3) return;
     document.getElementById('bookingModal').classList.remove('open');
+    
+    // Reset success modal content in case it was modified by skip
+    document.getElementById('successModal').querySelector('div[style*="font-size:18px"]').textContent = '受注リクエストを送信しました';
+    document.getElementById('successModal').querySelector('div[style*="font-size:12px; color:#666"]').innerHTML = 
+      'MooMが管理会社と日程を調整します。<br>確定した撮影日時はメールおよびカレンダーへ通知します。';
+
     document.getElementById('success-building').textContent=currentBuilding;
     document.getElementById('success-plan').textContent=currentPlan+' · '+currentPrice+'/件';
     var slotList=selectedSlotKeys.map(function(k,i){ return '候補'+(i+1)+': '+slotData[k]; }).join('  /  ');
+    document.getElementById('success-slots').style.color = '';
     document.getElementById('success-slots').textContent=slotList;
+    document.getElementById('successModal').classList.add('open');
+  }
+
+  function skipBooking() {
+    document.getElementById('bookingModal').classList.remove('open');
+    document.getElementById('success-building').textContent = currentBuilding;
+    document.getElementById('success-plan').textContent = currentPlan + ' · ' + currentPrice + '/件';
+    document.getElementById('success-slots').style.color = '#dc2626';
+    document.getElementById('success-slots').textContent = '未定 (後で予約する)';
+    
+    // Modify success modal content for skip case
+    document.getElementById('successModal').querySelector('div[style*="font-size:18px"]').textContent = '受注を完了しました';
+    document.getElementById('successModal').querySelector('div[style*="font-size:12px; color:#666"]').innerHTML = 
+      '案件の受注が完了しました。<br>「撮影案件」ページからいつでも日程の予約が可能です。';
+      
     document.getElementById('successModal').classList.add('open');
   }
 </script>

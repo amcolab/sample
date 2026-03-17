@@ -139,9 +139,57 @@
     </header>
 
     <!-- Content Area -->
-    <div style="flex:1; padding:24px; display:grid; grid-template-columns:1fr 280px; gap:24px; overflow-auto;">
+    <div style="flex:1; padding:24px; display:grid; grid-template-columns:1fr 280px; gap:24px; overflow: auto;">
       <!-- Left Column -->
       <div>
+        <!-- 内見予約の概要 Card -->
+        <div class="card" style="margin-bottom:24px; border-color: #3b82f6; background: #eff6ff;">
+          <div class="card-title flex items-center justify-between" style="border-bottom-color: #dbeafe; margin-bottom: 16px;">
+            <div class="flex items-center gap-2">
+                <i class="fas fa-calendar-check text-blue-600"></i>
+                <span style="color:#1e40af">内見予約の概要</span>
+            </div>
+          </div>
+          <div style="display:grid; grid-template-columns:120px 1fr; gap:12px 20px;">
+            <div>
+              <div class="info-label" style="text-transform: uppercase; font-weight: bold;">予約日時</div>
+              <div class="info-value" style="font-weight: 600;">2023/11/20 10:00 〜 11:00</div>
+            </div>
+            <div>
+              <div class="info-label" style="text-transform: uppercase; font-weight: bold;">担当者</div>
+              <div class="info-value" style="font-weight: 600;">今井千夏</div>
+            </div>
+            <div>
+              <div class="info-label" style="text-transform: uppercase; font-weight: bold;">家賃</div>
+              <div class="info-value" style="font-weight: 600;">22万円</div>
+            </div>
+            <div>
+              <div class="info-label" style="text-transform: uppercase; font-weight: bold;">所在地</div>
+              <div class="info-value" style="font-weight: 600;">東京都渋谷区神南1-2-3</div>
+            </div>
+            <div>
+              <div class="info-label" style="text-transform: uppercase; font-weight: bold;">広告費</div>
+              <div class="info-value" style="font-weight: 600;">100%</div>
+            </div>
+            <div>
+              <div class="info-label" style="text-transform: uppercase; font-weight: bold;">取引態様</div>
+              <div class="info-value" style="font-weight: 600;">貸主</div>
+            </div>
+            <div style="grid-column: span 2;">
+              <div class="info-label" style="text-transform: uppercase; font-weight: bold;">内見方法</div>
+              <div class="info-value" style="line-height: 1.5;">
+                スマートキーBOX設置物件です。スマートロック解除方法を必ずご確認の上、現地対応ください。未内見でのお申込みは受付けできません。
+              </div>
+            </div>
+            <div style="grid-column: span 2;">
+              <div class="info-label" style="text-transform: uppercase; font-weight: bold;">内見時注意事項</div>
+              <div class="info-value" style="color:#dc2626; font-weight:700; line-height: 1.5;">
+                ※ブレーカー操作厳禁※本物件はＳＮＳへの無断掲載・転載・共有を禁止しております※
+              </div>
+            </div>
+          </div>
+        </div>
+
         <!-- 物件概要 Card -->
         <div class="card" style="margin-bottom:24px;">
           <div class="card-title">物件概要</div>
@@ -172,19 +220,6 @@
             <div class="info-label">撮影日程</div>
             <div class="info-value" style="margin-bottom:8px;">2023/11/20 10:00〜</div>
             <span class="badge badge-confirmed">確認済み</span>
-          </div>
-
-          <!-- 入室方法 Section -->
-          <div style="border-top:1px solid #eee; margin-top:12px; padding-top:12px;">
-            <div class="info-label">入室方法</div>
-            <div class="info-value" style="margin-bottom:8px;">スマートキーボックス設置</div>
-            <div style="background:#f9f9f9; border:1px solid #eee; padding:8px 12px; margin-bottom:8px; border-radius:2px;">
-              <div class="info-label">暗証番号</div>
-              <div class="info-value" style="font-family:monospace; letter-spacing:2px;">XXXX</div>
-            </div>
-            <div style="font-size:12px; color:#666; line-height:1.5;">
-              注意事項: 撮影時は暗証番号を利用して入室してください。退出時は必ず施錠してください。
-            </div>
           </div>
         </div>
 
