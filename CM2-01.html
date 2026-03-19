@@ -34,7 +34,7 @@
     .badge-normal { display: inline-block; background: #f3f4f6; border: 1px solid #6b7280; color: #6b7280; font-size: 10px; padding: 1px 6px; }
 
     /* Table */
-    .COLS { display:grid; grid-template-columns: 64px 1fr 120px 110px 110px 100px 130px; align-items:center; }
+    .COLS { display:grid; grid-template-columns: 64px 1fr 120px 110px 110px 100px 100px 130px; align-items:center; }
     .tbl-row { padding: 12px 16px; border-bottom: 1px solid #eee; }
     .tbl-row:hover { background: #fafafa; }
     .tbl-head { padding: 8px 16px; background: #f2f2f2; border-bottom: 1px solid #000; font-size: 11px; font-weight: 700; color: #555; }
@@ -257,8 +257,17 @@
       <div style="border:1px solid #000; background:#fff;">
         <div style="display:flex; justify-content:space-between; align-items:center; padding:10px 16px; border-bottom:1px solid #000; background:#f9f9f9;">
           <div style="font-weight:700; font-size:14px;">掲載中の物件 <span style="font-weight:400; font-size:11px; color:#888;" id="result-count">全 5 件</span></div>
-          <div style="font-size:11px; color:#666;">
-            表示件数: <select style="width:auto; padding:2px 20px 2px 6px; font-size:11px; border:1px solid #000;"><option>20件</option><option>50件</option></select>
+          <div style="font-size:11px; color:#666; display:flex; align-items:center; gap:12px;">
+            <div>
+              表示件数: <select style="width:auto; padding:2px 20px 2px 6px; font-size:11px; border:1px solid #000;"><option>20件</option><option>50件</option></select>
+            </div>
+            <div>
+              並び替え: 
+              <select id="f-sort" onchange="applyFilters()" style="width:auto; padding:2px 20px 2px 6px; font-size:11px; border:1px solid #000;">
+                <option value="newest">新着順</option>
+                <option value="reward">報酬額が高い順</option>
+              </select>
+            </div>
           </div>
         </div>
 
@@ -268,15 +277,8 @@
           <div>建物名・住所</div>
           <div>管理会社</div>
           <div>間取り/部屋数</div>
-          <div>
-            <span class="sort-btn" id="sort-btn-date" onclick="toggleSort()" title="掲載日で並び替え">
-              掲載日
-              <span style="display:inline-flex; flex-direction:column; gap:0; line-height:1; margin-left:2px;">
-                <span class="sort-icon sort-icon-asc" style="font-size:8px;">▲</span>
-                <span class="sort-icon sort-icon-desc" style="font-size:8px;">▼</span>
-              </span>
-            </span>
-          </div>
+          <div>掲載日</div>
+          <div>報酬額</div>
           <div>撮影期限</div>
           <div style="text-align:right;">アクション</div>
         </div>
@@ -661,6 +663,7 @@
         '<div style="font-size:12px; color:#444;">' + r.company + '</div>' +
         '<div>' + r.madori + '<br><span style="font-size:11px;color:#666;">' + r.rooms + '部屋</span></div>' +
         '<div style="font-size:12px;">' + listedFormatted + '</div>' +
+        '<div style="font-weight:700; color:#059669;">' + r.price + '</div>' +
         '<div>' + deadlineHtml + '</div>' +
         '<div style="text-align:right;">' +
           '<button class="' + btnClass + ' btn-accent" onclick="openRegulationModal(\'' + r.name.replace(/'/g, "\\'") + '\',\'' + r.plan + '\',\'' + r.price + '\')">' + btnLabel + '</button>' +
@@ -670,50 +673,7 @@
     body.innerHTML = html;
   }
 
-  // ─── Sort ────────────────────────────────────────────
-  function toggleSort() {
-    if (sortDir === null || sortDir === 'desc') {
-      sortDir = 'asc';
-    } else {
-      sortDir = 'desc';
-    }
-    updateSortIcon();
-    applyFilters();
-  }
-
-  function updateSortIcon() {
-    var btn = document.getElementById('sort-btn-date');
-    btn.classList.remove('sort-asc', 'sort-desc');
-    var ascIcon = btn.querySelector('.sort-icon-asc');
-    var descIcon = btn.querySelector('.sort-icon-desc');
-    ascIcon.style.color = '#aaa';
-    descIcon.style.color = '#aaa';
-    if (sortDir === 'asc') {
-      btn.classList.add('sort-asc');
-      ascIcon.style.color = '#000';
-    } else if (sortDir === 'desc') {
-      btn.classList.add('sort-desc');
-      descIcon.style.color = '#000';
-    }
-  }
-
-  // ─── Filter ──────────────────────────────────────────
-  function validateFilterDates() {
-    var from = document.getElementById('f-date-from').value;
-    var to   = document.getElementById('f-date-to').value;
-    var err  = document.getElementById('f-date-err');
-    var fi   = document.getElementById('f-date-from');
-    var ti   = document.getElementById('f-date-to');
-    if (from && to && from > to) {
-      err.classList.add('show');
-      fi.classList.add('date-err'); ti.classList.add('date-err');
-      return false;
-    }
-    err.classList.remove('show');
-    fi.classList.remove('date-err'); ti.classList.remove('date-err');
-    return true;
-  }
-
+  // ─── Sort logic and Filters ──────────────────────────
   function applyFilters() {
     if (!validateFilterDates()) return;
 
@@ -725,6 +685,7 @@
     var deadline = document.getElementById('f-deadline').value;
     var dateFrom = document.getElementById('f-date-from').value;
     var dateTo   = document.getElementById('f-date-to').value;
+    var sortType = document.getElementById('f-sort').value;
 
     filteredRows = ALL_ROWS.filter(function(r) {
       if (kw && !r.name.toLowerCase().includes(kw) && !r.address.toLowerCase().includes(kw)) return false;
@@ -739,24 +700,30 @@
     });
 
     // Sort
-    if (sortDir === 'asc') {
-      filteredRows.sort(function(a,b){ return a.listedDate.localeCompare(b.listedDate); });
-    } else if (sortDir === 'desc') {
+    if (sortType === 'newest') {
       filteredRows.sort(function(a,b){ return b.listedDate.localeCompare(a.listedDate); });
+    } else if (sortType === 'reward') {
+      filteredRows.sort(function(a,b){
+        var pa = parseInt(a.price.replace(/[^\d]/g, '')) || 0;
+        var pb = parseInt(b.price.replace(/[^\d]/g, '')) || 0;
+        return pb - pa;
+      });
     }
 
     renderTable(filteredRows);
   }
 
   function resetFilters() {
-    ['f-keyword','f-pref','f-ward','f-madori','f-company','f-deadline','f-date-from','f-date-to'].forEach(function(id) {
+    ['f-keyword','f-pref','f-ward','f-madori','f-company','f-deadline','f-date-from','f-date-to','f-sort'].forEach(function(id) {
       var el = document.getElementById(id);
-      if (el) { el.value = ''; el.classList.remove('date-err'); }
+      if (el) {
+        if (id === 'f-sort') el.value = 'newest';
+        else el.value = '';
+        el.classList.remove('date-err');
+      }
     });
     document.getElementById('f-date-err').classList.remove('show');
-    filteredRows = ALL_ROWS.slice();
-    if (sortDir) { filteredRows.sort(function(a,b){ return sortDir==='asc'?a.listedDate.localeCompare(b.listedDate):b.listedDate.localeCompare(a.listedDate); }); }
-    renderTable(filteredRows);
+    applyFilters();
   }
 
   // Initial render

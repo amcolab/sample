@@ -142,7 +142,7 @@
     .COLS {
       display: grid; align-items: center; padding: 10px 16px;
       border-bottom: 1px solid #eee;
-      grid-template-columns: 60px 1fr 140px 120px 120px 100px;
+      grid-template-columns: 60px 1fr 140px 120px 120px 100px 100px;
     }
     .tbl-row:hover { background: #fafafa; }
     .room-row { background: #fff; border-bottom: 1px solid #f0f0f0; }
@@ -277,7 +277,7 @@
           <button class="tab active" onclick="switchTab('booking',this)">予約・確定 <span class="tab-badge warn">(18)</span></button>
           <button class="tab" onclick="switchTab('production',this)">制作・検品 <span class="tab-badge urgent">(42)</span></button>
           <button class="tab" onclick="switchTab('live',this)">承認済み <span class="tab-badge">(65)</span></button>
-          <button class="tab" onclick="switchTab('cancelled',this)">キャンセル <span class="tab-badge">(12)</span></button>
+          <button class="tab" onclick="switchTab('cancelled',this)">アーカイブ <span class="tab-badge">(12)</span></button>
         </div>
 
         <!-- ===== FILTER BAR ===== -->
@@ -374,10 +374,15 @@
             </div>
             <div style="display:flex; align-items:center; gap:4px; font-size:11px; color:#666;">
               表示件数:
-              <select style="width:auto; padding:2px 20px 2px 6px; font-size:11px; border:1px solid #000;">
+              <select style="width:auto; padding:2px 20px 2px 6px; font-size:11px; border:1px solid #000; margin-right:12px;">
                 <option>20件</option>
                 <option>50件</option>
                 <option>100件</option>
+              </select>
+              並び替え:
+              <select id="sortOrder" onchange="handleSortChange()" style="width:auto; padding:2px 20px 2px 6px; font-size:11px; border:1px solid #000;">
+                <option value="newest">新着順</option>
+                <option value="reward">報酬額が高い順</option>
               </select>
             </div>
           </div>
@@ -388,17 +393,16 @@
             <div>建物名 / Layout ID</div>
             <div>号室・間取り</div>
             <div>ステータス</div>
-            <div id="sort-date-col" onclick="toggleDateSort()" style="cursor:pointer; user-select:none; display:flex; align-items:center; gap:4px;">
+            <div style="cursor:default; display:flex; align-items:center; gap:4px;">
               受注/更新日
-              <span id="sort-date-icon" style="font-size:10px; color:#aaa;">↕</span>
             </div>
+            <div>報酬額</div>
             <div style="text-align:right;">アクション</div>
           </div>
 
-          <!-- ===== TAB: 予約・確定 ===== -->
           <div class="tab-section active" id="sect-booking">
             <!-- Building: スカイタワー A -->
-            <div class="border-b border-gray-300">
+            <div class="border-b border-gray-300" data-date="2023-11-01" data-reward="5000">
               <div class="tbl-row COLS bg-gray-50/80" style="padding:12px 16px;">
                 <div><div class="img-ph">IMAGE</div></div>
                 <div>
@@ -408,6 +412,7 @@
                 <div></div>
                 <div>スタンダード</div>
                 <div style="font-size:12px;">2023/11/01</div>
+                <div></div>
                 <div style="text-align:right;"><button class="btn-sm" onclick="location.href='CM08-1.html'">詳細</button></div>
               </div>
               <div class="bg-white">
@@ -417,6 +422,7 @@
                   <div>101, 102号室 / 1K</div>
                   <div><span class="s-badge s-waiting">撮影予約待ち</span><span class="dl-tag-soon ml-1">3日後</span></div>
                   <div style="font-size:11px;color:#999;">2023/10/25</div>
+                  <div>5,000円</div>
                   <div style="text-align:right;">
                     <button class="bg-black text-white text-[11px] font-bold px-3 py-1 hover:bg-gray-800 transition-colors"
                       onclick="openBookingModal('スカイタワー A', '101, 102号室')">予約する</button>
@@ -425,7 +431,7 @@
               </div>
             </div>
             <!-- Building: サンシャイン H -->
-            <div class="border-b border-gray-300">
+            <div class="border-b border-gray-300" data-date="2023-11-12" data-reward="6500">
               <div class="tbl-row COLS bg-green-50/10" style="padding:12px 16px;">
                 <div><div class="img-ph">IMAGE</div></div>
                 <div>
@@ -435,6 +441,7 @@
                 <div></div>
                 <div>プレミアム</div>
                 <div style="font-size:12px;">2023/11/12</div>
+                <div></div>
                 <div style="text-align:right;"><button class="btn-sm" onclick="location.href='CM08-2.html'">詳細</button></div>
               </div>
               <div class="bg-white">
@@ -444,6 +451,7 @@
                   <div>501, 502, 503号室 / 1LDK</div>
                   <div><span class="s-badge s-confirmed">撮影予約確定</span><span class="dl-tag-ok ml-1">明日 10:00</span></div>
                   <div style="font-size:11px;color:#999;">2023/11/13 (確定日)</div>
+                  <div>最大 6.500円</div>
                   <div style="text-align:right;">
                     <button class="bg-gray-100 text-black text-[11px] font-bold px-3 py-1 border border-black hover:bg-gray-200 transition-colors"
                       onclick="openRescheduleModal('サンシャイン H', '501, 502, 503号室')">変更する</button>
@@ -453,10 +461,9 @@
             </div>
           </div>
 
-          <!-- ===== TAB: 制作・検品 ===== -->
           <div class="tab-section" id="sect-production">
             <!-- Building: パークサイド B (mixed status) -->
-            <div class="border-b border-gray-300">
+            <div class="border-b border-gray-300" data-date="2023-10-28" data-reward="5000">
               <div class="tbl-row COLS bg-gray-50/80" style="padding:12px 16px;">
                 <div><div class="img-ph">IMAGE</div></div>
                 <div>
@@ -472,6 +479,7 @@
                 <div></div>
                 <div>プレミアム</div>
                 <div style="font-size:12px;">2023/10/28</div>
+                <div></div>
                 <div style="text-align:right;"><button class="btn-sm" onclick="location.href='CM08-3.html'">詳細</button></div>
               </div>
               <div class="bg-white">
@@ -481,6 +489,7 @@
                   <div>201, 202, 203号室 / 2LDK</div>
                   <div><span class="s-badge s-live">承認済み</span></div>
                   <div style="font-size:11px;color:#999;">2023/11/01</div>
+                  <div>5,000円</div>
                   <div></div>
                 </div>
                 <div class="room-row COLS">
@@ -489,6 +498,7 @@
                   <div>204, 205号室 / 2LDK</div>
                   <div><span class="s-badge s-rejected">差し戻し</span></div>
                   <div style="font-size:11px;color:#dc2626;">2023/11/10 (要再撮影)</div>
+                  <div>5,000円</div>
                   <div style="text-align:right;">
                     <button class="text-green-600 underline text-xs font-bold"
                       onclick="openUploadModal('パークサイド B', '204, 205号室', true)">動画アップロード</button>
@@ -500,6 +510,7 @@
                   <div>206号室 / 1LDK</div>
                   <div><span class="s-badge s-shooting">撮影対応中</span><span class="dl-tag-soon ml-1">残11h</span></div>
                   <div style="font-size:11px;color:#999;">未着手</div>
+                  <div>5,000円</div>
                   <div style="text-align:right;">
                     <button class="text-green-600 underline text-xs font-bold"
                       onclick="openUploadModal('パークサイド B', '206号室')">動画アップロード</button>
@@ -511,6 +522,7 @@
                   <div>207号室 / 1K</div>
                   <div><span class="s-badge s-shooting">撮影対応中</span><span class="dl-tag-over ml-1">超過 +2h</span></div>
                   <div style="font-size:11px;color:#dc2626;">2024/03/18 (期限超過)</div>
+                  <div>5,000円</div>
                   <div style="text-align:right;">
                     <button class="text-green-600 underline text-xs font-bold"
                       onclick="openUploadModal('パークサイド B', '207号室')">動画アップロード</button>
@@ -519,7 +531,7 @@
               </div>
             </div>
             <!-- Building: レジデンス C -->
-            <div class="border-b border-gray-300">
+            <div class="border-b border-gray-300" data-date="2023-10-20" data-reward="5000">
               <div class="tbl-row COLS bg-red-50/10" style="padding:12px 16px;">
                 <div><div class="img-ph">IMAGE</div></div>
                 <div>
@@ -533,6 +545,7 @@
                 <div></div>
                 <div>スタンダード</div>
                 <div style="font-size:12px;">2023/10/20</div>
+                <div></div>
                 <div style="text-align:right;"><button class="btn-sm" onclick="location.href='CM08.html'">詳細</button></div>
               </div>
               <div class="bg-white">
@@ -542,16 +555,16 @@
                   <div>301号室 / 3LDK</div>
                   <div><span class="s-badge s-review">承認待ち</span><span class="dl-tag-over ml-1">期限超過</span></div>
                   <div style="font-size:11px;color:#dc2626;">2023/10/24</div>
+                  <div>5,000円</div>
                   <div></div>
                 </div>
               </div>
             </div>
           </div>
 
-          <!-- ===== TAB: 承認済み ===== -->
           <div class="tab-section" id="sect-live">
             <!-- Building: メゾン E -->
-            <div class="border-b border-gray-300">
+            <div class="border-b border-gray-300" data-date="2023-10-10" data-reward="5000">
               <div class="tbl-row COLS bg-gray-50/80" style="padding:12px 16px;">
                 <div><div class="img-ph">IMAGE</div></div>
                 <div>
@@ -561,6 +574,7 @@
                 <div></div>
                 <div>VRプラン</div>
                 <div style="font-size:12px;">2023/10/10</div>
+                <div></div>
                 <div style="text-align:right;"><button class="btn-sm" onclick="location.href='CM08-5.html'">詳細</button></div>
               </div>
               <div class="bg-white">
@@ -570,6 +584,7 @@
                   <div>201, 202号室 / 2DK</div>
                   <div><span class="s-badge s-live">承認済み</span></div>
                   <div style="font-size:11px;color:#999;">2023/10/12</div>
+                  <div>5,000円</div>
                   <div></div>
                 </div>
                 <div class="room-row COLS" style="border-bottom:1px solid #f0f0f0;">
@@ -578,8 +593,9 @@
                   <div>301号室 / 1LDK</div>
                   <div><span class="s-badge s-live" style="background-color:#059669;color:white;border:none;">公開中</span></div>
                   <div style="font-size:11px;color:#999;">2023/11/22</div>
+                  <div>5,000円</div>
                   <div></div>
-                  <div style="grid-column:2 / 7; padding:8px 0 6px 0;">
+                  <div style="grid-column:2 / 8; padding:8px 0 6px 0;">
                     <div style="display:flex; flex-wrap:wrap; gap:0; border:1px solid #e5e7eb; width:fit-content; background:#fff;">
                       <div style="padding:5px 12px; border-right:1px solid #e5e7eb; text-align:center; min-width:66px;">
                         <div style="font-size:13px; font-weight:700;">1,284</div>
@@ -614,8 +630,9 @@
                   <div>401号室 / 2LDK</div>
                   <div><span class="s-badge s-live" style="background-color:#059669;color:white;border:none;">公開中</span></div>
                   <div style="font-size:11px;color:#999;">2023/11/15</div>
+                  <div>5,000円</div>
                   <div></div>
-                  <div style="grid-column:2 / 7; padding:8px 0 6px 0;">
+                  <div style="grid-column:2 / 8; padding:8px 0 6px 0;">
                     <div style="display:flex; flex-wrap:wrap; gap:0; border:1px solid #e5e7eb; width:fit-content; background:#fff;">
                       <div style="padding:5px 12px; border-right:1px solid #e5e7eb; text-align:center; min-width:66px;">
                         <div style="font-size:13px; font-weight:700;">978</div>
@@ -650,8 +667,9 @@
                   <div>402号室 / 1DK</div>
                   <div><span class="s-badge s-live" style="background-color:#059669;color:white;border:none;">公開中</span></div>
                   <div style="font-size:11px;color:#999;">2023/11/05</div>
+                  <div>5,000円</div>
                   <div></div>
-                  <div style="grid-column:2 / 7; padding:8px 0 6px 0;">
+                  <div style="grid-column:2 / 8; padding:8px 0 6px 0;">
                     <div style="display:flex; flex-wrap:wrap; gap:0; border:1px solid #e5e7eb; width:fit-content; background:#fff;">
                       <div style="padding:5px 12px; border-right:1px solid #e5e7eb; text-align:center; min-width:66px;">
                         <div style="font-size:13px; font-weight:700;">1,105</div>
@@ -685,10 +703,9 @@
             </div>
           </div>
 
-          <!-- ===== TAB: キャンセル ===== -->
           <div class="tab-section" id="sect-cancelled">
             <!-- Building: コーポ F -->
-            <div class="border-b border-gray-300">
+            <div class="border-b border-gray-300" data-date="2023-10-05" data-reward="5000">
               <div class="tbl-row COLS bg-gray-50/80" style="padding:12px 16px;">
                 <div><div class="img-ph">IMAGE</div></div>
                 <div>
@@ -698,6 +715,7 @@
                 <div></div>
                 <div>スタンダード</div>
                 <div style="font-size:12px;">2023/10/05</div>
+                <div></div>
                 <div style="text-align:right;"><button class="btn-sm" onclick="location.href='CM08-4.html'">詳細</button></div>
               </div>
               <div class="bg-white">
@@ -707,6 +725,7 @@
                   <div>105号室 / 1R</div>
                   <div><span class="s-badge s-cancelled">キャンセル</span></div>
                   <div style="font-size:11px;color:#999;">2023/10/06 (キャンセル日)</div>
+                  <div>5,000円</div>
                   <div></div>
                 </div>
               </div>
@@ -915,7 +934,7 @@
         <section>
           <div class="flex items-center gap-2 mb-4">
             <div class="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center text-xs font-bold">2</div>
-            <h3 class="font-bold">写真パネル (最大10枚)</h3>
+            <h3 class="font-bold">写真パネル (最大20枚)</h3>
           </div>
           <div class="space-y-3" id="photoList">
             <div class="photo-row grid grid-cols-[120px_1fr_140px_40px] items-start gap-4 p-4 border border-gray-200 bg-white shadow-sm">
@@ -1111,24 +1130,40 @@
     }
     function clearTag(f) { const el=document.getElementById(f); if(el) el.value=''; applyFilters(); }
 
-    // ===== Date sort =====
-    let dateSortOrder = null; // null | 'asc' | 'desc'
-    function toggleDateSort() {
-      dateSortOrder = dateSortOrder === 'asc' ? 'desc' : 'asc';
-      const icon = document.getElementById('sort-date-icon');
-      const col  = document.getElementById('sort-date-col');
-      if (icon) icon.textContent = dateSortOrder === 'asc' ? '↑' : '↓';
-      if (col)  col.style.color = '#000';
-      // Sort all visible .tbl-row groups within the active tab section
+    // ===== Sorting =====
+    function handleSortChange() {
+      const order = document.getElementById('sortOrder').value;
+      applySort(order);
+    }
+
+    function applySort(type) {
       const activeSection = document.querySelector('.tab-section.active');
       if (!activeSection) return;
       const groups = Array.from(activeSection.querySelectorAll('.border-b.border-gray-300'));
+      
       groups.sort((a, b) => {
-        const da = a.querySelector('[data-date]')?.dataset.date || '';
-        const db = b.querySelector('[data-date]')?.dataset.date || '';
-        return dateSortOrder === 'asc' ? da.localeCompare(db) : db.localeCompare(da);
+        if (type === 'newest') {
+          const da = a.dataset.date || '';
+          const db = b.dataset.date || '';
+          return db.localeCompare(da); // Newest first (desc)
+        } else if (type === 'reward') {
+          const ra = parseInt(a.dataset.reward) || 0;
+          const rb = parseInt(b.dataset.reward) || 0;
+          return rb - ra; // Highest reward first (desc)
+        }
+        return 0;
       });
+      
       groups.forEach(g => activeSection.appendChild(g));
+    }
+
+    /* Keep toggleDateSort for backward compatibility or remove if not needed */
+    function toggleDateSort() {
+      // Re-implemented to use the same logic
+      const current = document.getElementById('sortOrder').value;
+      const next = current === 'newest' ? 'reward' : 'newest';
+      document.getElementById('sortOrder').value = next;
+      handleSortChange();
     }
 
     // ===== Booking modal logic =====
