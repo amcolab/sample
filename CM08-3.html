@@ -145,7 +145,10 @@
             </div>
             <div>
               <div class="info-label">管理会社</div>
-              <div class="info-value">株式会社サンプル不動産</div>
+              <div style="display:flex; align-items:center; gap:8px;">
+                <div class="info-value">株式会社サンプル不動産</div>
+                <button class="btn-sm" onclick="openBusinessCardModal()" style="padding: 2px 8px; font-size: 10px;">電子名刺を送る</button>
+              </div>
             </div>
             <div>
               <div class="info-label">電話番号</div>
@@ -389,7 +392,45 @@
       </div>
     </div>
   </main>
+  </main>
+
+  <!-- 電子名刺 Modal -->
+  <div id="businessCardModal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center;">
+    <div style="background:#fff; border:1px solid #000; width:400px; padding:24px;">
+      <div style="font-size:16px; font-weight:700; margin-bottom:16px; border-bottom:1px solid #eee; padding-bottom:8px;">電子名刺を送る</div>
+      <div style="margin-bottom:16px;">
+        <label style="display:block; font-size:11px; color:#666; margin-bottom:4px;">送り先メールアドレス</label>
+        <input type="email" id="card-email" placeholder="example@sample.com" style="width:100%; border:1px solid #000; padding:8px; font-size:13px;" />
+      </div>
+      <div style="display:flex; justify-content:flex-end; gap:8px;">
+        <button class="btn" onclick="closeBusinessCardModal()">キャンセル</button>
+        <button class="btn-black" onclick="sendBusinessCard()">メールを送信する</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Success Toast -->
+  <div id="toast" style="display:none; position:fixed; bottom:24px; left:50%; transform:translateX(-50%); background:#10b981; color:#fff; padding:12px 24px; font-weight:700; z-index:1100; box-shadow:0 4px 12px rgba(0,0,0,0.1);">
+    電子名刺を送信しました
+  </div>
+
 <script>
+  function openBusinessCardModal() {
+    document.getElementById('businessCardModal').style.display = 'flex';
+    document.getElementById('card-email').value = '';
+  }
+  function closeBusinessCardModal() {
+    document.getElementById('businessCardModal').style.display = 'none';
+  }
+  function sendBusinessCard() {
+    var email = document.getElementById('card-email').value;
+    if (!email) { alert('メールアドレスを入力してください'); return; }
+    
+    closeBusinessCardModal();
+    var toast = document.getElementById('toast');
+    toast.style.display = 'block';
+    setTimeout(function() { toast.style.display = 'none'; }, 3000);
+  }
   function toggleBell() {
     var m = document.getElementById('bellMenu');
     m.style.display = m.style.display === 'none' ? 'block' : 'none';
