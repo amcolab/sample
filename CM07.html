@@ -275,7 +275,7 @@
         <!-- Tabs -->
         <div style="display:flex;">
           <button class="tab active" onclick="switchTab('booking',this)">予約・確定 <span class="tab-badge warn">(18)</span></button>
-          <button class="tab" onclick="switchTab('production',this)">制作・検品 <span class="tab-badge urgent">(41)</span></button>
+          <button class="tab" onclick="switchTab('production',this)">制作・検品 <span class="tab-badge urgent">(42)</span></button>
           <button class="tab" onclick="switchTab('live',this)">承認済み <span class="tab-badge">(65)</span></button>
           <button class="tab" onclick="switchTab('cancelled',this)">キャンセル <span class="tab-badge">(12)</span></button>
         </div>
@@ -498,11 +498,22 @@
                   <div></div>
                   <div class="font-bold pl-4 text-emerald-600">L-2031</div>
                   <div>206号室 / 1LDK</div>
-                  <div><span class="s-badge s-shooting">撮影対応中</span></div>
+                  <div><span class="s-badge s-shooting">撮影対応中</span><span class="dl-tag-soon ml-1">残11h</span></div>
                   <div style="font-size:11px;color:#999;">未着手</div>
                   <div style="text-align:right;">
                     <button class="text-green-600 underline text-xs font-bold"
                       onclick="openUploadModal('パークサイド B', '206号室')">動画アップロード</button>
+                  </div>
+                </div>
+                <div class="room-row COLS">
+                  <div></div>
+                  <div class="font-bold pl-4 text-emerald-600">L-2041</div>
+                  <div>207号室 / 1K</div>
+                  <div><span class="s-badge s-shooting">撮影対応中</span><span class="dl-tag-over ml-1">超過 +2h</span></div>
+                  <div style="font-size:11px;color:#dc2626;">2024/03/18 (期限超過)</div>
+                  <div style="text-align:right;">
+                    <button class="text-green-600 underline text-xs font-bold"
+                      onclick="openUploadModal('パークサイド B', '207号室')">動画アップロード</button>
                   </div>
                 </div>
               </div>
