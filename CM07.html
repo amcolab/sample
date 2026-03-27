@@ -111,6 +111,7 @@
     /* Deadline tags */
     .dl-tag-over { display:inline-block; background:#fef2f2; border:1px solid #dc2626; color:#dc2626; font-size:10px; padding:1px 5px; }
     .dl-tag-soon { display:inline-block; background:#fffbeb; border:1px solid #d97706; color:#d97706; font-size:10px; padding:1px 5px; }
+    .dl-tag-safe { display:inline-block; background:#eff6ff; border:1px solid #2563eb; color:#2563eb; font-size:10px; padding:1px 5px; }
     .dl-tag-ok   { display:inline-block; border:1px solid #ccc; color:#888; font-size:10px; padding:1px 5px; }
 
     /* Inputs */
@@ -420,8 +421,8 @@
                   <div></div>
                   <div class="font-bold pl-4 text-emerald-600">L-4001</div>
                   <div>101, 102号室 / 1K</div>
-                  <div><span class="s-badge s-waiting">撮影予約待ち</span><span class="dl-tag-soon ml-1">3日後</span></div>
-                  <div style="font-size:11px;color:#999;">2023/10/25</div>
+                  <div><span class="s-badge s-waiting">撮影予約待ち</span><span class="dl-tag-safe ml-1">残22h</span></div>
+                  <div style="font-size:11px;color:#e0481a;">2023/10/25</div>
                   <div>5,000円</div>
                   <div style="text-align:right;">
                     <button class="bg-black text-white text-[11px] font-bold px-3 py-1 hover:bg-gray-800 transition-colors"
@@ -449,12 +450,12 @@
                   <div></div>
                   <div class="font-bold pl-4 text-emerald-600">L-5011</div>
                   <div>501, 502, 503号室 / 1LDK</div>
-                  <div><span class="s-badge s-confirmed">撮影予約確定</span><span class="dl-tag-ok ml-1">明日 10:00</span></div>
-                  <div style="font-size:11px;color:#999;">2023/11/13 (確定日)</div>
+                  <div><span class="s-badge s-waiting">撮影予約待ち</span><span class="dl-tag-soon ml-1">残24h</span></div>
+                  <div style="font-size:11px;color:#999;">2023/11/13</div>
                   <div>最大 6.500円</div>
                   <div style="text-align:right;">
-                    <button class="bg-gray-100 text-black text-[11px] font-bold px-3 py-1 border border-black hover:bg-gray-200 transition-colors"
-                      onclick="openRescheduleModal('サンシャイン H', '501, 502, 503号室')">変更する</button>
+                    <button class="bg-black text-white text-[11px] font-bold px-3 py-1 hover:bg-gray-800 transition-colors"
+                      onclick="openBookingModal('サンシャイン H', '501, 502, 503号室')">予約する</button>
                   </div>
                 </div>
               </div>
