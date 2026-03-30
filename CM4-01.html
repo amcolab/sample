@@ -146,6 +146,10 @@
                 <input type="text" placeholder="検索..." style="border:1px solid #000; padding:6px 12px; width:200px; font-size:12px; background:#fff;">
             </div>
             <div style="display:flex; gap:20px; align-items:center;">
+                <!-- 電子名刺提出 -->
+                <button onclick="openMeishiPopup()" style="border:1px solid #000; padding:4px 12px; font-size:12px; font-weight:700; background:#1a202c; color:#fff; cursor:pointer; display:flex; align-items:center; gap:6px; font-family:inherit;">
+                  🪪 電子名刺提出
+                </button>
                 <!-- Bell -->
                 <div id="bellWrap" style="position:relative; display:inline-block;">
                     <div onclick="toggleBell()" style="position:relative; cursor:pointer; font-size:18px;">🔔
@@ -301,6 +305,23 @@ document.addEventListener('click', function(e) {
     if (userWrap && !userWrap.contains(e.target))
         document.getElementById('userMenuDrop').style.display = 'none';
 });
+
+/* ===== 電子名刺 POPUP ===== */
+function openMeishiPopup() {
+    document.getElementById('meishiPopupOverlay').classList.add('open');
+}
+function closeMeishiPopup() {
+    document.getElementById('meishiPopupOverlay').classList.remove('open');
+    document.getElementById('copySuccessMsg').style.display = 'none';
+}
+function copyMeishiUrl() {
+    var dummyUrl = "https://moom.com/meishi/sato_kenta_0123";
+    navigator.clipboard.writeText(dummyUrl).then(function() {
+        var msg = document.getElementById('copySuccessMsg');
+        msg.style.display = 'block';
+        setTimeout(function() { msg.style.display = 'none'; }, 2000);
+    });
+}
 
 /* ===== SETTINGS DRAWER ===== */
 function openSettings() {
@@ -609,6 +630,30 @@ function closeEvPopup() {
         <div id="evPopupBody"></div>
     </div>
 </div>
+
+<!-- 電子名刺 Popup -->
+<div id="meishiPopupOverlay" onclick="if(event.target===this) closeMeishiPopup()" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.5); z-index: 1000; align-items: center; justify-content: center;">
+    <div style="background:#fff; border:1px solid #000; width:440px; max-width:92vw; position:relative; box-shadow:0 4px 24px rgba(0,0,0,0.15);">
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:16px 20px; border-bottom:1px solid #000;">
+            <div style="font-size:16px; font-weight:700;">電子名刺</div>
+            <button onclick="closeMeishiPopup()" style="border:1px solid #000; padding:4px 12px; background:#fff; cursor:pointer; font-size:14px; font-family:inherit; line-height:1;">✕</button>
+        </div>
+        <div style="padding:24px; text-align:center;">
+            <!-- 名刺画像プレースホルダー -->
+            <div style="border:1px solid #eee; padding:10px; margin-bottom:20px; background:#fafafa;">
+                <img src="https://via.placeholder.com/600x340.png?text=Business+Card+Image" alt="電子名刺画像" style="width:100%; height:auto; display:block; border:1px solid #ccc;">
+            </div>
+            
+            <button onclick="copyMeishiUrl()" style="background:#000; color:#fff; border:1px solid #000; padding:12px 32px; font-size:14px; font-weight:700; cursor:pointer; display:inline-flex; align-items:center; gap:8px;">
+                <span>🔗</span> 名刺URLをコピーして共有
+            </button>
+            <div id="copySuccessMsg" style="display:none; font-size:12px; color:#16a34a; margin-top:12px; font-weight:700;">✔ URLをクリップボードにコピーしました</div>
+        </div>
+    </div>
+</div>
+<style>
+#meishiPopupOverlay.open { display: flex !important; }
+</style>
 
 </body>
 </html>
