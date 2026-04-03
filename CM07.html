@@ -432,7 +432,9 @@
                   <div class="col-booking-deadline"><span class="text-xs text-orange-600 font-bold">残り48h</span></div>
                   <div style="font-size:11px;color:#e0481a;">2023/10/25</div>
                   <div>5,000円</div>
-                  <div style="text-align:right;">
+                  <div style="text-align:right; display:flex; gap:6px; justify-content:flex-end;">
+                    <button class="text-red-600 border border-red-600 text-[11px] font-bold px-3 py-1 hover:bg-red-50 transition-colors"
+                      onclick="openRejectModal('スカイタワー A', '101号室')">辞退する</button>
                     <button class="bg-black text-white text-[11px] font-bold px-3 py-1 hover:bg-gray-800 transition-colors"
                       onclick="openBookingModal('スカイタワー A', '101号室')">予約する</button>
                   </div>
@@ -445,7 +447,10 @@
                   <div class="col-booking-deadline text-xs text-gray-400">-</div>
                   <div style="font-size:11px;color:#999;">2023/10/25</div>
                   <div>5,000円</div>
-                  <div style="text-align:right;"></div>
+                  <div style="text-align:right;">
+                    <button class="bg-black text-white text-[11px] font-bold px-3 py-1 hover:bg-gray-800 transition-colors"
+                      onclick="openRescheduleModal('スカイタワー A', '102号室')">日程変更</button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -473,7 +478,10 @@
                   <div class="col-booking-deadline text-xs text-gray-400">-</div>
                   <div style="font-size:11px;color:#999;">2023/11/13</div>
                   <div>最大 6.500円</div>
-                  <div style="text-align:right;"></div>
+                  <div style="text-align:right;">
+                    <button class="bg-black text-white text-[11px] font-bold px-3 py-1 hover:bg-gray-800 transition-colors"
+                      onclick="openRescheduleModal('サンシャイン H', '501, 502, 503号室')">日程変更</button>
+                  </div>
                 </div>
               </div>
             </div>
@@ -927,6 +935,25 @@
     </div>
   </div>
 
+  <!-- ===== REJECT MODAL ===== -->
+  <div class="modal-bg" id="rejectModal">
+    <div class="modal" style="width:420px; text-align:center; padding:32px;">
+      <div class="w-16 h-16 bg-red-50 text-red-500 rounded-full flex items-center justify-center mb-6 mx-auto">
+        <i class="fas fa-times-circle text-2xl"></i>
+      </div>
+      <div style="margin-bottom:12px; text-sm text-gray-600;">
+        <div style="font-size:11px; font-weight:600; margin-bottom:4px; color:#999; text-transform:uppercase;">案件辞退確認</div>
+        <div style="font-weight:600;"><span id="rejectBuilding"></span> / <span id="rejectRoom" style="color:#2563eb;"></span></div>
+      </div>
+      <h3 class="text-lg font-bold mb-2">この案件を辞退しますか？</h3>
+      <p class="text-xs text-gray-500 mb-8">辞退する場合、他のカメラマンへ案件が譲渡されます。<br>「はい」を選ぶと、この案件は表示されなくなります。</p>
+      <div class="flex gap-3">
+        <button class="flex-1 btn py-3" onclick="closeModal('rejectModal')">いいえ、戻る</button>
+        <button class="flex-1 btn-black py-3" onclick="confirmReject()">はい、辞退する</button>
+      </div>
+    </div>
+  </div>
+
   <!-- ===== UPLOAD MODAL ===== -->
   <div class="modal-bg" id="uploadModal">
     <div class="modal" style="width:700px; max-width:95vw; max-height:90vh; overflow-y:auto; padding:0;">
@@ -1258,6 +1285,17 @@
       selectedCandidates = []; isRescheduling = true;
       initCalendar(); updateCandidateList(); resetViews();
       openModal('bookingModal');
+    }
+
+    function openRejectModal(building, room) {
+      document.getElementById('rejectBuilding').textContent = building;
+      document.getElementById('rejectRoom').textContent = room;
+      openModal('rejectModal');
+    }
+
+    function confirmReject() {
+      closeModal('rejectModal');
+      showToast('success', '案件を辞退しました。他のカメラマンへ譲渡されます。');
     }
 
     function initCalendar() {
