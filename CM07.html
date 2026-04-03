@@ -145,6 +145,11 @@
       border-bottom: 1px solid #eee;
       grid-template-columns: 60px 1fr 140px 120px 120px 100px 100px;
     }
+    body.is-booking .COLS {
+      grid-template-columns: 60px 1fr 140px 110px 80px 120px 100px 100px;
+    }
+    .col-booking-deadline { display:none; }
+    body.is-booking .col-booking-deadline { display:block; }
     .tbl-row:hover { background: #fafafa; }
     .room-row { background: #fff; border-bottom: 1px solid #f0f0f0; }
     .room-row:hover { background: #f9f9f9; }
@@ -283,7 +288,7 @@
 
         <!-- ===== FILTER BAR ===== -->
         <div class="wf" style="background:#fff; padding:16px;">
-          <div style="display:grid; grid-template-columns:repeat(5, 1fr); gap:12px; margin-bottom:12px;">
+          <div id="filterGridTop" style="display:grid; grid-template-columns:repeat(5, 1fr); gap:12px; margin-bottom:12px;">
             <div>
               <div style="font-size:11px; font-weight:600; margin-bottom:4px; color:#555;">キーワード検索</div>
               <input type="text" id="q" placeholder="建物名、住所" oninput="applyFilters()" />
@@ -318,8 +323,8 @@
                 <option>3LDK</option>
               </select>
             </div>
-            <div>
-              <div style="font-size:11px; font-weight:600; margin-bottom:4px; color:#555;">ステータス</div>
+            <div id="filter-status-col">
+              <div id="status-label" style="font-size:11px; font-weight:600; margin-bottom:4px; color:#555;">ステータス</div>
               <select id="status" onchange="applyFilters()">
                 <option value="">すべて</option>
                 <option>予約確定</option>
@@ -393,7 +398,8 @@
             <div>画像</div>
             <div>建物名 / Layout ID</div>
             <div>号室・間取り</div>
-            <div>ステータス</div>
+            <div id="col-status">ステータス</div>
+            <div class="col-booking-deadline">予約期限</div>
             <div style="cursor:default; display:flex; align-items:center; gap:4px;">
               受注/更新日
             </div>
@@ -410,24 +416,36 @@
                   <a href="AD04.html" class="text-blue-600 hover:underline font-bold text-sm">スカイタワー A</a>
                   <div style="font-size:11px;color:#666;">東京都渋谷区代々木1-2-3</div>
                 </div>
-                <div></div>
-                <div>スタンダード</div>
+                <div class="text-xs font-bold text-gray-700">スタンダード</div>
+                <div><span class="s-badge text-red-600 bg-red-50 border-red-200">未予約</span></div>
+                <div class="col-booking-deadline"><span class="text-xs text-orange-600 font-bold">残り48h</span></div>
                 <div style="font-size:12px;">2023/11/01</div>
                 <div></div>
                 <div style="text-align:right;"><button class="btn-sm" onclick="location.href='CM08-1.html'">詳細</button></div>
               </div>
               <div class="bg-white">
-                <div class="room-row COLS">
+                <div class="room-row COLS border-b border-gray-50">
                   <div></div>
                   <div class="font-bold pl-4 text-emerald-600">L-4001</div>
-                  <div>101, 102号室 / 1K</div>
-                  <div><span class="s-badge s-waiting">撮影予約待ち</span><span class="dl-tag-safe ml-1">残22h</span></div>
+                  <div>101号室 / 1K</div>
+                  <div><span class="s-badge text-red-600 bg-red-50 border-red-200">未予約</span></div>
+                  <div class="col-booking-deadline"><span class="text-xs text-orange-600 font-bold">残り48h</span></div>
                   <div style="font-size:11px;color:#e0481a;">2023/10/25</div>
                   <div>5,000円</div>
                   <div style="text-align:right;">
                     <button class="bg-black text-white text-[11px] font-bold px-3 py-1 hover:bg-gray-800 transition-colors"
-                      onclick="openBookingModal('スカイタワー A', '101, 102号室')">予約する</button>
+                      onclick="openBookingModal('スカイタワー A', '101号室')">予約する</button>
                   </div>
+                </div>
+                <div class="room-row COLS">
+                  <div></div>
+                  <div class="font-bold pl-4 text-emerald-600">L-4002</div>
+                  <div>102号室 / 1K</div>
+                  <div><span class="s-badge text-blue-700 bg-blue-50 border-blue-200">予約確定待ち</span></div>
+                  <div class="col-booking-deadline text-xs text-gray-400">-</div>
+                  <div style="font-size:11px;color:#999;">2023/10/25</div>
+                  <div>5,000円</div>
+                  <div style="text-align:right;"></div>
                 </div>
               </div>
             </div>
@@ -439,8 +457,9 @@
                   <a href="AD04.html" class="text-blue-600 hover:underline font-bold text-sm">サンシャイン H</a>
                   <div style="font-size:11px;color:#666;">東京都渋谷区広尾2-1-5</div>
                 </div>
-                <div></div>
-                <div>プレミアム</div>
+                <div class="text-xs font-bold text-gray-700">プレミアム</div>
+                <div><span class="s-badge text-blue-700 bg-blue-50 border-blue-200">予約確定待ち</span></div>
+                <div class="col-booking-deadline text-xs text-gray-400">-</div>
                 <div style="font-size:12px;">2023/11/12</div>
                 <div></div>
                 <div style="text-align:right;"><button class="btn-sm" onclick="location.href='CM08-2.html'">詳細</button></div>
@@ -450,13 +469,11 @@
                   <div></div>
                   <div class="font-bold pl-4 text-emerald-600">L-5011</div>
                   <div>501, 502, 503号室 / 1LDK</div>
-                  <div><span class="s-badge s-waiting">撮影予約待ち</span><span class="dl-tag-soon ml-1">残24h</span></div>
+                  <div><span class="s-badge text-blue-700 bg-blue-50 border-blue-200">予約確定待ち</span></div>
+                  <div class="col-booking-deadline text-xs text-gray-400">-</div>
                   <div style="font-size:11px;color:#999;">2023/11/13</div>
                   <div>最大 6.500円</div>
-                  <div style="text-align:right;">
-                    <button class="bg-black text-white text-[11px] font-bold px-3 py-1 hover:bg-gray-800 transition-colors"
-                      onclick="openBookingModal('サンシャイン H', '501, 502, 503号室')">予約する</button>
-                  </div>
+                  <div style="text-align:right;"></div>
                 </div>
               </div>
             </div>
@@ -999,7 +1016,6 @@
   </div>
 
   <script>
-    // ===== Tab switch =====
     const TAB_MAP = { booking:'sect-booking', production:'sect-production', live:'sect-live', cancelled:'sect-cancelled' };
     function switchTab(key, btn) {
       document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
@@ -1008,6 +1024,43 @@
       document.getElementById(TAB_MAP[key]).classList.add('active');
       const counts = { booking:'18', production:'41', live:'65', cancelled:'12' };
       document.getElementById('totalCount').textContent = '全 ' + counts[key] + ' 件';
+      
+      // Toggle body class for layout adjustments
+      if (key === 'booking') document.body.classList.add('is-booking');
+      else document.body.classList.remove('is-booking');
+
+      // Update status search dropdown
+      updateStatusDropdown(key);
+    }
+
+    function updateStatusDropdown(key) {
+      const select = document.getElementById('status');
+      const label = document.getElementById('status-label');
+      const options = {
+        booking: ['未予約', '予約確定待ち'],
+        production: ['撮影対応中', '承認待ち', '差し戻し', '承認済み'],
+        live: ['公開中', '承認済み'],
+        cancelled: ['キャンセル']
+      }[key] || [];
+
+      if (label) {
+        label.textContent = key === 'booking' ? '予約ステータス' : 'ステータス';
+      }
+
+      const currentVal = select.value;
+      select.innerHTML = '<option value="">すべて</option>';
+      options.forEach(opt => {
+        const o = document.createElement('option');
+        o.value = opt;
+        o.textContent = opt;
+        select.appendChild(o);
+      });
+      // Try to restore previous value if it exists in new options
+      if (options.includes(currentVal)) {
+        select.value = currentVal;
+      } else {
+        select.value = ""; // Reset if not applicable
+      }
     }
 
     // ===== Header dropdowns =====
@@ -1108,7 +1161,7 @@
       updateTags();
     }
     function resetFilters() {
-      ['q','madori','pref','city','shoot_from','shoot_to','update_from','update_to'].forEach(id => {
+      ['q','madori','pref','city','status','shoot_from','shoot_to','update_from','update_to'].forEach(id => {
         const el = document.getElementById(id);
         if (el) { el.value = ''; el.classList.remove('date-err'); }
       });
@@ -1116,12 +1169,25 @@
       updateTags();
     }
     function updateTags() {
-      const fields = ['madori','pref'];
+      const fields = ['madori','pref','status'];
       let any = false;
       fields.forEach(f => {
         const val = document.getElementById(f)?.value;
-        const tag = document.getElementById('tag-'+f);
-        const tv  = document.getElementById('tag-'+f+'-v');
+        let tag = document.getElementById('tag-'+f);
+        let tv  = document.getElementById('tag-'+f+'-v');
+        
+        // Create tag if it doesn't exist (for status)
+        if (!tag && val) {
+          const container = document.getElementById('filterTags');
+          const clearAllBtn = container.querySelector('button[onclick="resetFilters()"]');
+          tag = document.createElement('span');
+          tag.id = 'tag-' + f;
+          tag.className = 'f-tag';
+          tag.innerHTML = `${f === 'status' ? 'ステータス' : f}: <span id="tag-${f}-v">${val}</span><button onclick="clearTag('${f}')">×</button>`;
+          container.insertBefore(tag, clearAllBtn);
+          tv = tag.querySelector(`#tag-${f}-v`);
+        }
+
         if (tag) {
           if (val) { tag.style.display='inline-flex'; if(tv) tv.textContent=val; any=true; }
           else { tag.style.display='none'; }
@@ -1395,6 +1461,13 @@
     // Close modal on backdrop click
     window.onclick = function(e) {
       if (e.target.classList.contains('modal-bg')) e.target.classList.remove('open');
+    };
+
+    // Initialize
+    window.onload = function() {
+      // Toggle is-booking for initial tab (booking)
+      document.body.classList.add('is-booking');
+      updateStatusDropdown('booking');
     };
   </script>
 </body>
