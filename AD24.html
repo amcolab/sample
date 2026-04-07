@@ -3,7 +3,7 @@
 <head>
 <meta charset="utf-8"/>
 <meta content="width=device-width, initial-scale=1.0" name="viewport"/>
-<title>設定 - MooM 内覧パートナー</title>
+<title>設定 - MooM カメラマン</title>
 <script src="https://cdn.tailwindcss.com?plugins=forms,container-queries"></script>
 <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+JP:wght@400;500;700&display=swap" rel="stylesheet"/>
 <script>
@@ -101,7 +101,7 @@
         <div id="bellDrop" style="display:none; position:absolute; right:0; top:calc(100% + 8px); background:#fff; border:1px solid #000; z-index:300; width:300px; box-shadow:0 2px 8px rgba(0,0,0,0.08);">
           <div style="padding:10px 14px; border-bottom:1px solid #000; font-weight:700; font-size:12px; background:#f9f9f9;">お知らせ <span style="color:#f44336;">(2)</span></div>
           <a href="#" style="display:block; padding:10px 14px; border-bottom:1px solid #eee; text-decoration:none; color:#000;">
-            <div style="font-size:12px; font-weight:600;">内覧マニュアルが更新されました</div>
+            <div style="font-size:12px; font-weight:600;">撮影マニュアルが更新されました</div>
             <div style="font-size:11px; color:#888; margin-top:2px;">2023/11/10 · MooM運営</div>
           </a>
           <a href="#" style="display:block; padding:10px 14px; border-bottom:1px solid #eee; text-decoration:none; color:#000;">
@@ -136,7 +136,7 @@
           <span class="px-2 py-0.5 bg-wb text-white text-xs font-bold">RANK A</span>
           <span class="px-2 py-0.5 border border-wb text-xs font-bold bg-wbox">本人確認済み</span>
         </div>
-        <div class="text-xs text-gray-500">パートナーID: P-00456 · 登録日: 2024/01/15 · 内覧パートナー · 東京都・神奈川県</div>
+        <div class="text-xs text-gray-500">パートナーID: P-00456 · 登録日: 2024/01/15 · カメラマン · 東京都・神奈川県</div>
       </div>
     </div>
 
@@ -163,7 +163,7 @@
           <button class="wbtn text-xs mb-4">画像を変更</button>
           <div class="w-full text-center mb-3">
             <div class="font-bold text-lg">佐藤 健太</div>
-            <div class="text-xs text-gray-500">内覧パートナー</div>
+            <div class="text-xs text-gray-500">カメラマン</div>
           </div>
           <div class="w-full space-y-2">
             <div class="flex justify-between text-xs font-bold">
@@ -326,76 +326,96 @@
           </div>
         </div>
 
-        <!-- ── 業務・経験情報 ── -->
+        <!-- ── 対応エリア ── -->
         <div class="wcard">
-          <div class="flex justify-between items-center mb-5">
-            <h3 class="sec-title mb-0 border-0 pb-0">業務・経験情報</h3>
-          </div>
-          <div class="grid grid-cols-2 gap-4">
-            <!-- 不動産業界経験 -->
-            <div class="col-span-2">
-              <label class="lbl">不動産業界経験 <span class="text-red-500">*</span></label>
-              <select class="ifield appearance-none bg-white">
-                <option value="">選択してください</option>
-                <option>1年未満</option>
-                <option>1〜3年</option>
-                <option>3〜5年</option>
-                <option selected>5〜10年</option>
-                <option>10年以上</option>
-                <option>未経験</option>
-              </select>
-            </div>
-            <!-- 宅建 -->
-            <div class="col-span-2">
-              <label class="lbl">宅地建物取引士資格 <span class="text-red-500">*</span></label>
-              <div class="flex gap-6 mt-1.5">
-                <label class="flex items-center gap-1.5 text-sm cursor-pointer"><input type="radio" name="takken" checked class="accent-black" /> あり</label>
-                <label class="flex items-center gap-1.5 text-sm cursor-pointer"><input type="radio" name="takken" class="accent-black" /> なし</label>
-              </div>
-            </div>
-            <!-- 内覧対応実績 -->
-            <div class="col-span-2">
-              <label class="lbl">過去の内覧対応実績 <span class="text-red-500">*</span></label>
-              <textarea class="ifield h-24" placeholder="これまでの内覧対応や接客の経験を簡潔に入力してください">年間100件以上の内見対応実績あり。高級マンションから一般物件まで幅広く対応。丁寧な説明と迅速な対応が強みです。</textarea>
-            </div>
-          </div>
-
-          <!-- 対応エリア -->
-          <div class="mt-5 pt-4 border-t border-gray-100">
+          <div>
             <p class="text-xs font-bold text-gray-500 mb-3 uppercase tracking-wider">対応エリア</p>
-            <div class="grid grid-cols-2 gap-4">
-              <div class="col-span-2">
-                <label class="lbl">対応可能エリア <span class="text-red-500">*</span> <span class="text-gray-400 font-normal">（複数選択可）</span></label>
-                <p class="text-[10px] text-gray-400 mb-2">内覧対応できる都道府県を選択してください</p>
-                <div class="flex flex-wrap gap-2">
-                  <label class="area-chip"><input type="checkbox" checked class="hidden peer" /><span class="peer-checked:bg-black peer-checked:text-white border border-black px-3 py-1 text-xs cursor-pointer block">東京都</span></label>
-                  <label class="area-chip"><input type="checkbox" checked class="hidden peer" /><span class="peer-checked:bg-black peer-checked:text-white border border-black px-3 py-1 text-xs cursor-pointer block">神奈川県</span></label>
-                  <label class="area-chip"><input type="checkbox" class="hidden peer" /><span class="peer-checked:bg-black peer-checked:text-white border border-black px-3 py-1 text-xs cursor-pointer block">埼玉県</span></label>
-                  <label class="area-chip"><input type="checkbox" class="hidden peer" /><span class="peer-checked:bg-black peer-checked:text-white border border-black px-3 py-1 text-xs cursor-pointer block">千葉県</span></label>
-                  <label class="area-chip"><input type="checkbox" class="hidden peer" /><span class="peer-checked:bg-black peer-checked:text-white border border-black px-3 py-1 text-xs cursor-pointer block">大阪府</span></label>
-                  <label class="area-chip"><input type="checkbox" class="hidden peer" /><span class="peer-checked:bg-black peer-checked:text-white border border-black px-3 py-1 text-xs cursor-pointer block">愛知県</span></label>
-                  <label class="area-chip"><input type="checkbox" class="hidden peer" /><span class="peer-checked:bg-black peer-checked:text-white border border-black px-3 py-1 text-xs cursor-pointer block">福岡県</span></label>
-                  <label class="area-chip"><input type="checkbox" class="hidden peer" /><span class="peer-checked:bg-black peer-checked:text-white border border-black px-3 py-1 text-xs cursor-pointer block">その他</span></label>
+            <div class="grid grid-cols-1 gap-4">
+              <div class="col-span-1">
+                <label class="lbl">対応可能エリア <span class="text-red-500">*</span></label>
+                <p class="text-[10px] text-gray-400 mb-2">撮影対応できる都道府県と市区町村を追加してください</p>
+                
+                <!-- Add Area Controls -->
+                <div class="flex gap-2 mb-6">
+                  <select class="ifield" style="max-width:200px;">
+                    <option value="">都道府県を選択</option>
+                    <option>東京都</option>
+                    <option>神奈川県</option>
+                    <option>埼玉県</option>
+                    <option>千葉県</option>
+                    <option>大阪府</option>
+                    <option>愛知県</option>
+                    <option>福岡県</option>
+                  </select>
+                  <button class="wbtn-d whitespace-nowrap text-xs">+ 都道府県を追加</button>
+                </div>
+
+                <!-- Dynamic Area List -->
+                <div class="space-y-4">
+                  <!-- Tokyo Block -->
+                  <div class="border border-black bg-white">
+                    <div class="flex justify-between items-center p-3 bg-wbox border-b border-black">
+                       <span class="text-xs font-bold">東京都</span>
+                       <button class="text-xs hover:text-red-600">✕ 削除</button>
+                    </div>
+                    <div class="p-3">
+                      <div class="flex flex-wrap gap-2 mb-3">
+                        <div class="flex items-center gap-1 border border-black px-2 py-0.5 text-[10px] bg-white">
+                          <span>渋谷区</span><button class="ml-1 text-gray-400 hover:text-black">✕</button>
+                        </div>
+                        <div class="flex items-center gap-1 border border-black px-2 py-0.5 text-[10px] bg-white">
+                          <span>港区</span><button class="ml-1 text-gray-400 hover:text-black">✕</button>
+                        </div>
+                        <div class="flex items-center gap-1 border border-black px-2 py-0.5 text-[10px] bg-white">
+                          <span>新宿区</span><button class="ml-1 text-gray-400 hover:text-black">✕</button>
+                        </div>
+                      </div>
+                      <button class="wbtn-sm text-[10px]">+ 市区町村を追加</button>
+                    </div>
+                  </div>
+
+                  <!-- Kanagawa Block -->
+                  <div class="border border-black bg-white">
+                    <div class="flex justify-between items-center p-3 bg-wbox border-b border-black">
+                       <span class="text-xs font-bold">神奈川県</span>
+                       <button class="text-xs hover:text-red-600">✕ 削除</button>
+                    </div>
+                    <div class="p-3">
+                      <div class="flex flex-wrap gap-2 mb-3">
+                        <div class="flex items-center gap-1 border border-black px-2 py-0.5 text-[10px] bg-white">
+                          <span>横浜市中区</span><button class="ml-1 text-gray-400 hover:text-black">✕</button>
+                        </div>
+                        <div class="flex items-center gap-1 border border-black px-2 py-0.5 text-[10px] bg-white">
+                          <span>横浜市西区</span><button class="ml-1 text-gray-400 hover:text-black">✕</button>
+                        </div>
+                      </div>
+                      <button class="wbtn-sm text-[10px]">+ 市区町村を追加</button>
+                    </div>
+                  </div>
+
                 </div>
               </div>
-              <div>
-                <label class="lbl">1日の最大対応件数 <span class="text-red-500">*</span></label>
-                <select class="ifield appearance-none bg-white">
-                  <option value="">選択してください</option>
-                  <option>1件</option>
-                  <option>2件</option>
-                  <option selected>3件</option>
-                  <option>4件以上</option>
-                </select>
-              </div>
-              <div>
-                <label class="lbl">週あたりの稼働可能日数 <span class="text-red-500">*</span></label>
-                <select class="ifield appearance-none bg-white">
-                  <option value="">選択してください</option>
-                  <option>1〜2日</option>
-                  <option selected>3〜4日</option>
-                  <option>5日以上</option>
-                </select>
+              
+              <div class="grid grid-cols-2 gap-4">
+                <div>
+                  <label class="lbl">1日の最大対応件数 <span class="text-red-500">*</span></label>
+                  <select class="ifield appearance-none bg-white">
+                    <option value="">選択してください</option>
+                    <option>1件</option>
+                    <option>2件</option>
+                    <option selected>3件</option>
+                    <option>4件以上</option>
+                  </select>
+                </div>
+                <div>
+                  <label class="lbl">週あたりの稼働可能日数 <span class="text-red-500">*</span></label>
+                  <select class="ifield appearance-none bg-white">
+                    <option value="">選択してください</option>
+                    <option>1〜2日</option>
+                    <option selected>3〜4日</option>
+                    <option>5日以上</option>
+                  </select>
+                </div>
               </div>
             </div>
           </div>
@@ -407,8 +427,10 @@
             <h3 class="sec-title mb-0 border-0 pb-0">自己紹介</h3>
           </div>
           <div>
-            <label class="lbl">自己PR・対応の強み <span class="text-gray-400 font-normal">任意</span></label>
-            <textarea class="ifield h-32 mt-1" placeholder="内見時の対応の強みや、ユーザーへの一言など自由に記入してください">不動産業界10年の経験を活かし、お客様のご要望に合わせた丁寧な内見対応が得意です。初めての方も安心してご相談いただけるよう、分かりやすいご説明を心がけています。</textarea>
+            <label class="lbl">自己紹介（実績・機材など） <span class="text-gray-400 font-normal">任意</span></label>
+            <textarea class="ifield h-32 mt-1" placeholder="カメラマンとしての実績や使用機材、得意な撮影スタイルなどを記入してください">プロフィールをご覧いただきありがとうございます。建築写真・不動産撮影をメインに活動しております。Matterportやドローン撮影にも対応可能です。
+使用機材：Sony α7R IV, Matterport Pro2, DJI Air 3。
+丁寧な構図作りと、明るく清潔感のあるレタッチを心がけています。</textarea>
           </div>
           <div class="mt-4 flex justify-end">
             <button class="wbtn-d px-6" onclick="toast('保存しました')">保存する</button>
@@ -731,7 +753,7 @@
   </div><!-- /p-8 -->
 
   <footer class="mt-auto border-t border-wb bg-wbox p-3 text-center">
-    <p class="text-[10px] font-bold">AD24 設定 · MooM 内覧パートナー</p>
+    <p class="text-[10px] font-bold">AD24 設定 · MooM カメラマン</p>
   </footer>
 
 </main>
