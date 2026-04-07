@@ -95,6 +95,27 @@
     .urgent-banner { display:flex; align-items:center; gap:10px; padding:10px 16px; background:#fef2f2; border:1px solid #dc2626; font-size:12px; color:#991b1b; }
     .urgent-banner .banner-icon { font-size:16px; flex-shrink:0; }
     .urgent-banner strong { color:#dc2626; font-weight:400; }
+
+    /* Map Search Overlay */
+    #mapOverlay { display:none; position:fixed; inset:0; background:#fff; z-index:1000; flex-direction:column; }
+    #mapOverlay.open { display:flex; font-family: 'Noto Sans JP', sans-serif; }
+    .map-header { height:52px; border-bottom:1px solid #000; display:flex; align-items:center; justify-content:space-between; padding:0 20px; background:#fff; flex-shrink:0; }
+    .map-container { flex:1; background:#f0f0f0; position:relative; overflow:hidden; }
+    .map-placeholder { width:100%; height:100%; background-image: radial-gradient(#ccc 1px, transparent 1px); background-size: 24px 24px; position:relative; }
+    .map-filter-card { position:absolute; top:20px; left:20px; width:280px; background:#fff; border:1px solid #000; padding:16px; box-shadow:4px 4px 0 rgba(0,0,0,0.1); z-index:100; }
+    .map-marker { position:absolute; width:40px; height:40px; background:#fff; border:2px solid #000; display:flex; align-items:center; justify-content:center; cursor:pointer; font-weight:700; font-size:11px; transform:translate(-50%, -100%); transition: all 0.2s; }
+    .map-marker::after { content:''; position:absolute; bottom:-10px; left:50%; transform:translateX(-50%); border-left:6px solid transparent; border-right:6px solid transparent; border-top:8px solid #000; }
+    .map-marker:hover { background:#000; color:#fff; z-index:200; transform:translate(-50%, -105%) scale(1.1); }
+    .map-marker.urgent { border-color:#dc2626; color:#dc2626; }
+    .map-marker.urgent:hover { background:#dc2626; color:#fff; }
+    
+    .marker-label { position:absolute; bottom:-24px; left:50%; transform:translateX(-50%); background:rgba(255,255,255,0.9); border:1px solid #000; padding:2px 6px; font-size:10px; white-space:nowrap; pointer-events:none; }
+
+    /* Map Detail Modal (iframe) */
+    .map-detail-modal { display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:2000; align-items:center; justify-content:center; }
+    .map-detail-modal.open { display:flex; }
+    .map-detail-content { background:#fff; border:1px solid #000; width:90%; height:90%; position:relative; display:flex; flex-direction:column; }
+    .map-detail-close { position:absolute; top:-40px; right:0; color:#fff; font-size:30px; cursor:pointer; background:none; border:none; }
   </style>
 </head>
 <body>
@@ -248,6 +269,7 @@
           </div>
           <div style="display:flex; gap:6px; justify-content:flex-end;">
             <button class="btn" onclick="resetFilters()">リセット</button>
+            <button class="btn" onclick="openMapSearch()" style="display:flex; align-items:center; gap:6px;"><i class="fas fa-map-marked-alt text-[#555]"></i> マップで検索</button>
             <button class="btn-black" onclick="applyFilters()">検索</button>
           </div>
         </div>
@@ -441,6 +463,73 @@
   </div>
 </div>
 
+<!-- ========== MAP SEARCH OVERLAY ========== -->
+<div id="mapOverlay">
+  <div class="map-header">
+    <div style="display:flex; align-items:center; gap:12px;">
+      <div style="font-size:15px; font-weight:700;">MooM Map</div>
+      <div style="font-size:11px; color:#888;">物件マップ検索 / 掲載中</div>
+    </div>
+    <div style="display:flex; gap:12px;">
+      <button class="btn" onclick="closeMapSearch()" style="font-weight:700;">リスト表示に戻る</button>
+    </div>
+  </div>
+  <div class="map-container">
+    <div class="map-placeholder" id="mapMain">
+      <!-- Dummy Markers (Randomly placed for demo) -->
+      <div class="map-marker urgent" style="top:40%; left:45%;" onclick="openDetailModal('AD04.html')">
+        ¥5K
+        <div class="marker-label">サンシャイン・レジデンス A</div>
+      </div>
+      <div class="map-marker" style="top:55%; left:60%;" onclick="openDetailModal('AD04.html')">
+        ¥8K
+        <div class="marker-label">パークヒルズ C</div>
+      </div>
+      <div class="map-marker" style="top:35%; left:30%;" onclick="openDetailModal('AD04.html')">
+        ¥5K
+        <div class="marker-label">代官山レジデンス B</div>
+      </div>
+      <div class="map-marker urgent" style="top:65%; left:35%;" onclick="openDetailModal('AD04.html')">
+        ¥5K
+        <div class="marker-label">恵比寿グリーンコート</div>
+      </div>
+    </div>
+
+    <!-- Map Filter Card -->
+    <div class="map-filter-card">
+      <div style="font-size:12px; font-weight:700; margin-bottom:12px; display:flex; align-items:center; gap:6px;">
+        <i class="fas fa-filter"></i> エリア絞り込み
+      </div>
+      <div style="margin-bottom:10px;">
+        <div style="font-size:11px; font-weight:600; margin-bottom:4px; color:#555;">都道府県</div>
+        <select id="m-pref" onchange="applyMapFilters()">
+          <option value="">すべて</option>
+          <option>東京都</option>
+          <option>神奈川県</option>
+          <option>大阪府</option>
+        </select>
+      </div>
+      <div style="margin-bottom:12px;">
+        <div style="font-size:11px; font-weight:600; margin-bottom:4px; color:#555;">市区町村</div>
+        <select id="m-ward" onchange="applyMapFilters()">
+          <option value="">すべて</option>
+          <option>渋谷区</option>
+          <option>港区</option>
+          <option>目黒区</option>
+          <option>新宿区</option>
+          <option>世田谷区</option>
+          <option>横浜市</option>
+        </select>
+      </div>
+      <div style="font-size:10px; color:#888; margin-bottom:12px; line-height:1.5;">
+        ※マップ上のエリアを変更すると、検索結果が自動的に更新されます。
+      </div>
+      <button class="btn-black" style="width:100%; border-radius:4px !important;" onclick="applyMapFilters()">反映する</button>
+    </div>
+  </div>
+</div>
+
+
 <script>
   // ─── Data ─────────────────────────────────────────────
   var ALL_ROWS = [
@@ -604,7 +693,7 @@
       html += '<div class="COLS tbl-row ' + rowClass + '">' +
         '<div><div style="width:52px;height:40px;background:#e5e7eb;border:1px solid #ccc;display:flex;align-items:center;justify-content:center;font-size:9px;color:#888;">IMAGE</div></div>' +
         '<div>' +
-          '<a href="AD04.html" style="font-weight:700;color:#2563eb;text-decoration:none;">' + r.name + '</a>' +
+          '<a href="javascript:void(0)" onclick="openDetailModal(\'AD04.html\')" style="font-weight:700;color:#2563eb;text-decoration:none;">' + r.name + '</a>' +
           '<div style="font-size:11px;color:#666;">' + r.address + '</div>' +
           '<div style="font-size:11px;color:#888;margin-top:2px;"><i class="fas fa-map-marker-alt" style="margin-right:4px;"></i>' + r.distance + 'km</div>' +
           viewersHtml +
@@ -615,7 +704,7 @@
         '<div style="font-weight:700; color:#059669;">' + r.price + '</div>' +
         '<div>' + deadlineHtml + '</div>' +
         '<div style="text-align:right;">' +
-          '<button class="' + btnClass + ' btn-accent" onclick="openRegulationModal(\'' + r.name.replace(/'/g, "\\'") + '\',\'' + r.plan + '\',\'' + r.price + '\')">' + btnLabel + '</button>' +
+          '<button class="' + btnClass + ' btn-accent" onclick="openDetailModal(\'AD04.html\')">' + btnLabel + '</button>' +
         '</div>' +
       '</div>';
     });
@@ -867,6 +956,54 @@
       
     document.getElementById('successModal').classList.add('open');
   }
+
+  // --- Map Search Features ---
+  function openMapSearch() {
+    document.getElementById('mapOverlay').classList.add('open');
+    // Sync filters to map
+    document.getElementById('m-pref').value = document.getElementById('f-pref').value;
+    document.getElementById('m-ward').value = document.getElementById('f-ward').value;
+  }
+  function closeMapSearch() {
+    document.getElementById('mapOverlay').classList.remove('open');
+    // Sync filters back to list
+    document.getElementById('f-pref').value = document.getElementById('m-pref').value;
+    document.getElementById('f-ward').value = document.getElementById('m-ward').value;
+    applyFilters();
+  }
+  function applyMapFilters() {
+    // In a real app, this would filter markers. For demo, we just sync back and apply main filters.
+    document.getElementById('f-pref').value = document.getElementById('m-pref').value;
+    document.getElementById('f-ward').value = document.getElementById('m-ward').value;
+    // Just a visual feedback
+    const mainMap = document.getElementById('mapMain');
+    mainMap.style.opacity = '0.5';
+    setTimeout(() => {
+      mainMap.style.opacity = '1';
+    }, 300);
+  }
+
+  function openDetailModal(url) {
+    const modal = document.getElementById('mapDetailModal');
+    const iframe = document.getElementById('mapDetailIframe');
+    iframe.src = url + (url.includes('?') ? '&' : '?') + 'embed=true';
+    modal.classList.add('open');
+  }
+
+  function closeDetailModal() {
+    const modal = document.getElementById('mapDetailModal');
+    const iframe = document.getElementById('mapDetailIframe');
+    iframe.src = 'about:blank';
+    modal.classList.remove('open');
+  }
 </script>
+
+<!-- ========== DETAIL MODAL (IFRAME) ========== -->
+<div class="map-detail-modal" id="mapDetailModal">
+  <div class="map-detail-content">
+    <button class="map-detail-close" onclick="closeDetailModal()">×</button>
+    <iframe id="mapDetailIframe" src="about:blank" style="width:100%; height:100%; border:none;"></iframe>
+  </div>
+</div>
 </body>
 </html>

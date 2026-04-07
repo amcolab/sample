@@ -22,13 +22,18 @@
     .detail-value { padding: 8px 16px; font-size: 13px; flex: 1; }
     .section-head { background:#f2f2f2; padding:10px 14px; border-bottom:1px solid #000; font-size:13px; font-weight:700; }
     .badge-live { background:#d1fae5; color:#065f46; border:1px solid #6ee7b7; font-size:11px; padding:2px 8px; font-weight:700; display:inline-block; }
+    .badge-urgent { display: inline-block; background: #fef2f2; border: 1px solid #dc2626; color: #dc2626; font-size: 10px; padding: 1px 6px; font-weight: 400; }
+    .badge-normal { display: inline-block; background: #f3f4f6; border: 1px solid #6b7280; color: #6b7280; font-size: 10px; padding: 1px 6px; }
+    .countdown-urgent { color: #dc2626; font-size: 12px; font-weight: 400; font-variant-numeric: tabular-nums; }
+    .countdown-warning { color: #d97706; font-size: 12px; font-weight: 400; font-variant-numeric: tabular-nums; }
+    .viewers-badge { display:inline-flex; align-items:center; gap:3px; font-size:10px; color:#b45309; background:#fffbeb; border:1px solid #fcd34d; padding:1px 6px; font-weight:400; margin-top:4px; }
   </style>
 </head>
 <body>
 <div style="display:flex; min-height:100vh;">
 
   <!-- SIDEBAR -->
-  <aside style="width:200px; min-width:200px; border-right:1px solid #000; display:flex; flex-direction:column; min-height:100vh; background:#fff;">
+  <aside id="sidebar" style="width:200px; min-width:200px; border-right:1px solid #000; display:flex; flex-direction:column; min-height:100vh; background:#fff;">
       <a href="CM0-01.html" style="padding:16px; border-bottom:1px solid #000; text-decoration:none; color:inherit; display:block;">
           <div style="font-size:15px; font-weight:700;">MooM</div>
           <div style="font-size:10px; color:#888; margin-top:2px;">カメラマンポータル</div>
@@ -50,7 +55,7 @@
   <main style="flex:1; display:flex; flex-direction:column; min-width:0; overflow-y:auto;">
 
     <!-- Header -->
-    <header style="height:52px; border-bottom:1px solid #000; display:flex; align-items:center; justify-content:space-between; padding:0 20px; background:#fff; flex-shrink:0; position:sticky; top:0; z-index:100;">
+    <header id="mainHeader" style="height:52px; border-bottom:1px solid #000; display:flex; align-items:center; justify-content:space-between; padding:0 20px; background:#fff; flex-shrink:0; position:sticky; top:0; z-index:100;">
       <div style="flex: 1; display: flex; align-items: center;">
         <input type="text" placeholder="検索..." style="border: 1px solid #000; padding: 6px 12px; width: 200px; font-size: 12px; background: #fff;" />
       </div>
@@ -100,6 +105,43 @@
 
         <!-- Left -->
         <div style="display:flex; flex-direction:column; gap:24px;">
+
+          <!-- 撮影募集内容 -->
+          <section class="wf" style="background:#fff; overflow:hidden;">
+            <div class="section-head">撮影募集内容</div>
+            <div style="background:#fff;">
+              <div style="display:flex; border-bottom:1px solid #e5e7eb;">
+                <div class="detail-label">掲載日</div>
+                <div class="detail-value">2023/10/15</div>
+              </div>
+              <div style="display:flex; border-bottom:1px solid #e5e7eb;">
+                <div class="detail-label">報酬額</div>
+                <div class="detail-value" style="color:#059669; font-weight:700; font-size:15px;">¥5,000</div>
+              </div>
+              <div style="display:flex; border-bottom:1px solid #e5e7eb;">
+                <div class="detail-label">撮影期限</div>
+                <div class="detail-value">
+                  <span class="badge-urgent">至急: 2日</span>
+                  <div style="margin-top:4px; display:flex; align-items:center; gap:3px;">
+                    <span style="font-size:10px; color:#999;">残り</span>
+                    <span class="countdown-urgent" id="cd-detail">01日 23:59:59</span>
+                  </div>
+                </div>
+              </div>
+              <div style="display:flex; border-bottom:1px solid #e5e7eb;">
+                <div class="detail-label">登録地点からの距離</div>
+                <div class="detail-value">
+                  <i class="fas fa-map-marker-alt" style="margin-right:4px; color:#666;"></i>1.2km
+                </div>
+              </div>
+              <div style="display:flex;">
+                <div class="detail-label">確認中の人数</div>
+                <div class="detail-value">
+                  <div class="viewers-badge">👀 現在 4人が確認中</div>
+                </div>
+              </div>
+            </div>
+          </section>
 
           <!-- 物件概要 -->
           <section class="wf" style="background:#fff; overflow:hidden;">
@@ -285,6 +327,18 @@
 </div>
 
 <script>
+  // Embed check
+  const urlParams = new URLSearchParams(window.location.search);
+  if(urlParams.get('embed') === 'true'){
+    if(document.getElementById('sidebar')) document.getElementById('sidebar').style.display='none';
+    if(document.getElementById('mainHeader')) document.getElementById('mainHeader').style.display='none';
+    // Adjust main padding
+    const mainCont = document.querySelector('main > div');
+    if(mainCont) {
+      mainCont.style.padding = '16px';
+    }
+  }
+
   function toggleBell(){
     const d=document.getElementById('bellDrop');
     const u=document.getElementById('userMenuDrop');
@@ -313,6 +367,24 @@
   function hideRoomDetail(){
     document.getElementById('roomDetailModal').style.display='none';
   }
+
+  // Countdown for detail page
+  let detailSecs = 2 * 24 * 3600 - 1;
+  setInterval(function() {
+    if (detailSecs > 0) {
+      detailSecs--;
+      const d = Math.floor(detailSecs / 86400);
+      const h = Math.floor((detailSecs % 86400) / 3600);
+      const m = Math.floor((detailSecs % 3600) / 60);
+      const s = detailSecs % 60;
+      const fmt = (d > 0 ? d + '日 ' : '') + 
+                  String(h).padStart(2,'0') + ':' + 
+                  String(m).padStart(2,'0') + ':' + 
+                  String(s).padStart(2,'0');
+      const el = document.getElementById('cd-detail');
+      if (el) el.textContent = fmt;
+    }
+  }, 1000);
 </script>
 </body>
 </html>
