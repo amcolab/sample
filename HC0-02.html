@@ -69,14 +69,27 @@
           </div>
         </header>
 
-        <div class="p-8 max-w-3xl mx-auto w-full space-y-8">
+        <div class="p-8 max-w-4xl mx-auto w-full space-y-8">
             <nav class="text-[10px] text-gray-500">
-                <a href="HC0-01.html" class="hover:underline">ヘルプセンター</a> &gt; おお問い合わせ
+                <a href="HC0-01.html" class="hover:underline">ヘルプセンター</a> &gt; お問い合わせ
             </nav>
 
             <h2 class="text-2xl font-bold uppercase tracking-tight">Contact Support</h2>
 
-            <div class="wireframe-box p-8 space-y-8">
+            <!-- TABS -->
+            <div style="display:flex; border-bottom:2px solid #000; gap:0; margin-bottom:24px;">
+                <button id="tab-contact" onclick="switchTab('contact')" 
+                    style="flex:1; padding:12px 24px; font-weight:700; font-size:13px; cursor:pointer; background:#000; color:#fff; border:none; text-align:left;">
+                    📧 新規お問い合わせ
+                </button>
+                <button id="tab-tickets" onclick="switchTab('tickets')" 
+                    style="flex:1; padding:12px 24px; font-weight:700; font-size:13px; cursor:pointer; background:#fff; color:#333; border:none; text-align:left;">
+                    📋 サポートチケット <span id="ticket-count-badge" style="background:#dc2626; color:#fff; font-size:10px; padding:1px 6px; margin-left:4px; border-radius:3px; display:none;">5</span>
+                </button>
+            </div>
+
+            <!-- TAB 1: Contact Support Form -->
+            <div id="panel-contact" class="wireframe-box p-8 space-y-8">
                 <p class="text-xs text-gray-600 leading-relaxed border-b border-gray-100 pb-6">
                     カメラマン向けのサポート窓口です。撮影中のトラブル、データのアップロード、報酬の支払いに関するお問い合わせはこちらからお願いします。
                 </p>
@@ -119,17 +132,343 @@
 
                     <div class="pt-6 border-t border-black flex justify-center gap-4">
                         <button type="button" onclick="location.href='HC0-01.html'" class="wireframe-btn">キャンセル</button>
-                        <button type="submit" class="wireframe-btn-dark uppercase">Send Support Request</button>
+                        <button type="submit" onclick="submitContact(event)" class="wireframe-btn-dark uppercase">Send Support Request</button>
                     </div>
                 </form>
             </div>
+
+            <!-- TAB 2: Support Tickets -->
+            <div id="panel-tickets" style="display:none;">
+                <!-- Filters -->
+                <div class="wireframe-box p-6 mb-6">
+                    <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:12px; align-items:end;">
+                        <div style="grid-column:span 2;">
+                            <label class="wireframe-label">キーワード検索</label>
+                            <input type="text" id="ticket-search" placeholder="チケットID・内容で検索..." 
+                                style="width:100%; border:1px solid #000; padding:6px; font-size:12px; outline:none;">
+                        </div>
+                        <div>
+                            <label class="wireframe-label">ステータス</label>
+                            <select id="ticket-status-filter" style="width:100%; border:1px solid #000; padding:6px; font-size:12px; background:#fff; outline:none;">
+                                <option value="">すべて</option>
+                                <option value="pending">チェック待ち</option>
+                                <option value="processing">対応中</option>
+                                <option value="completed">完了</option>
+                            </select>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Tickets List -->
+                <div id="tickets-list" style="space-y:4; display:flex; flex-direction:column; gap:12px;">
+                    <!-- Tickets will be inserted here by JavaScript -->
+                </div>
+            </div>
             
             <div class="text-center">
-                <p class="text-[10px] text-gray-400 font-mono tracking-tighter uppercase">Support Portal v1.0 / Privacy Policy</p>
+                <p class="text-[10px] text-gray-400 font-mono tracking-tighter uppercase">Support Portal v2.0 / Privacy Policy</p>
+            </div>
+        </div>
+
+        <!-- Ticket Detail Modal -->
+        <div id="ticket-modal" style="display:none; position:fixed; inset:0; background:rgba(0,0,0,0.5); z-index:1000; align-items:center; justify-content:center; padding:20px;" onclick="closeTicketModal(event)">
+            <div style="background:#fff; border:1px solid #000; width:540px; max-height:85vh; overflow-y:auto; display:flex; flex-direction:column;" onclick="event.stopPropagation()">
+                <!-- Modal Header -->
+                <div style="padding:16px 20px; border-bottom:1px solid #000; display:flex; justify-content:space-between; align-items:center; background:#f5f5f5; flex-shrink:0;">
+                    <div>
+                        <div style="font-weight:700; font-size:11px; color:#888; text-transform:uppercase;">チケット ID</div>
+                        <div id="modal-ticket-id" style="font-weight:700; font-size:14px;"></div>
+                    </div>
+                    <button onclick="closeTicketModal()" style="background:none; border:none; font-size:20px; cursor:pointer; color:#666; line-height:1;">&times;</button>
+                </div>
+
+                <!-- Ticket Metadata -->
+                <div style="padding:12px 20px; border-bottom:1px solid #eee; background:#fafafa; display:grid; grid-template-columns:1fr 1fr; gap:12px; font-size:12px; flex-shrink:0;">
+                    <div>
+                        <span style="color:#888; font-size:10px; font-weight:700; display:block;">受信日時</span>
+                        <span id="modal-date"></span>
+                    </div>
+                    <div>
+                        <span style="color:#888; font-size:10px; font-weight:700; display:block;">ステータス</span>
+                        <span id="modal-status" style="font-weight:700;"></span>
+                    </div>
+                    <div style="grid-column:span 2;">
+                        <span style="color:#888; font-size:10px; font-weight:700; display:block;">カテゴリー</span>
+                        <span id="modal-category"></span>
+                    </div>
+                </div>
+
+                <!-- Subject -->
+                <div style="padding:16px 20px; border-bottom:1px solid #eee; flex-shrink:0;">
+                    <div style="font-size:10px; font-weight:700; color:#888; margin-bottom:4px;">件名</div>
+                    <div id="modal-subject" style="font-size:13px; font-weight:700;"></div>
+                </div>
+
+                <!-- Original Content -->
+                <div style="padding:16px 20px; border-bottom:1px solid #eee; background:#fff; flex-shrink:0;">
+                    <div style="font-size:10px; font-weight:700; color:#888; margin-bottom:6px;">ご質問内容</div>
+                    <div id="modal-content" style="font-size:12px; line-height:1.6; color:#333; white-space:pre-wrap;"></div>
+                </div>
+
+                <!-- Conversation Thread - SCROLLABLE -->
+                <div id="modal-thread" style="padding:16px 20px; flex:1; overflow-y:auto; background:#fafafa; display:flex; flex-direction:column; gap:12px;">
+                    <!-- Messages will be inserted here -->
+                </div>
+
+                <!-- Reply Input -->
+                <div style="padding:16px 20px; border-top:1px solid #eee; background:#fff; flex-shrink:0;">
+                    <div style="font-size:10px; font-weight:700; color:#888; margin-bottom:6px;">返信を入力</div>
+                    <textarea id="modal-reply-text" placeholder="返信を入力..." 
+                        style="width:100%; border:1px solid #000; padding:8px; font-size:12px; font-family:inherit; outline:none; resize:none; min-height:60px; margin-bottom:8px;"></textarea>
+                    <div style="display:flex; gap:8px; justify-content:flex-end;">
+                        <button onclick="closeTicketModal()" class="wireframe-btn" style="padding:6px 16px; font-size:11px;">キャンセル</button>
+                        <button onclick="sendTicketReply()" class="wireframe-btn-dark" style="padding:6px 16px; font-size:11px;">返信を送信</button>
+                    </div>
+                </div>
             </div>
         </div>
     </main>
 </div>
 
-</body>
-</html>
+
+<script>
+// Mock data - tickets storage
+let ticketsData = [
+    {
+        id: "CONTACT-2026-001",
+        date: "2026/03/14 10:22",
+        category: "upload",
+        categoryLabel: "データのアップロード",
+        subject: "撮影データのアップロードが中断される",
+        content: "昨日から撮影データをアップロードしようとしているのですが、70%付近で毎回中断されてしまいます。ファイルサイズは約850MBなのですが、何か対応方法はあるでしょうか。よろしくお願いいたします。",
+        status: "processing",
+        statusLabel: "対応中",
+        replies: [
+            {
+                sender: "admin",
+                senderLabel: "Admin",
+                time: "2026/03/14 11:00",
+                text: "本当にご迷惑をおかけしております。確認させていただきました。お客様の環境でアップロード制限の問題が見られるようです。以下の対応をお試しください:\n\n1. ブラウザのキャッシュをクリア\n2. WiFi/LAN接続を確認\n3. ファイルを複数に分割してアップロード\n\n対応状況を教えていただけますか。"
+            },
+            {
+                sender: "partner",
+                senderLabel: "あなた",
+                time: "2026/03/14 13:45",
+                text: "ご対応ありがとうございます！\n提案いただいた方法で試しましたらアップロードが完了しました！\nお手数おかけしました。"
+            },
+            {
+                sender: "admin",
+                senderLabel: "Admin",
+                time: "2026/03/14 14:30",
+                text: "解決してよかったです！ご不便ご迷惑をおかけしました。このようなお問題がございましたら、いつでもお気軽にお問い合わせください。"
+            }
+        ]
+    },
+    {
+        id: "CONTACT-2026-002",
+        date: "2026/03/13 16:45",
+        category: "reward",
+        categoryLabel: "報酬・振込口座",
+        subject: "報酬の振込先変更について",
+        content: "先日引っ越しをしたため、報酬の振込先銀行支店・口座番号を変更したいのですが、手続きの方法を教えていただけますか。",
+        status: "completed",
+        statusLabel: "完了",
+        replies: [
+            {
+                sender: "admin",
+                senderLabel: "Admin",
+                time: "2026/03/13 17:30",
+                text: "ご連絡ありがとうございます。振込先の変更についてですが、管理画面の「設定」メニューから直接変更することができます。手順は以下の通りです:\n\n1. 設定 → 振込先情報\n2. 「編集」ボタンをクリック\n3. 新しい銀行情報を入力\n4. 保存\n\n詳細はヘルプセンターのこちらを参照ください。"
+            },
+            {
+                sender: "partner",
+                senderLabel: "あなた",
+                time: "2026/03/13 18:00",
+                text: "ありがとうございます！確認できました。無事に変更完了です。"
+            }
+        ]
+    },
+    {
+        id: "CONTACT-2026-003",
+        date: "2026/03/12 09:10",
+        category: "system",
+        categoryLabel: "システム操作・不具合",
+        subject: "物件検索機能について",
+        content: "物件検索機能で検索してもなぜか結果が反映されません。キーワードを入力して検索しても「0件」と表示されるばかりです。",
+        status: "pending",
+        statusLabel: "チェック待ち",
+        replies: []
+    }
+];
+
+// Tab switching
+function switchTab(tabName) {
+    const contactPanel = document.getElementById('panel-contact');
+    const ticketsPanel = document.getElementById('panel-tickets');
+    const contactBtn = document.getElementById('tab-contact');
+    const ticketsBtn = document.getElementById('tab-tickets');
+
+    if (tabName === 'contact') {
+        contactPanel.style.display = 'block';
+        ticketsPanel.style.display = 'none';
+        contactBtn.style.background = '#000';
+        contactBtn.style.color = '#fff';
+        ticketsBtn.style.background = '#fff';
+        ticketsBtn.style.color = '#333';
+    } else {
+        contactPanel.style.display = 'none';
+        ticketsPanel.style.display = 'block';
+        contactBtn.style.background = '#fff';
+        contactBtn.style.color = '#333';
+        ticketsBtn.style.background = '#000';
+        ticketsBtn.style.color = '#fff';
+        renderTicketsList();
+    }
+}
+
+// Render tickets list
+function renderTicketsList() {
+    const listContainer = document.getElementById('tickets-list');
+    const searchTerm = document.getElementById('ticket-search').value.toLowerCase();
+    const statusFilter = document.getElementById('ticket-status-filter').value;
+
+    const filtered = ticketsData.filter(t => {
+        const matchesSearch = t.id.toLowerCase().includes(searchTerm) || t.subject.toLowerCase().includes(searchTerm) || t.content.toLowerCase().includes(searchTerm);
+        const matchesStatus = !statusFilter || t.status === statusFilter;
+        return matchesSearch && matchesStatus;
+    });
+
+    listContainer.innerHTML = filtered.map(ticket => {
+        const statusColors = {
+            pending: { bg: '#fff3e0', border: '#fb8c00', label: '⏳' },
+            processing: { bg: '#e3f2fd', border: '#0288d1', label: '🔄' },
+            completed: { bg: '#e8f5e9', border: '#43a047', label: '✅' }
+        };
+        const colors = statusColors[ticket.status];
+        const lastReply = ticket.replies.length > 0 ? ticket.replies[ticket.replies.length - 1] : null;
+        const lastReplyPreview = lastReply ? lastReply.text.substring(0, 60) + '...' : 'まだ返信がありません';
+
+        return `
+            <div style="border:1px solid #000; background:${colors.bg}; padding:16px; cursor:pointer; hover:box-shadow: 0 2px 4px rgba(0,0,0,0.1);" onclick="openTicketModal('${ticket.id}')">
+                <div style="display:flex; justify-content:space-between; align-items:start; margin-bottom:8px;">
+                    <div>
+                        <div style="font-weight:700; font-size:12px; color:#333;">🎫 ${ticket.id}</div>
+                        <div style="font-size:11px; color:#666; margin-top:2px;">${ticket.date}</div>
+                    </div>
+                    <div style="text-align:right;">
+                        <span style="display:inline-block; background:${colors.border}; color:#fff; padding:2px 8px; font-size:10px; font-weight:700; border-radius:2px;">${colors.label} ${ticket.statusLabel}</span>
+                    </div>
+                </div>
+                <div style="margin:8px 0;">
+                    <div style="font-weight:700; font-size:12px; color:#000;">${ticket.subject}</div>
+                    <div style="font-size:10px; color:#888; margin-top:4px; background:#f0f0f0; padding:6px; border-radius:2px;">${ticket.categoryLabel}</div>
+                </div>
+                <div style="margin-top:8px; padding-top:8px; border-top:1px dashed #999;">
+                    <div style="font-size:11px; color:#666;">💬 ${lastReplyPreview}</div>
+                </div>
+                <div style="margin-top:8px; text-align:right;">
+                    <span style="color:#0288d1; font-size:11px; font-weight:700; cursor:pointer;">[詳細を見る →]</span>
+                </div>
+            </div>
+        `;
+    }).join('');
+}
+
+// Open ticket detail modal
+function openTicketModal(ticketId) {
+    const ticket = ticketsData.find(t => t.id === ticketId);
+    if (!ticket) return;
+
+    document.getElementById('modal-ticket-id').textContent = ticket.id;
+    document.getElementById('modal-date').textContent = ticket.date;
+    document.getElementById('modal-status').innerHTML = `<span style="display:inline-block; background:${ticket.status === 'pending' ? '#fb8c00' : ticket.status === 'processing' ? '#0288d1' : '#43a047'}; color:#fff; padding:2px 6px; font-size:10px; border-radius:2px;">${ticket.statusLabel}</span>`;
+    document.getElementById('modal-category').textContent = ticket.categoryLabel;
+    document.getElementById('modal-subject').textContent = ticket.subject;
+    document.getElementById('modal-content').textContent = ticket.content;
+
+    // Render replies thread
+    const threadContainer = document.getElementById('modal-thread');
+    threadContainer.innerHTML = ticket.replies.map(reply => {
+        const isAdmin = reply.sender === 'admin';
+        const bgColor = isAdmin ? '#e3f2fd' : '#fff3e0';
+        const alignment = isAdmin ? 'flex-end' : 'flex-start';
+        const textAlign = isAdmin ? 'right' : 'left';
+
+        return `
+            <div style="display:flex; justify-content:${alignment}; margin-bottom:8px;">
+                <div style="background:${bgColor}; border:1px solid #ccc; padding:10px 12px; border-radius:4px; max-width:85%; text-align:${textAlign};">
+                    <div style="font-weight:700; font-size:11px; color:#666; margin-bottom:4px;">${reply.senderLabel} • ${reply.time}</div>
+                    <div style="font-size:12px; color:#333; line-height:1.5; white-space:pre-wrap;">${reply.text}</div>
+                </div>
+            </div>
+        `;
+    }).join('');
+
+    document.getElementById('modal-reply-text').value = '';
+    document.getElementById('modal-reply-text').dataset.ticketId = ticketId;
+    document.getElementById('ticket-modal').style.display = 'flex';
+}
+
+// Close ticket modal
+function closeTicketModal(e) {
+    if (!e || e.target === document.getElementById('ticket-modal')) {
+        document.getElementById('ticket-modal').style.display = 'none';
+    }
+}
+
+// Send ticket reply
+function sendTicketReply() {
+    const replyText = document.getElementById('modal-reply-text').value.trim();
+    if (!replyText) {
+        alert('返信を入力してください');
+        return;
+    }
+
+    const ticketId = document.getElementById('modal-reply-text').dataset.ticketId;
+    const ticket = ticketsData.find(t => t.id === ticketId);
+    if (!ticket) return;
+
+    // Add reply to ticket
+    const now = new Date();
+    const timeStr = now.toLocaleString('ja-JP', { year: 'numeric', month: '2-digit', day: '2-digit', hour: '2-digit', minute: '2-digit' }).replace(/\//g, '/');
+    
+    ticket.replies.push({
+        sender: 'partner',
+        senderLabel: 'あなた',
+        time: timeStr,
+        text: replyText
+    });
+
+    // Update status to "processing" if it was "pending"
+    if (ticket.status === 'pending') {
+        ticket.status = 'processing';
+        ticket.statusLabel = '対応中';
+    }
+
+    // Refresh modal
+    openTicketModal(ticketId);
+    alert('返信を送信しました');
+}
+
+// Submit new contact
+function submitContact(e) {
+    e.preventDefault();
+    alert('お問い合わせを送信しました。チケットはサポートチケットタブで確認できます。');
+    // Show ticket badge
+    document.getElementById('ticket-count-badge').style.display = 'inline-block';
+    // Could add new ticket to ticketsData here
+    switchTab('tickets');
+}
+
+// Initialize ticket count
+document.addEventListener('DOMContentLoaded', function() {
+    if (ticketsData.length > 0) {
+        document.getElementById('ticket-count-badge').style.display = 'inline-block';
+        document.getElementById('ticket-count-badge').textContent = ticketsData.length;
+    }
+
+    // Add event listeners for filters
+    document.getElementById('ticket-search').addEventListener('input', renderTicketsList);
+    document.getElementById('ticket-status-filter').addEventListener('change', renderTicketsList);
+});
+</script>
