@@ -1010,10 +1010,40 @@
             + 写真を追加する
           </button>
         </section>
+        
+        <section>
+          <div class="flex items-center gap-2 mb-4">
+            <div class="w-8 h-8 rounded-full bg-black text-white flex items-center justify-center text-xs font-bold">3</div>
+            <h3 class="font-bold">アップロード前の最終確認</h3>
+            <span class="text-[10px] text-gray-400 font-normal">※ すべてチェックしてください</span>
+          </div>
+          <div class="bg-blue-50/50 p-4 border border-blue-100 mb-4 flex gap-3 items-start">
+            <i class="fas fa-info-circle text-blue-500 mt-0.5"></i>
+            <p class="text-[11px] text-blue-900 leading-relaxed font-medium">差し戻しを防ぐため、アップロード前に必ず以下の項目を満たしているか確認してください。</p>
+          </div>
+          <div class="space-y-3 bg-white p-4 border border-gray-200 shadow-sm" id="uploadChecklist">
+            <label class="flex items-start gap-3 cursor-pointer group">
+              <input type="checkbox" class="upload-check mt-0.5 w-4 h-4 text-black border-gray-300 focus:ring-black" onchange="checkUploadConditions()">
+              <span class="text-xs text-gray-700 group-hover:text-black transition-colors">動画の長さは指定の範囲内（XX秒〜XX秒）ですか？</span>
+            </label>
+            <label class="flex items-start gap-3 cursor-pointer group">
+              <input type="checkbox" class="upload-check mt-0.5 w-4 h-4 text-black border-gray-300 focus:ring-black" onchange="checkUploadConditions()">
+              <span class="text-xs text-gray-700 group-hover:text-black transition-colors">画面のブレや映像の乱れ、傾きはありませんか？</span>
+            </label>
+            <label class="flex items-start gap-3 cursor-pointer group">
+              <input type="checkbox" class="upload-check mt-0.5 w-4 h-4 text-black border-gray-300 focus:ring-black" onchange="checkUploadConditions()">
+              <span class="text-xs text-gray-700 group-hover:text-black transition-colors">不要な映り込み（鏡への反射、個人情報、撮影者本人など）はありませんか？</span>
+            </label>
+            <label class="flex items-start gap-3 cursor-pointer group">
+              <input type="checkbox" class="upload-check mt-0.5 w-4 h-4 text-black border-gray-300 focus:ring-black" onchange="checkUploadConditions()">
+              <span class="text-xs text-gray-700 group-hover:text-black transition-colors">指定されたすべての部屋・設備（水回り、バルコニーなど）がもれなく撮影されていますか？</span>
+            </label>
+          </div>
+        </section>
       </div>
       <div class="p-6 bg-gray-50 border-t border-gray-200 flex justify-end gap-3 mt-4">
         <button class="btn px-8" onclick="closeModal('uploadModal')">キャンセル</button>
-        <button class="btn-black px-12" onclick="saveUpload()">アップロードを完了する</button>
+        <button id="btnSubmitUpload" class="btn-black px-12 opacity-50 cursor-not-allowed" onclick="saveUpload()" disabled>アップロードを完了する</button>
       </div>
     </div>
   </div>
@@ -1148,8 +1178,31 @@
       document.getElementById('upRoom').textContent = room;
       isFromRejected = fromRejected;
       resetPhotoList();
+      
+      const checklist = document.querySelectorAll('.upload-check');
+      if (checklist.length > 0) {
+        checklist.forEach(cb => cb.checked = false);
+        checkUploadConditions();
+      }
+      
       openModal('uploadModal');
     }
+
+    function checkUploadConditions() {
+      const checkboxes = document.querySelectorAll('.upload-check');
+      const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+      const btn = document.getElementById('btnSubmitUpload');
+      if (btn) {
+        if (allChecked) {
+          btn.disabled = false;
+          btn.classList.remove('opacity-50', 'cursor-not-allowed');
+        } else {
+          btn.disabled = true;
+          btn.classList.add('opacity-50', 'cursor-not-allowed');
+        }
+      }
+    }
+
     function saveUpload() {
       if (isFromRejected) { closeModal('uploadModal'); openModal('reSubmitConfirmModal'); }
       else { showToast('success','動画と写真をアップロードしました。審査待ちステータスへ移行します'); closeModal('uploadModal'); }

@@ -201,7 +201,30 @@
               </div>
 
               <div style="margin-top:16px;">
-                <button class="btn-black" style="width:100%;">アップロード</button>
+                <div style="margin-bottom:12px; background:#f9f9f9; padding:16px; border:1px solid #eee;">
+                  <div style="font-size:12px; font-weight:700; margin-bottom:10px; display:flex; align-items:center; gap:6px;">
+                    <i class="fas fa-check-square text-blue-600"></i> アップロード前の最終確認 <span style="font-size:10px; color:#999; font-weight:normal;">※すべてチェックしてください</span>
+                  </div>
+                  <div class="space-y-2">
+                    <label class="flex items-start gap-3 cursor-pointer">
+                      <input type="checkbox" class="room1-check mt-0.5 text-black focus:ring-black border-gray-300" onchange="checkUploadReady('room1')">
+                      <span class="text-xs text-gray-700 hover:text-black">動画の長さは指定の範囲内（XX秒〜XX秒）ですか？</span>
+                    </label>
+                    <label class="flex items-start gap-3 cursor-pointer">
+                      <input type="checkbox" class="room1-check mt-0.5 text-black focus:ring-black border-gray-300" onchange="checkUploadReady('room1')">
+                      <span class="text-xs text-gray-700 hover:text-black">画面のブレや映像の乱れ、傾きはありませんか？</span>
+                    </label>
+                    <label class="flex items-start gap-3 cursor-pointer">
+                      <input type="checkbox" class="room1-check mt-0.5 text-black focus:ring-black border-gray-300" onchange="checkUploadReady('room1')">
+                      <span class="text-xs text-gray-700 hover:text-black">不要な映り込み（鏡への反射、個人情報、撮影者本人など）はありませんか？</span>
+                    </label>
+                    <label class="flex items-start gap-3 cursor-pointer">
+                      <input type="checkbox" class="room1-check mt-0.5 text-black focus:ring-black border-gray-300" onchange="checkUploadReady('room1')">
+                      <span class="text-xs text-gray-700 hover:text-black">指定されたすべての部屋・設備（水回り、バルコニーなど）がもれなく撮影されていますか？</span>
+                    </label>
+                  </div>
+                </div>
+                <button id="btnUpload_room1" class="btn-black opacity-50 cursor-not-allowed" style="width:100%; transition:all 0.2s;" disabled>アップロード</button>
               </div>
             </div>
           </div>
@@ -245,7 +268,30 @@
               </div>
 
               <div style="margin-top:16px;">
-                <button class="btn-black" style="width:100%;">アップロード</button>
+                <div style="margin-bottom:12px; background:#f9f9f9; padding:16px; border:1px solid #eee;">
+                  <div style="font-size:12px; font-weight:700; margin-bottom:10px; display:flex; align-items:center; gap:6px;">
+                    <i class="fas fa-check-square text-blue-600"></i> アップロード前の最終確認 <span style="font-size:10px; color:#999; font-weight:normal;">※すべてチェックしてください</span>
+                  </div>
+                  <div class="space-y-2">
+                    <label class="flex items-start gap-3 cursor-pointer">
+                      <input type="checkbox" class="room2-check mt-0.5 text-black focus:ring-black border-gray-300" onchange="checkUploadReady('room2')">
+                      <span class="text-xs text-gray-700 hover:text-black">動画の長さは指定の範囲内（XX秒〜XX秒）ですか？</span>
+                    </label>
+                    <label class="flex items-start gap-3 cursor-pointer">
+                      <input type="checkbox" class="room2-check mt-0.5 text-black focus:ring-black border-gray-300" onchange="checkUploadReady('room2')">
+                      <span class="text-xs text-gray-700 hover:text-black">画面のブレや映像の乱れ、傾きはありませんか？</span>
+                    </label>
+                    <label class="flex items-start gap-3 cursor-pointer">
+                      <input type="checkbox" class="room2-check mt-0.5 text-black focus:ring-black border-gray-300" onchange="checkUploadReady('room2')">
+                      <span class="text-xs text-gray-700 hover:text-black">不要な映り込み（鏡への反射、個人情報、撮影者本人など）はありませんか？</span>
+                    </label>
+                    <label class="flex items-start gap-3 cursor-pointer">
+                      <input type="checkbox" class="room2-check mt-0.5 text-black focus:ring-black border-gray-300" onchange="checkUploadReady('room2')">
+                      <span class="text-xs text-gray-700 hover:text-black">指定されたすべての部屋・設備（水回り、バルコニーなど）がもれなく撮影されていますか？</span>
+                    </label>
+                  </div>
+                </div>
+                <button id="btnUpload_room2" class="btn-black opacity-50 cursor-not-allowed" style="width:100%; transition:all 0.2s;" disabled>アップロード</button>
               </div>
             </div>
           </div>
@@ -315,6 +361,22 @@
   </main>
 
   <script>
+    // Upload check
+    function checkUploadReady(roomId) {
+      const checkboxes = document.querySelectorAll('.' + roomId + '-check');
+      const allChecked = Array.from(checkboxes).every(cb => cb.checked);
+      const btn = document.getElementById('btnUpload_' + roomId);
+      if (btn) {
+        if (allChecked) {
+          btn.disabled = false;
+          btn.classList.remove('opacity-50', 'cursor-not-allowed');
+        } else {
+          btn.disabled = true;
+          btn.classList.add('opacity-50', 'cursor-not-allowed');
+        }
+      }
+    }
+
     // Toast notification
     function showToast(message) {
       const toast = document.querySelector('.toast');
