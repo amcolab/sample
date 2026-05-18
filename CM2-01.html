@@ -436,6 +436,51 @@
   </main>
 </div>
 
+<!-- ========== PLAN SELECTION MODAL ========== -->
+<div class="modal-bg" id="planSelectionModal">
+  <div class="modal" style="width:720px; max-width:95vw; display:flex; flex-direction:column;">
+    <div style="padding:20px 24px; border-bottom:1px solid #000; background:#f9f9f9;">
+      <div style="font-size:16px; font-weight:700;">契約プランを選んでください</div>
+      <div style="font-size:12px; color:#666; margin-top:4px;">ご注意</div>
+      <ul style="font-size:12px; color:#666; margin:8px 0 0 20px; line-height:1.6;">
+        <li>本日から3日以内に撮影してアップロードしてください。</li>
+        <li>各プランともMooM外の媒体での同一物件撮影禁止となる場合、成約手数料が発生します。</li>
+        <li>画像・写真提供期間は2年間保証させていただきます。それ以降は削除させていただく場合があります。</li>
+      </ul>
+    </div>
+    <div style="flex:1; overflow-y:auto; padding:24px; display:flex; gap:16px;">
+      <!-- Plan A -->
+      <div style="flex:1; border:2px solid #000; padding:24px; cursor:pointer; transition:all 0.2s;" id="planA-card" onclick="selectPlan('A')">
+        <input type="radio" name="plan" id="plan-a-radio" value="A" checked style="margin-right:8px;" />
+        <label for="plan-a-radio" style="cursor:pointer; font-weight:700; font-size:13px;">「説得」 報酬プラン</label>
+        <div style="font-size:11px; color:#666; margin-top:12px;">最大額度: <strong style="color:#000; font-size:12px;">¥10,000</strong>（税抜）</div>
+        <div style="font-size:11px; color:#666; margin-top:8px;">
+          <div style="font-weight:600; margin-bottom:6px;">✓ 説得機能</div>
+          <div style="margin-left:16px; line-height:1.6;">
+            アップロードいただいた画像・写真が達成できた場合、営業スキップボーナス（¥5,000/税抜）をお支払いします。
+          </div>
+        </div>
+      </div>
+      <!-- Plan B -->
+      <div style="flex:1; border:2px solid #ccc; padding:24px; cursor:pointer; transition:all 0.2s;" id="planB-card" onclick="selectPlan('B')">
+        <input type="radio" name="plan" id="plan-b-radio" value="B" style="margin-right:8px;" />
+        <label for="plan-b-radio" style="cursor:pointer; font-weight:700; font-size:13px;">「成約」 報酬プラン</label>
+        <div style="font-size:11px; color:#666; margin-top:12px;">最大額度: <strong style="color:#000; font-size:12px;">¥34,650</strong>（税抜）</div>
+        <div style="font-size:11px; color:#666; margin-top:8px;">
+          <div style="font-weight:600; margin-bottom:6px;">✓ 成約機能</div>
+          <div style="margin-left:16px; line-height:1.6;">
+            成約物件プランより高い金額プランをお支払いしています。
+          </div>
+        </div>
+      </div>
+    </div>
+    <div style="padding:16px 24px; border-top:1px solid #000; display:flex; justify-content:flex-end; gap:8px; background:#fff;">
+      <button class="btn" onclick="closePlanSelectionModal()">キャンセル</button>
+      <button class="btn-black" onclick="confirmPlanSelection()">このプランで予約する →</button>
+    </div>
+  </div>
+</div>
+
 <!-- ========== STEP 1: 規約確認 MODAL ========== -->
 <div class="modal-bg" id="regulationModal">
   <div class="modal" style="width:560px; max-height:90vh; display:flex; flex-direction:column;">
@@ -911,7 +956,7 @@
         '<div style="font-weight:700; color:#059669;">' + r.price + '</div>' +
         '<div>' + deadlineHtml + '</div>' +
         '<div style="text-align:right;">' +
-          '<button class="' + btnClass + ' btn-accent" onclick="openDetailModal(\'AD04.html\')">' + btnLabel + '</button>' +
+          '<button class="' + btnClass + ' btn-accent" onclick="openPlanSelectionModal(\'' + r.name + '\', \'' + r.price + '\')">' + btnLabel + '</button>' +
         '</div>' +
       '</div>';
     });
@@ -1009,6 +1054,55 @@
   var slotData = {};
 
   // ─── Modal flow ──────────────────────────────────────
+  function openPlanSelectionModal(building, price) {
+    currentBuilding = building;
+    currentPrice = price;
+    // Reset to plan A by default
+    document.getElementById('plan-a-radio').checked = true;
+    document.getElementById('plan-b-radio').checked = false;
+    updatePlanCardStyles('A');
+    document.getElementById('planSelectionModal').classList.add('open');
+  }
+
+  function selectPlan(planType) {
+    if (planType === 'A') {
+      document.getElementById('plan-a-radio').checked = true;
+      document.getElementById('plan-b-radio').checked = false;
+    } else {
+      document.getElementById('plan-a-radio').checked = false;
+      document.getElementById('plan-b-radio').checked = true;
+    }
+    updatePlanCardStyles(planType);
+  }
+
+  function updatePlanCardStyles(selectedPlan) {
+    const cardA = document.getElementById('planA-card');
+    const cardB = document.getElementById('planB-card');
+    if (selectedPlan === 'A') {
+      cardA.style.borderColor = '#000';
+      cardA.style.backgroundColor = '#f9f9f9';
+      cardB.style.borderColor = '#ccc';
+      cardB.style.backgroundColor = '#fff';
+    } else {
+      cardA.style.borderColor = '#ccc';
+      cardA.style.backgroundColor = '#fff';
+      cardB.style.borderColor = '#000';
+      cardB.style.backgroundColor = '#f9f9f9';
+    }
+  }
+
+  function closePlanSelectionModal() {
+    document.getElementById('planSelectionModal').classList.remove('open');
+  }
+
+  function confirmPlanSelection() {
+    const selectedPlan = document.getElementById('plan-a-radio').checked ? 'A' : 'B';
+    const planNames = { 'A': '「説得」報酬プラン', 'B': '「成約」報酬プラン' };
+    currentPlan = planNames[selectedPlan];
+    document.getElementById('planSelectionModal').classList.remove('open');
+    openRegulationModal(currentBuilding, currentPlan, currentPrice);
+  }
+
   function openRegulationModal(building, plan, price) {
     currentBuilding = building; currentPlan = plan; currentPrice = price;
     document.getElementById('reg-building-name').textContent = building;
@@ -1048,7 +1142,7 @@
   }
 
   function closeAll() {
-    ['regulationModal','bookingModal','successModal','stationModal'].forEach(function(id){
+    ['planSelectionModal','regulationModal','bookingModal','successModal','stationModal'].forEach(function(id){
       const el = document.getElementById(id);
       if (el) el.classList.remove('open');
     });
