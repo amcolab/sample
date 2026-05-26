@@ -90,7 +90,7 @@
 
         /* Event detail popup */
         #evPopupOverlay {
-            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 600;
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 680;
             align-items: center; justify-content: center;
         }
         #evPopupOverlay.open { display: flex; }
@@ -112,6 +112,75 @@
         .pop-val {
             flex: 1; padding: 10px 14px; font-size: 13px; display: flex; align-items: center;
             line-height: 1.6;
+        }
+
+        /* Cancel booking popup */
+        #cancelPopupOverlay {
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 700;
+            align-items: center; justify-content: center;
+        }
+        #cancelPopupOverlay.open { display: flex; }
+        #cancelPopup {
+            background: #fff; border: 1px solid #000; width: 600px; max-width: 92vw;
+            max-height: 88vh; overflow-y: auto; box-shadow: 0 4px 24px rgba(0,0,0,0.15);
+        }
+        .cancel-section {
+            padding: 16px; border-bottom: 1px solid #000;
+        }
+        .cancel-section:last-child { border-bottom: none; }
+        .cancel-title {
+            font-size: 14px; font-weight: 700; margin-bottom: 12px;
+            padding-bottom: 8px; border-bottom: 1px solid #e8e8e8;
+        }
+        .cancel-reason {
+            margin-bottom: 10px;
+        }
+        .cancel-reason label {
+            display: flex; align-items: flex-start; gap: 8px; cursor: pointer;
+            font-size: 13px; padding: 6px 0;
+        }
+        .cancel-reason input[type="radio"] {
+            margin-top: 2px; cursor: pointer;
+        }
+        .cancel-textarea {
+            width: 100%; border: 1px solid #000; padding: 10px;
+            font-size: 12px; font-family: inherit; resize: vertical;
+            min-height: 80px; box-sizing: border-box;
+        }
+        .cancel-buttons {
+            display: flex; gap: 8px; justify-content: flex-end; margin-top: 14px;
+        }
+        .cancel-btn-cancel {
+            flex: 1; border: 1px solid #000; padding: 10px 16px;
+            background: #fff; cursor: pointer; font-size: 12px; font-weight: 700;
+        }
+        .cancel-btn-confirm {
+            background: #f44336; color: #fff; border: none; border-radius: 24px;
+            padding: 10px 32px; cursor: pointer; font-size: 13px; font-weight: 700;
+            flex: 1; max-width: 180px;
+        }
+        .cancel-btn-confirm:hover { background: #d32f2f; }
+
+        /* Events list popup */
+        #eventsListPopupOverlay {
+            display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.4); z-index: 650;
+            align-items: center; justify-content: center;
+        }
+        #eventsListPopupOverlay.open { display: flex; }
+        #eventsListPopup {
+            background: #fff; border: 1px solid #ccc; width: 500px; max-width: 92vw;
+            max-height: 88vh; overflow-y: auto; box-shadow: 0 4px 24px rgba(0,0,0,0.15);
+        }
+        .evlist-item {
+            padding: 12px 16px; border-bottom: 1px solid #eee; cursor: pointer;
+            font-size: 13px; display: flex; justify-content: space-between; align-items: center;
+        }
+        .evlist-item:hover { background: #f9f9f9; }
+        .evlist-time {
+            font-weight: 700; color: #1a202c;
+        }
+        .evlist-title {
+            flex: 1; margin-left: 12px;
         }
     </style>
 </head>
@@ -543,6 +612,18 @@ function renderCalendar() {
             dateDiv.textContent = cellDate.getDate() + '日';
             td.appendChild(dateDiv);
 
+            // Click on date cell to show events
+            if (inMonth) {
+                td.style.cursor = 'pointer';
+                (function(dateStr) {
+                    td.onclick = function(e) { 
+                        if (!e.target.classList.contains('ev-bar')) {
+                            onDateCellClick(dateStr);
+                        }
+                    };
+                })(cellStr);
+            }
+
             // Events for this day
             var dayEvs = EVENTS.filter(function(e) { return e.date === cellStr; });
             dayEvs.sort(function(a, b) { return a.startHour - b.startHour; });
@@ -615,10 +696,78 @@ function openEvPopup(ev) {
             + '</div>';
     }).join('');
     document.getElementById('evPopupBody').innerHTML = html;
+    window.currentEventForCancel = ev;
     document.getElementById('evPopupOverlay').classList.add('open');
 }
 function closeEvPopup() {
     document.getElementById('evPopupOverlay').classList.remove('open');
+}
+
+/* ===== CANCEL BOOKING POPUP ===== */
+function openCancelPopup() {
+    document.getElementById('evPopupOverlay').classList.remove('open');
+    document.getElementById('cancelPopupOverlay').classList.add('open');
+    document.getElementById('cancelDetails').value = '';
+    document.querySelectorAll('input[name="cancelReason"]').forEach(function(r) { r.checked = false; });
+}
+function closeCancelPopup() {
+    document.getElementById('cancelPopupOverlay').classList.remove('open');
+}
+function submitCancel() {
+    var reason = document.querySelector('input[name="cancelReason"]:checked');
+    var details = document.getElementById('cancelDetails').value;
+    
+    if (!reason) {
+        alert('キャンセル理由を選択してください。');
+        return;
+    }
+    
+    console.log('キャンセル理由:', reason.value);
+    console.log('詳細:', details);
+    
+    alert('キャンセルしました。');
+    closeCancelPopup();
+    window.currentEventForCancel = null;
+}
+
+/* ===== DATE CELL CLICK ===== */
+function onDateCellClick(dateStr) {
+    var evs = EVENTS.filter(function(e) { return e.date === dateStr && !e.done; });
+    if (evs.length === 0) {
+        alert('この日付には予約がありません。');
+        return;
+    }
+    if (evs.length === 1) {
+        openEvPopup(evs[0]);
+    } else {
+        // Multiple pending events - show list
+        showEventsListPopup(dateStr, evs);
+    }
+}
+
+function showEventsListPopup(dateStr, evs) {
+    var d = new Date(dateStr);
+    var dateLabel = (d.getMonth()+1) + '月' + d.getDate() + '日';
+    
+    var html = '<div style="padding:14px 16px; border-bottom:1px solid #eee; font-size:13px; font-weight:700;">'
+        + dateLabel + ' (' + evs.length + '件)'
+        + '</div>';
+    
+    evs.forEach(function(ev) {
+        html += '<div class="evlist-item" onclick="closeEventsListPopup(); openEvPopup(window.eventsListData[' + EVENTS.indexOf(ev) + '])">'
+            + '<span class="evlist-time">' + hh(ev.startHour) + '</span>'
+            + '<span class="evlist-title">' + ev.title + '</span>'
+            + '<span style="color:#888; font-size:11px;">→</span>'
+            + '</div>';
+    });
+    
+    document.getElementById('eventsListBody').innerHTML = html;
+    window.eventsListData = EVENTS;
+    document.getElementById('eventsListPopupOverlay').classList.add('open');
+}
+
+function closeEventsListPopup() {
+    document.getElementById('eventsListPopupOverlay').classList.remove('open');
 }
 </script>
 
@@ -630,6 +779,63 @@ function closeEvPopup() {
             <button onclick="closeEvPopup()" style="border:1px solid #000; padding:4px 12px; background:#fff; cursor:pointer; font-size:14px; font-family:inherit; line-height:1;">✕</button>
         </div>
         <div id="evPopupBody"></div>
+        <div style="padding:14px 20px; border-top:1px solid #000; display:flex; gap:8px; justify-content:flex-end;">
+            <button onclick="openCancelPopup()" style="border:1px solid #000; padding:8px 20px; background:#fff; cursor:pointer; font-size:12px; font-weight:700;">キャンセル</button>
+        </div>
+    </div>
+</div>
+
+<!-- Cancel Booking Popup -->
+<div id="cancelPopupOverlay" onclick="if(event.target===this) closeCancelPopup()">
+    <div id="cancelPopup">
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:16px 20px; border-bottom:1px solid #000;">
+            <div style="font-size:16px; font-weight:700;">内見予約のキャンセル</div>
+            <button onclick="closeCancelPopup()" style="border:1px solid #000; padding:4px 12px; background:#fff; cursor:pointer; font-size:14px; font-family:inherit; line-height:1;">✕</button>
+        </div>
+
+        <div class="cancel-section">
+            <div class="cancel-title">🔴 キャンセル理由</div>
+            <div class="cancel-reason">
+                <label>
+                    <input type="radio" name="cancelReason" value="内見時間が変わったため">
+                    <span>内見時間が変わったため</span>
+                </label>
+            </div>
+            <div class="cancel-reason">
+                <label>
+                    <input type="radio" name="cancelReason" value="お客様が他の物件で決めたため">
+                    <span>お客様が他の物件で決めたため</span>
+                </label>
+            </div>
+            <div class="cancel-reason">
+                <label>
+                    <input type="radio" name="cancelReason" value="その他">
+                    <span>その他</span>
+                </label>
+            </div>
+        </div>
+
+        <div class="cancel-section">
+            <div class="cancel-title">備考</div>
+            <div style="font-size:11px; color:#666; margin-bottom:8px;">その他の場合はこちらにキャンセル理由をご入力ください。</div>
+            <textarea id="cancelDetails" class="cancel-textarea" placeholder="キャンセル理由の詳細を入力してください"></textarea>
+        </div>
+
+        <div class="cancel-section" style="display:flex; gap:8px; justify-content:center;">
+            <button onclick="closeCancelPopup()" class="cancel-btn-cancel">戻る</button>
+            <button onclick="submitCancel()" class="cancel-btn-confirm">✕ キャンセル</button>
+        </div>
+    </div>
+</div>
+
+<!-- Events List Popup -->
+<div id="eventsListPopupOverlay" onclick="if(event.target===this) closeEventsListPopup()">
+    <div id="eventsListPopup">
+        <div style="display:flex; justify-content:space-between; align-items:center; padding:14px 16px; border-bottom:1px solid #000;">
+            <div style="font-size:14px; font-weight:700;">この日の予約一覧</div>
+            <button onclick="closeEventsListPopup()" style="border:1px solid #000; padding:4px 12px; background:#fff; cursor:pointer; font-size:14px; font-family:inherit; line-height:1;">✕</button>
+        </div>
+        <div id="eventsListBody"></div>
     </div>
 </div>
 
