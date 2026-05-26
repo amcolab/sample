@@ -108,7 +108,7 @@
             </div>
           </div>
           <div class="flex items-center gap-1">
-            <span class="text-xs text-gray-500 whitespace-nowrap">支払ステータス</span>
+            <span class="text-xs text-gray-500 whitespace-nowrap">入金ステータス</span>
             <div class="border border-wireframe-border bg-white px-3 py-2 text-xs flex items-center gap-2 min-w-[130px]">
               <span>すべて</span><span class="text-[8px]">▼</span>
             </div>
@@ -128,16 +128,16 @@
             <div class="text-[10px] text-gray-400 border-t border-gray-200 pt-2">税抜 / 承認済み分のみ</div>
           </div>
           <div class="wireframe-box p-5 space-y-2">
-            <div class="text-xs font-bold">支払済み額</div>
+            <div class="text-xs font-bold">入金済み額</div>
             <div class="text-3xl font-bold">¥0</div>
             <div class="text-[10px] text-gray-400 border-t border-gray-200 pt-2">確定・振込済分</div>
           </div>
           <div class="wireframe-box p-5 space-y-2">
-            <div class="text-xs font-bold">未払い額</div>
+            <div class="text-xs font-bold">未入金額</div>
             <div class="text-3xl font-bold">¥24,500</div>
             <div class="space-y-0.5 border-t border-gray-200 pt-2">
-              <div class="flex justify-between text-[10px]"><span class="text-gray-500">未払い</span><span>¥24,500</span></div>
-              <div class="flex justify-between text-[10px]"><span class="text-gray-500">支払予定</span><span>¥0</span></div>
+              <div class="flex justify-between text-[10px]"><span class="text-gray-500">未入金</span><span>¥24,500</span></div>
+              <div class="flex justify-between text-[10px]"><span class="text-gray-500">入金予定</span><span>¥0</span></div>
             </div>
           </div>
           <div class="wireframe-box p-5 space-y-2">
@@ -161,56 +161,56 @@
                 <th>対象月</th>
                 <th class="text-right">対応案件数</th>
                 <th class="text-right">報酬合計（税抜）</th>
-                <th class="text-right">支払済み額</th>
-                <th class="text-right">未払い額</th>
-                <th>支払ステータス</th>
+                <th class="text-right">入金済み額</th>
+                <th class="text-right">未入金額</th>
+                <th>入金ステータス</th>
                 <th>アクション</th>
               </tr>
             </thead>
             <tbody>
-              <tr class="hover:bg-gray-50 cursor-pointer" onclick="openDrawer('2025年02月度','未払い')">
+              <tr class="hover:bg-gray-50 cursor-pointer" onclick="openDrawer('2025年02月度','未入金')">
                 <td class="font-bold text-xs">2025年02月度</td>
                 <td class="text-right">5</td>
                 <td class="text-right">¥24,500</td>
                 <td class="text-right">¥0</td>
                 <td class="text-right font-bold text-red-600">¥24,500</td>
-                <td><span class="chip">未払い</span></td>
+                <td><span class="chip">未入金</span></td>
                 <td><button class="text-xs underline">詳細</button></td>
               </tr>
-              <tr class="hover:bg-gray-50 cursor-pointer" onclick="openDrawer('2025年01月度','支払済み')">
+              <tr class="hover:bg-gray-50 cursor-pointer" onclick="openDrawer('2025年01月度','入金済み')">
                 <td class="font-bold text-xs">2025年01月度</td>
                 <td class="text-right">7</td>
                 <td class="text-right">¥32,000</td>
                 <td class="text-right">¥32,000</td>
                 <td class="text-right">¥0</td>
-                <td><span class="chip bold">支払済み</span></td>
+                <td><span class="chip bold">入金済み</span></td>
                 <td><button class="text-xs underline">詳細</button></td>
               </tr>
-              <tr class="hover:bg-gray-50 cursor-pointer" onclick="openDrawer('2024年12月度','支払予定')">
+              <tr class="hover:bg-gray-50 cursor-pointer" onclick="openDrawer('2024年12月度','入金予定')">
                 <td class="font-bold text-xs">2024年12月度</td>
                 <td class="text-right">4</td>
                 <td class="text-right">¥18,500</td>
                 <td class="text-right">¥0</td>
                 <td class="text-right font-bold">¥18,500</td>
-                <td><span class="chip">支払予定</span></td>
+                <td><span class="chip">入金予定</span></td>
                 <td><button class="text-xs underline">詳細</button></td>
               </tr>
-              <tr class="hover:bg-gray-50 cursor-pointer" onclick="openDrawer('2024年11月度','支払済み')">
+              <tr class="hover:bg-gray-50 cursor-pointer" onclick="openDrawer('2024年11月度','入金済み')">
                 <td class="font-bold text-xs">2024年11月度</td>
                 <td class="text-right">6</td>
                 <td class="text-right">¥28,000</td>
                 <td class="text-right">¥28,000</td>
                 <td class="text-right">¥0</td>
-                <td><span class="chip bold">支払済み</span></td>
+                <td><span class="chip bold">入金済み</span></td>
                 <td><button class="text-xs underline">詳細</button></td>
               </tr>
-              <tr class="hover:bg-gray-50 cursor-pointer" onclick="openDrawer('2024年10月度','支払済み')">
+              <tr class="hover:bg-gray-50 cursor-pointer" onclick="openDrawer('2024年10月度','入金済み')">
                 <td class="font-bold text-xs">2024年10月度</td>
                 <td class="text-right">3</td>
                 <td class="text-right">¥14,000</td>
                 <td class="text-right">¥14,000</td>
                 <td class="text-right">¥0</td>
-                <td><span class="chip bold">支払済み</span></td>
+                <td><span class="chip bold">入金済み</span></td>
                 <td><button class="text-xs underline">詳細</button></td>
               </tr>
             </tbody>
@@ -232,8 +232,8 @@
     </div>
     <div class="flex-1 overflow-y-auto p-6 space-y-6">
       <div class="flex items-center gap-3 flex-wrap">
-        <span class="text-xs text-gray-500">支払ステータス</span>
-        <span id="drawer-status" class="chip bold">未払い</span>
+        <span class="text-xs text-gray-500">入金ステータス</span>
+        <span id="drawer-status" class="chip bold">未入金</span>
       </div>
 
       <!-- 報酬サマリーカード -->
@@ -243,9 +243,9 @@
           <div class="text-xs text-gray-500">報酬合計（税抜 / 承認済み分のみ）</div>
           <div class="text-3xl font-bold" id="drawer-total">¥24,500</div>
           <div class="border-t border-gray-200 pt-3 space-y-1.5">
-            <div class="flex justify-between text-xs"><span class="text-gray-500">支払済み額</span><span id="drawer-paid">¥0</span></div>
-            <div class="flex justify-between text-xs"><span class="text-gray-500">未払い額</span><span id="drawer-unpaid" class="font-bold text-red-600">¥24,500</span></div>
-            <div class="flex justify-between text-xs"><span class="text-gray-500">支払予定日</span><span class="text-gray-400">2025/03/15</span></div>
+            <div class="flex justify-between text-xs"><span class="text-gray-500">入金済み額</span><span id="drawer-paid">¥0</span></div>
+            <div class="flex justify-between text-xs"><span class="text-gray-500">未入金額</span><span id="drawer-unpaid" class="font-bold text-red-600">¥24,500</span></div>
+            <div class="flex justify-between text-xs"><span class="text-gray-500">入金予定日</span><span class="text-gray-400">2025/03/15</span></div>
           </div>
         </div>
       </div>
