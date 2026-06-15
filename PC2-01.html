@@ -35,6 +35,11 @@
     .local-tab.active { @apply bg-white font-bold; }
     #drawer { transition: transform 0.2s ease; transform: translateX(100%); }
     #drawer.open { transform: translateX(0); }
+    .dropdown-menu { position:absolute; background:#fff; border:1px solid #000; z-index:50; display:none; }
+    .dropdown-menu.active { display:block; }
+    .dropdown-item { padding:8px 12px; cursor:pointer; font-size:12px; }
+    .dropdown-item:hover { background:#f0f0f0; }
+    .dropdown-wrapper { position:relative; }
       .nav-item { display:block; padding:10px 24px; cursor:pointer; color:#333; font-size:13px; text-decoration:none; }
       .nav-item:hover { background:#f0f0f0; }
       .nav-active { font-weight:700; border-left:4px solid #000; background:#f9f9f9; padding:10px 20px; display:block; font-size:13px; color:#000; text-decoration:none; }
@@ -101,10 +106,35 @@
       <!-- Filter -->
       <div class="wireframe-box p-4">
         <div class="flex flex-wrap gap-3 items-center">
-          <div class="flex items-center gap-1">
+          <div class="flex items-center gap-1 relative dropdown-wrapper">
+            <span class="text-xs text-gray-500 whitespace-nowrap">対象年</span>
+            <div class="border border-wireframe-border bg-white px-3 py-2 text-xs flex items-center gap-2 min-w-[100px] cursor-pointer" onclick="toggleYearDropdown()">
+              <span id="yearDisplay">2025年</span><span class="text-[8px]">▼</span>
+            </div>
+            <div id="yearDropdown" class="dropdown-menu" style="top:100%; left:0; min-width:100px;">
+              <div class="dropdown-item" onclick="selectYear('2024年')">2024年</div>
+              <div class="dropdown-item" onclick="selectYear('2025年')">2025年</div>
+              <div class="dropdown-item" onclick="selectYear('2026年')">2026年</div>
+            </div>
+          </div>
+          <div class="flex items-center gap-1 relative dropdown-wrapper">
             <span class="text-xs text-gray-500 whitespace-nowrap">対象月</span>
-            <div class="border border-wireframe-border bg-white px-3 py-2 text-xs flex items-center gap-2 min-w-[130px]">
-              <span>2025年02月度</span><span class="text-[8px]">▼</span>
+            <div class="border border-wireframe-border bg-white px-3 py-2 text-xs flex items-center gap-2 min-w-[100px] cursor-pointer" onclick="toggleMonthDropdown()">
+              <span id="monthDisplay">02月度</span><span class="text-[8px]">▼</span>
+            </div>
+            <div id="monthDropdown" class="dropdown-menu" style="top:100%; left:0; min-width:100px;">
+              <div class="dropdown-item" onclick="selectMonth('01月度')">01月度</div>
+              <div class="dropdown-item" onclick="selectMonth('02月度')">02月度</div>
+              <div class="dropdown-item" onclick="selectMonth('03月度')">03月度</div>
+              <div class="dropdown-item" onclick="selectMonth('04月度')">04月度</div>
+              <div class="dropdown-item" onclick="selectMonth('05月度')">05月度</div>
+              <div class="dropdown-item" onclick="selectMonth('06月度')">06月度</div>
+              <div class="dropdown-item" onclick="selectMonth('07月度')">07月度</div>
+              <div class="dropdown-item" onclick="selectMonth('08月度')">08月度</div>
+              <div class="dropdown-item" onclick="selectMonth('09月度')">09月度</div>
+              <div class="dropdown-item" onclick="selectMonth('10月度')">10月度</div>
+              <div class="dropdown-item" onclick="selectMonth('11月度')">11月度</div>
+              <div class="dropdown-item" onclick="selectMonth('12月度')">12月度</div>
             </div>
           </div>
           <div class="flex items-center gap-1">
@@ -320,6 +350,39 @@
     const d=document.getElementById('userMenuDrop');
     d.style.display=d.style.display==='block'?'none':'block';
   }
+  
+  function toggleYearDropdown(){
+    const dropdown = document.getElementById('yearDropdown');
+    dropdown.classList.toggle('active');
+    document.getElementById('monthDropdown').classList.remove('active');
+  }
+  
+  function toggleMonthDropdown(){
+    const dropdown = document.getElementById('monthDropdown');
+    dropdown.classList.toggle('active');
+    document.getElementById('yearDropdown').classList.remove('active');
+  }
+  
+  function selectYear(year){
+    document.getElementById('yearDisplay').textContent = year;
+    document.getElementById('yearDropdown').classList.remove('active');
+  }
+  
+  function selectMonth(month){
+    document.getElementById('monthDisplay').textContent = month;
+    document.getElementById('monthDropdown').classList.remove('active');
+  }
+  
+  // Close dropdowns when clicking outside
+  document.addEventListener('click', function(event){
+    const yearDropdown = document.getElementById('yearDropdown');
+    const monthDropdown = document.getElementById('monthDropdown');
+    if(!event.target.closest('.dropdown-wrapper')){
+      yearDropdown.classList.remove('active');
+      monthDropdown.classList.remove('active');
+    }
+  });
+  
   function openDrawer(month, status) {
     document.getElementById('drawer-title').textContent = '報酬明細詳細 — ' + month;
     document.getElementById('drawer-status').textContent = status;
