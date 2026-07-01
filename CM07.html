@@ -1028,7 +1028,13 @@
         <div style="font-weight:600;"><span id="rejectBuilding"></span> / <span id="rejectRoom" style="color:#2563eb;"></span></div>
       </div>
       <h3 class="text-lg font-bold mb-2">この案件を辞退しますか？</h3>
-      <p class="text-xs text-gray-500 mb-8">辞退する場合、他のカメラマンへ案件が譲渡されます。<br>「はい」を選ぶと、この案件は表示されなくなります。</p>
+      <p class="text-xs text-gray-500 mb-4">辞退する場合、他のカメラマンへ案件が譲渡されます。<br>「はい」を選ぶと、この案件は表示されなくなります。</p>
+      <div class="bg-red-50 border border-red-200 rounded-lg p-3 mb-6 text-left">
+        <p class="text-[11px] text-red-700 leading-5">
+          ※自ら辞退した場合、ランクの減点対象となり、ペナルティにつながる可能性があります。<br>
+          万が一やむを得ず参加できない場合は、必ず管理者へご連絡ください。管理者が対応を判断いたします。
+        </p>
+      </div>
       <div class="flex gap-3">
         <button class="flex-1 btn py-3" onclick="closeModal('rejectModal')">いいえ、戻る</button>
         <button class="flex-1 btn-black py-3" onclick="confirmReject()">はい、辞退する</button>
